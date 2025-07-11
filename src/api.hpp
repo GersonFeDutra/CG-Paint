@@ -10,8 +10,8 @@
     static_assert(false, "Não implementado para macOS");
 #elif defined(__linux__) || defined(__unix__) || defined(unix) || defined(__unix)
     // Linux
-#else
 	#include <GL/glut.h>
 	#include <GL/freeglut.h>
+#else
     static_assert(false, "Sistema operacional desconhecido");
 #endif

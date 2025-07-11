@@ -1,6 +1,10 @@
 #pragma once
 
-#include <numbers> // Inclui algumas funções matemáticas básicas
+#include <random>
+#include <numbers>
+
+// Inclui algumas funções matemáticas básicas
+#include "../api.hpp"
 
 namespace cg
 {

@@ -127,7 +127,7 @@ void drawArcText(const char* text, float radius, float startAngle, float endAngl
  */
 inline void genCircleAuto(Vec2 center, float radius, float quality = 1.5f, int min_offset = 12, int limit = 2048) {
     int segs = int(quality * radius) + min_offset; // Valor base linear + offset mínimo
-    genCircle(center, radius, min(segs, limit));
+    genCircle(center, radius, std::min(segs, limit));
 }
 
 

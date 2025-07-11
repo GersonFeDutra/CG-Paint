@@ -1,8 +1,3 @@
-# Configure vcpkg toolchain if not already set
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
-
 cmake_minimum_required(VERSION 3.16)
 project(MyOpenGLApp LANGUAGES CXX)
 
@@ -17,6 +12,11 @@ add_executable(MyOpenGLApp ${SOURCES})
 target_include_directories(MyOpenGLApp PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 if(MSVC)
+    # Configure vcpkg toolchain if not already set
+    if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+    endif()
+
     # Visual Studio (MSVC)
     find_package(OpenGL REQUIRED)
     find_package(FreeGLUT REQUIRED)
