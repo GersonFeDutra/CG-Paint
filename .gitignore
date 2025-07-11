@@ -1,0 +1,5 @@
+# todos os objetos de compilação devem ser gerados aqui
+build/
+
+# arquivos temporários
+*.tmp
