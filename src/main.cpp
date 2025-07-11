@@ -8,8 +8,8 @@
 #include "cg/geometry.hpp"
 
 
-const cg::Vec2 FLAG_SIZE{20, 14};
-const cg::Vec2 WINDOW_SIZE{FLAG_SIZE * 30}; // aspect ratio: 10:7
+static constexpr cg::Vec2 FLAG_SIZE{20, 14};
+static constexpr cg::Vec2 WINDOW_SIZE{FLAG_SIZE * 30}; // aspect ratio: 10:7
 
 struct FlagColors {
     static const cg::Color GREEN, YELLOW, BLUE, WHITE;
@@ -104,9 +104,7 @@ void display()
          * @param radialCoords Coordenadas em relação ao centro do mapa, numa grade de 1/9.5 do raio por quadrante.
          * Referência: <https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_Brazil_%28dimensions%29.svg>.
          */
-        Star(uint8_t size, Vec2 radialCoords) : radius(radius), coords(radialCoords) {
-            float radius = starSizes[size - 1];
-
+        Star(uint8_t size, Vec2 radialCoords) : radius(starSizes[size - 1]), coords(radialCoords) {
             coords.y -= 0.5f;
             coords = CENTER + coords * CELL_SCALAR;
             genStar(coords, radius, 0.45f);
@@ -192,7 +190,7 @@ void display()
 int main(int argc, char** argv) {
     glutInit(&argc, argv); // Inicializa o GLUT
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_MULTISAMPLE); // modo de exibição: frame buffer, modelo de cor, e antialias ativado
-    glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
     glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y); // tamanho da área interna da janela (coordenadas de tela)
     glutCreateWindow("Trabalho CG [Open GL]: Bandeira do Brasil");
 

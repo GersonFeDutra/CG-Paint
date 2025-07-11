@@ -1,14 +1,15 @@
 #pragma once
-#include <cmath> // Inclui algumas funções matemáticas básicas
+
+#include <numbers> // Inclui algumas funções matemáticas básicas
 
 namespace cg
 {
 
 template <typename T>
-constexpr T TAU = static_cast<T>(2 * M_PI);
+constexpr T TAU = std::numbers::pi_v<T> * static_cast<T>(2);
 
 template <typename T>
-constexpr T PI = static_cast<T>(M_PI);
+constexpr T PI = std::numbers::pi_v<T>;
 
 
 struct Vec2 {

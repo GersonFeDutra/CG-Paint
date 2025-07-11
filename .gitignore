@@ -1,5 +1,7 @@
 # todos os objetos de compilação devem ser gerados aqui
 build/
+# Configurações da IDE Visual Studio
+.vs/
 
 # arquivos temporários
 *.tmp

@@ -1,3 +1,8 @@
+# Configure vcpkg toolchain if not already set
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
 cmake_minimum_required(VERSION 3.16)
 project(MyOpenGLApp LANGUAGES CXX)
 
@@ -14,22 +19,15 @@ target_include_directories(MyOpenGLApp PRIVATE ${PROJECT_SOURCE_DIR}/src)
 if(MSVC)
     # Visual Studio (MSVC)
     find_package(OpenGL REQUIRED)
-    find_path(FREEGLUT_INCLUDE_DIR GL/freeglut.h)
-    find_library(FREEGLUT_LIBRARY NAMES freeglut)
+    find_package(FreeGLUT REQUIRED)
 
-    if (NOT FREEGLUT_INCLUDE_DIR OR NOT FREEGLUT_LIBRARY)
-        message(FATAL_ERROR "FreeGLUT não encontrado no MSVC. Instale via vcpkg ou configure os paths manualmente.")
-    endif()
-
-    target_include_directories(MyOpenGLApp PRIVATE ${FREEGLUT_INCLUDE_DIR})
     target_link_libraries(MyOpenGLApp
-        ${FREEGLUT_LIBRARY}
+        PRIVATE
+        FreeGLUT::freeglut
         OpenGL::GL
         OpenGL::GLU
-        opengl32.lib
-        glu32.lib
-        user32.lib
-        gdi32.lib
+        user32
+        gdi32
     )
 
 elseif(WIN32)
