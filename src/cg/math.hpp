@@ -1,10 +1,19 @@
 #pragma once
 
-#include <random>
-#include <numbers>
+#include "../api.hpp"
+
+// Windows Macros may override later std::min / std::max uses
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
 
 // Inclui algumas funções matemáticas básicas
-#include "../api.hpp"
+#include <random>
+#include <numbers>
 
 namespace cg
 {
