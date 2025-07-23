@@ -4,6 +4,10 @@
 #include <cstring> // Manipulação de cadeias de caracteres
 #include <random>
 
+#include "util.hpp"
+
+#include "facade/gui.hpp"
+
 #include "cg/math.hpp"
 #include "cg/geometry.hpp"
 
@@ -19,7 +23,7 @@ const cg::Color FlagColors::YELLOW{255, 203, 0};
 const cg::Color FlagColors::BLUE{48, 38, 129};
 const cg::Color FlagColors::WHITE{255, 255, 255};
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define _ENABLE_ZOOM 1
 #endif
 
@@ -54,12 +58,14 @@ int init(void)
 }
 
 // Referência para a construção matemática da bandeira: <https://youtu.be/yBjX9jLuLSY>
+/* Loop principal de desenho. */
 void display()
 {
+    Gui::newFrame();
+
     using namespace cg;
 
-    /* Loop principal de desenho */
-    glClear(GL_COLOR_BUFFER_BIT); // Limpa o buffer de cor
+    glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
 
     glColor3ub(FlagColors::YELLOW.r, FlagColors::YELLOW.g, FlagColors::YELLOW.b);
 
@@ -163,9 +169,9 @@ void display()
     Star wezen(2, {-5, -3.8f}); // Roraima
     Star mirzam(2, {-8, -3.6f}); // Amapá
     Star sirius(1, {-7, -2.8f}); // Mato Grosso
+    //randomizeColor();
     Star muliphen(4, {-6.15f, -2.15f}); // Rondônia
 
-    //randomizeColor();
     // Canis Minor
     Star procyon(1, {-7.8f, 1.2f}); // Amazonas
 
@@ -183,23 +189,82 @@ void display()
     drawArcText("ORDEM E PROGRESSO", midRadius - 0.22f, endAngle, startAngle, 0.004f);
     glPopMatrix();
 
-    glFlush(); // desenha comandos não executados, forçando sua execução em tempo finito
+    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    {
+        static int counter = 0;
+
+        static bool check = false;
+        static float f = 0.0f;
+        static Vec3 color;
+
+        Window test("Hello, world!");
+
+        test.showText("Teste!");
+        test.showCheckBox(&check, "Active");
+        test.showSliderFloat(&f, "float");
+        test.showColorEdit(&color, "color");
+        
+        if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+        test.sameLine();
+
+        test.showText("counter = %d", counter);
+
+        
+        test.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
+        
+    }
+
+    Gui::render();
+
+    // Sincroniza comandos de desenho não executados,
+    // em tempo finito [GLUT_DOUBLE buffering]
+    glutSwapBuffers();
+    
+    // Força atualização contínua. Garantindo execução imediata.
+    glutPostRedisplay(); // Recomendado para uso com a GUI
+}
+
+/* Chamada sempre que a janela for redimensionada */
+void reshape(int w, int h) {
+    // 1. Atualiza o viewport
+    glViewport(0, 0, w, h);
+
+    // Repassa o evento para o ImGui
+    ImGui_ImplGLUT_ReshapeFunc(w, h);
+
+    // Lógica personalizada de redimensionamento abaixo
 }
 
 
 int main(int argc, char** argv) {
-    glutInit(&argc, argv); // Inicializa o GLUT
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_MULTISAMPLE); // modo de exibição: frame buffer, modelo de cor, e antialias ativado
+    // 1. Inicialização do GLUT
+    glutInit(&argc, argv);
+    
+    // modo de exibição: frame buffer, modelo de cor, e antialias ativado
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_MULTISAMPLE);
+    // double buffering é necessário para tratamentos visuais dinâmicos
+    // [requisitado pela GUI]
+
     //glEnable(GL_MULTISAMPLE);
     glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y); // tamanho da área interna da janela (coordenadas de tela)
     glutCreateWindow("Trabalho CG [Open GL]: Bandeira do Brasil");
+
+    // Setup Gui Singleton
+    Gui::initialize();
 
     int err = init();
     if (err != EXIT_SUCCESS)
         return err;
 
-    glutDisplayFunc(display); // Estabelece a callback de exibição
+    // Estabelecer callbacks de exibição / redimensão
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape); // Necessário para tratamento da GUI
+
     glutMainLoop(); // Mostre tudo, e espere
+
+    // Destroy o Singleton
+    Gui::shutdown();
 
     return EXIT_SUCCESS;
 }

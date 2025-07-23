@@ -9,7 +9,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 
 add_executable(MyOpenGLApp ${SOURCES})
-target_include_directories(MyOpenGLApp PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(MyOpenGLApp PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/vendor # Third Party Libraries
+)
 
 if(MSVC)
     # Configure vcpkg toolchain if not already set
