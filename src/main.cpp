@@ -189,7 +189,9 @@ void display()
     drawArcText("ORDEM E PROGRESSO", midRadius - 0.22f, endAngle, startAngle, 0.004f);
     glPopMatrix();
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    // Mostra uma janela simples.
+    // Cada janela ser criada num escopo separado para invocar
+    // os construtores/ destrutores necessários
     {
         static int counter = 0;
 
@@ -212,7 +214,6 @@ void display()
 
         
         test.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
-        
     }
 
     Gui::render();

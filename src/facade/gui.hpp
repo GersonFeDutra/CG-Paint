@@ -173,7 +173,6 @@ public:
         return ImGui::Checkbox(label, active);
     }
 
-    // Edit 1 float using a slider at given [min, max] range
     inline void showSliderFloat(float *f, float min, float max, const char *label = "") const {
         ImGui::SliderFloat(label, f, 0.0f, 1.0f);
     }
