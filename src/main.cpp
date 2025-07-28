@@ -1,10 +1,8 @@
-#include "api.hpp" // Importações do Open GL, GLUT e auxiliares
+#include "util.hpp" // Importações do Open GL, FreeGLUT e métodos auxiliares para debug
 
 #include <cstdlib> // Inclui algumas convenções do C
 #include <cstring> // Manipulação de cadeias de caracteres
 #include <random>
-
-#include "util.hpp"
 
 #include "facade/gui.hpp"
 
@@ -18,14 +16,10 @@ static constexpr cg::Vec2 WINDOW_SIZE{FLAG_SIZE * 30}; // aspect ratio: 10:7
 struct FlagColors {
     static const cg::Color GREEN, YELLOW, BLUE, WHITE;
 };
-const cg::Color FlagColors::GREEN{0, 148, 64};
-const cg::Color FlagColors::YELLOW{255, 203, 0};
-const cg::Color FlagColors::BLUE{48, 38, 129};
-const cg::Color FlagColors::WHITE{255, 255, 255};
-
-#ifdef _DEBUG
-#define _ENABLE_ZOOM 1
-#endif
+const cg::Color FlagColors::GREEN{ 0, 148, 64 };
+const cg::Color FlagColors::YELLOW{ 255, 203, 0 };
+const cg::Color FlagColors::BLUE{ 48, 38, 129 };
+const cg::Color FlagColors::WHITE{ 255, 255, 255 };
 
 
 /* Inicialização do renderer */
@@ -34,25 +28,40 @@ int init(void)
     using namespace cg;
 
     auto [r, g, b] = FlagColors::GREEN.normalized();
-    glClearColor(r, g, b, 1.0f); // cor de fundo
 
-    glMatrixMode(GL_PROJECTION);
+    GLdebug {
+        glClearColor(r, g, b, 1.0f); // cor de fundo
+    }
+    GLdebug {
+        glMatrixMode(GL_PROJECTION);
+    }
 
-#ifdef _ENABLE_ZOOM
-    Vec2 center = FLAG_SIZE / 2.0f;
-    Vec2 halfSize = FLAG_SIZE / 4.0f; // metade da metade → zoom 2x
+    constexpr bool _ENABLE_ZOOM = IS_DEBUG;
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity(); // sempre limpe antes de aplicar nova projeção
-    gluOrtho2D(
-        center.x - halfSize.x,
-        center.x + halfSize.x,
-        center.y - halfSize.y,
-        center.y + halfSize.y
-    );
-#else
-    gluOrtho2D(0.0, FLAG_SIZE.x, 0.0, FLAG_SIZE.y); // coordenadas limite do viewport normalizadas (em 2D)
-#endif
+    if constexpr (_ENABLE_ZOOM) {
+        Vec2 center = FLAG_SIZE / 2.0f;
+        Vec2 halfSize = FLAG_SIZE / 4.0f; // metade da metade → zoom 2x
+
+        GLdebug {
+            glMatrixMode(GL_PROJECTION);
+        }
+        GLdebug {
+            glLoadIdentity(); // sempre limpe antes de aplicar nova projeção
+        }
+        GLdebug {
+            gluOrtho2D(
+                center.x - halfSize.x,
+                center.x + halfSize.x,
+                center.y - halfSize.y,
+                center.y + halfSize.y
+            );
+        }
+    }
+    else {
+        GLdebug {
+            gluOrtho2D(0.0, FLAG_SIZE.x, 0.0, FLAG_SIZE.y); // coordenadas limite do viewport normalizadas (em 2D)
+        }
+    }
 
     return EXIT_SUCCESS;
 }
@@ -65,30 +74,43 @@ void display()
 
     using namespace cg;
 
-    glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
+    GLdebug {
+        glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
+    }
 
-    glColor3ub(FlagColors::YELLOW.r, FlagColors::YELLOW.g, FlagColors::YELLOW.b);
+    GLdebug {
+        glColor3ub(FlagColors::YELLOW.r, FlagColors::YELLOW.g, FlagColors::YELLOW.b);
+    }
 
     // Desenha o diamante (losango) da bandeira do Brasil
     float diamondOffset = 1.7f;
-    glBegin(GL_POLYGON);
-        glVertex2f(FLAG_SIZE.x / 2.0f, FLAG_SIZE.y - diamondOffset);
-        glVertex2f(FLAG_SIZE.x - diamondOffset, FLAG_SIZE.y / 2.0f);
-        glVertex2f(FLAG_SIZE.x / 2.0f, diamondOffset);
-        glVertex2f(diamondOffset, FLAG_SIZE.y / 2.0f);
-    glEnd();
+    GLdebug {
+        glBegin(GL_POLYGON);
+            glVertex2f(FLAG_SIZE.x / 2.0f, FLAG_SIZE.y - diamondOffset);
+            glVertex2f(FLAG_SIZE.x - diamondOffset, FLAG_SIZE.y / 2.0f);
+            glVertex2f(FLAG_SIZE.x / 2.0f, diamondOffset);
+            glVertex2f(diamondOffset, FLAG_SIZE.y / 2.0f);
+        glEnd();
+    }
 
     // Desenha o círculo da bandeira do Brasil
     static constexpr Vec2 CENTER{FLAG_SIZE / 2.0f};
     static constexpr float RADIUS = 3.5f;
 
-    glColor3ub(FlagColors::BLUE.r, FlagColors::BLUE.g, FlagColors::BLUE.b);
-    genCircleAuto(CENTER, RADIUS, 10.0f);
+    GLdebug {
+        glColor3ub(FlagColors::BLUE.r, FlagColors::BLUE.g, FlagColors::BLUE.b);
+    }
+    GLdebug {
+        genCircleAuto(CENTER, RADIUS, 10.0f);
+    }
 
     // Desenha a faixa da bandeira, composta por arcos
-    glColor3ub(FlagColors::WHITE.r, FlagColors::WHITE.g, FlagColors::WHITE.b);
+    GLdebug {
+        glColor3ub(FlagColors::WHITE.r, FlagColors::WHITE.g, FlagColors::WHITE.b);
+    }
     const Vec2 arcCenter{CENTER.x - 2.0f, 0.0f};
     const float arcInnerRadius = 8.0f, arcOuterRadius = 8.5f;
+
     genSemiArcOverCircle( arcCenter,
         arcInnerRadius, arcOuterRadius, // radius: inner, outer
         CENTER, 3.5f,
@@ -176,18 +198,26 @@ void display()
     Star procyon(1, {-7.8f, 1.2f}); // Amazonas
 
     /* Texto da faixa */ 
-    glColor3ub(FlagColors::GREEN.r, FlagColors::GREEN.g, FlagColors::GREEN.b);
-    glPushMatrix();
+    GLdebug {
+        glColor3ub(FlagColors::GREEN.r, FlagColors::GREEN.g, FlagColors::GREEN.b);
+    }
+    GLdebug {
+        glPushMatrix();
+    }
 
     const float midRadius = (arcInnerRadius + arcOuterRadius) / 2.0f; // raio médio da faixa
     // Calcular ângulos do arco visível
     auto [startAngle, endAngle] = computeArcAngles(arcCenter, midRadius, CENTER, RADIUS);
 
-    glTranslatef(arcCenter.x, arcCenter.y, 0.0f); // Centralizar no centro do arco
+    GLdebug{
+        glTranslatef(arcCenter.x, arcCenter.y, 0.0f); // Centralizar no centro do arco
+    }
 
     // Desenhar texto na faixa
     drawArcText("ORDEM E PROGRESSO", midRadius - 0.22f, endAngle, startAngle, 0.004f);
-    glPopMatrix();
+    GLdebug{
+        glPopMatrix();
+    }
 
     // Mostra uma janela simples.
     // Cada janela ser criada num escopo separado para invocar
@@ -226,10 +256,13 @@ void display()
     glutPostRedisplay(); // Recomendado para uso com a GUI
 }
 
+
 /* Chamada sempre que a janela for redimensionada */
 void reshape(int w, int h) {
     // 1. Atualiza o viewport
-    glViewport(0, 0, w, h);
+    GLdebug {
+        glViewport(0, 0, w, h);
+    }
 
     // Repassa o evento para o ImGui
     ImGui_ImplGLUT_ReshapeFunc(w, h);

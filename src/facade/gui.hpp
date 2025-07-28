@@ -14,7 +14,7 @@
 #include "imgui/imgui_impl_glut.h"
 #include "util.hpp"
 
-#include "cg/math.hpp" // Color
+#include "cg/math.hpp" // Vec3
 
 
 // Forward declarations
