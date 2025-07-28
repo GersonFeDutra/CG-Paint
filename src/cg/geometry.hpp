@@ -12,13 +12,13 @@ namespace cg
  * de um centro arcCenter, mas somente o trecho que fica DENTRO do círculo
  * (circleCenter, circleRadius).
  */
-void genSemiArcOverCircle(const Vec2& arcCenter, float innerRadius,
-        float outerRadius, const Vec2& circleCenter, float circleRadius,
+void genSemiArcOverCircle(const Vector2& arcCenter, float innerRadius,
+        float outerRadius, const Vector2& circleCenter, float circleRadius,
         std::size_t segments = 64, std::size_t edgeSegments = 4);
 
 
 /* Função para calcular o ângulo médio do arco visível */
-std::pair<float, float> computeArcAngles(const Vec2& arcCenter, float radius, const Vec2& circleCenter, float circleRadius);
+std::pair<float, float> computeArcAngles(const Vector2& arcCenter, float radius, const Vector2& circleCenter, float circleRadius);
 
 
 /** Gera um círculo no frame buffer do Open GL
@@ -26,7 +26,7 @@ std::pair<float, float> computeArcAngles(const Vec2& arcCenter, float radius, co
  * @param radius Raio do círculo
  * @param segments "Resolução"/ quantidade de segmentos do polígono gerado
  */
-inline void genCircle(Vec2 center, float radius, std::size_t segments)
+inline void genCircle(Vector2 center, float radius, std::size_t segments)
 {
     glBegin(GL_POLYGON); // Inicializa o desenho de um polígono
     float x, y;
@@ -47,7 +47,7 @@ inline void genCircle(Vec2 center, float radius, std::size_t segments)
 /** Gera um semi-círculo em Open GL frame buffer
  * @param segmentsByArc quantidade de segmentos em cada arco (interno e externo)
  */
-inline void genSemiArc(Vec2 center, float innerRadius, float outerRadius,
+inline void genSemiArc(Vector2 center, float innerRadius, float outerRadius,
         float startAngle, float endAngle, std::size_t segmentsByArc) {
     glBegin(GL_LINE_LOOP); // Inicializa o desenho de um polígono
     float x, y;
@@ -84,7 +84,7 @@ inline void genSemiArc(Vec2 center, float innerRadius, float outerRadius,
  * @param outerRadius Raio externo (pontas)
  * @param innerRatio Razão do raio interno (entre 0 e 1)
  */
-inline void genStar(const Vec2& center, float outerRadius, float innerRatio) {
+inline void genStar(const Vector2& center, float outerRadius, float innerRatio) {
     constexpr int numPoints = 5;
     float innerRadius = outerRadius * std::clamp(innerRatio, 0.0f, 1.0f);
 
@@ -126,7 +126,7 @@ void drawArcText(const char* text, float radius, float startAngle, float endAngl
  * @param min_offset Quantidade mínima de segmentos.
  * @param limit Quantidade máxima de segmentos.
  */
-inline void genCircleAuto(Vec2 center, float radius, float quality = 1.5f, int min_offset = 12, int limit = 2048) {
+inline void genCircleAuto(Vector2 center, float radius, float quality = 1.5f, int min_offset = 12, int limit = 2048) {
     int segs = int(quality * radius) + min_offset; // Valor base linear + offset mínimo
     genCircle(center, radius, std::min(segs, limit));
 }
@@ -135,5 +135,6 @@ inline void genCircleAuto(Vec2 center, float radius, float quality = 1.5f, int m
 inline void genCircleAuto(float x, float y, float radius, float quality = 1.5f, int min_offset = 12, int limit = 2048) {
     genCircleAuto({x, y}, radius, quality, min_offset, limit);
 }
+
 
 } // namespace cg

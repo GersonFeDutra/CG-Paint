@@ -845,7 +845,7 @@ static void DemoWindowWidgetsBasic()
         ImGui::AlignTextToFramePadding();
         ImGui::TextLinkOpenURL("Hyperlink", "https://github.com/ocornut/imgui/wiki/Error-Handling");
 
-        // Color buttons, demonstrate using PushID() to add unique identifier in the ID stack, and changing style.
+        // ColorRgb buttons, demonstrate using PushID() to add unique identifier in the ID stack, and changing style.
         IMGUI_DEMO_MARKER("Widgets/Basic/Buttons (Colored)");
         for (int i = 0; i < 7; i++)
         {
@@ -1540,7 +1540,7 @@ static void DemoWindowWidgetsDragAndDrop()
             // ColorEdit widgets automatically act as drag source and drag target.
             // They are using standardized payload strings IMGUI_PAYLOAD_TYPE_COLOR_3F and IMGUI_PAYLOAD_TYPE_COLOR_4F
             // to allow your own widgets to use colors in their drag and drop interaction.
-            // Also see 'Demo->Widgets->Color/Picker Widgets->Palette' demo.
+            // Also see 'Demo->Widgets->ColorRgb/Picker Widgets->Palette' demo.
             HelpMarker("You can drag from the color squares.");
             static float col1[3] = { 1.0f, 0.0f, 0.2f };
             static float col2[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
@@ -10112,7 +10112,7 @@ struct MyDocument
     bool        Open;       // Set when open (we keep an array of all available documents to simplify demo code!)
     bool        OpenPrev;   // Copy of Open from last update.
     bool        Dirty;      // Set when the document has been modified
-    ImVec4      Color;      // An arbitrary variable associated to the document
+    ImVec4      ColorRgb;      // An arbitrary variable associated to the document
 
     MyDocument(int uid, const char* name, bool open = true, const ImVec4& color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f))
     {
@@ -10120,7 +10120,7 @@ struct MyDocument
         snprintf(Name, sizeof(Name), "%s", name);
         Open = OpenPrev = open;
         Dirty = false;
-        Color = color;
+        ColorRgb = color;
     }
     void DoOpen()       { Open = true; }
     void DoForceClose() { Open = false; Dirty = false; }
@@ -10155,7 +10155,7 @@ struct ExampleAppDocuments
     {
         ImGui::PushID(doc);
         ImGui::Text("Document \"%s\"", doc->Name);
-        ImGui::PushStyleColor(ImGuiCol_Text, doc->Color);
+        ImGui::PushStyleColor(ImGuiCol_Text, doc->ColorRgb);
         ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
         ImGui::PopStyleColor();
 
@@ -10180,7 +10180,7 @@ struct ExampleAppDocuments
         ImGui::SetNextItemShortcut(ImGuiMod_Ctrl | ImGuiKey_W, ImGuiInputFlags_Tooltip);
         if (ImGui::Button("Close"))
             CloseQueue.push_back(doc);
-        ImGui::ColorEdit3("color", &doc->Color.x);  // Useful to test drag and drop and hold-dragged-to-open-tab behavior.
+        ImGui::ColorEdit3("color", &doc->ColorRgb.x);  // Useful to test drag and drop and hold-dragged-to-open-tab behavior.
         ImGui::PopID();
     }
 

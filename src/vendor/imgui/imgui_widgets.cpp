@@ -6267,7 +6267,7 @@ bool ImGui::ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFl
         if (g.Style.FrameBorderSize > 0.0f)
             RenderFrameBorder(bb.Min, bb.Max, rounding);
         else
-            window->DrawList->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_FrameBg), rounding); // Color buttons are often in need of some sort of border // FIXME-DPI
+            window->DrawList->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_FrameBg), rounding); // ColorRgb buttons are often in need of some sort of border // FIXME-DPI
     }
 
     // Drag and Drop Source

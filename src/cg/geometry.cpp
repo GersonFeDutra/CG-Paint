@@ -8,8 +8,8 @@
 namespace cg
 {
 
-void genSemiArcOverCircle(const Vec2& arcCenter, float innerRadius,
-        float outerRadius, const Vec2& circleCenter, float circleRadius,
+void genSemiArcOverCircle(const Vector2& arcCenter, float innerRadius,
+        float outerRadius, const Vector2& circleCenter, float circleRadius,
         std::size_t segments, std::size_t edgeSegments)
 {
     // 1) distância e direção entre centros
@@ -34,7 +34,7 @@ void genSemiArcOverCircle(const Vec2& arcCenter, float innerRadius,
     // 3) ângulos de interseção NO PERÍMETRO DO CÍRCULO AZUL,
     //    usando o raio correto para cada t
     auto intersectAng = [&](float R, float theta){
-        Vec2 p{ arcCenter.x + R * std::cos(theta),
+        Vector2 p{ arcCenter.x + R * std::cos(theta),
                 arcCenter.y + R * std::sin(theta) };
         return std::atan2(p.y - circleCenter.y,
                           p.x - circleCenter.x);
@@ -102,7 +102,7 @@ void genSemiArcOverCircle(const Vec2& arcCenter, float innerRadius,
 
 
 /* Função para calcular o ângulo médio do arco visível */
-std::pair<float, float> computeArcAngles(const Vec2& arcCenter, float radius, const Vec2& circleCenter, float circleRadius)
+std::pair<float, float> computeArcAngles(const Vector2& arcCenter, float radius, const Vector2& circleCenter, float circleRadius)
 {
     // 1. Calcular vetor entre centros
     float dx = circleCenter.x - arcCenter.x;

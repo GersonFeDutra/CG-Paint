@@ -14,7 +14,7 @@
 #include "imgui/imgui_impl_glut.h"
 #include "util.hpp"
 
-#include "cg/math.hpp" // Vec3
+#include "cg/math.hpp" // Vector3
 
 
 // Forward declarations
@@ -161,7 +161,7 @@ public:
      * Returns true if active.
      * @param label Associated label text.
      */
-    inline bool showButton(const char* label = "", cg::Vec2 size = {}) const {
+    inline bool showButton(const char* label = "", cg::Vector2 size = {}) const {
         return ImGui::Button(label, *(ImVec2 *)&size);
     }
 
@@ -183,7 +183,7 @@ public:
         showSliderFloat(f, 0.0f, 1.0f, label);
     }
 
-    inline void showColorEdit(cg::Vec3* color, const char *label = "") {
+    inline void showColorEdit(cg::Vector3* color, const char *label = "") {
         ImGui::ColorEdit3(label, (float*)color); // Edit 3 floats representing a color
     }
 

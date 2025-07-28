@@ -11,7 +11,6 @@
 
 
 #if defined(_WIN32) || defined(_WIN64)
-	#include <windows.h>
 	extern HANDLE _hConsole;
 	extern WORD _saved_attributes;
 	#define SET_CLI_RED() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_INTENSITY)
@@ -72,7 +71,7 @@ constexpr void print_success(const char* message, Args...args) {
 
 
 // Prints a source file location in the stderr to mark the next message (this does not break the line with '\n').
-constexpr void print_location_tag(const char* tag,
+inline void print_location_tag(const char* tag,
 	const std::source_location location = std::source_location::current()
 ) {
 	fprintf(stderr, "[%s] %s:%d (%s): ", // Arquivo, linha e função
@@ -81,10 +80,27 @@ constexpr void print_location_tag(const char* tag,
 
 
 /* Clear Open GL Error codes stack. */
-inline void GLClearError();
+inline void GLClearError()
+{
+	while (glGetError() != GL_NO_ERROR);
+}
+
 
 /* Logs every Open GL error code accumulated. */
-inline bool GLLogCall(const std::source_location location = std::source_location::current());
+inline bool GLLogCall(const std::source_location location = std::source_location::current())
+{
+	bool out = true;
+	while (GLenum error = glGetError()) {
+		SET_CLI_RED();
+
+		print_location_tag("OpenGL Error", location);
+		fprintf(stderr, "Error Code: %d\n", error);
+
+		RESET_CLI();
+		out = false;
+	}
+	return out;
+}
 
 
 #ifdef _DEBUG

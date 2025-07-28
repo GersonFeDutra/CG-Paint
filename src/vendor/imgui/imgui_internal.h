@@ -372,7 +372,7 @@ IMGUI_API ImGuiID       ImHashStr(const char* data, size_t data_size = 0, ImGuiI
 static inline void      ImQsort(void* base, size_t count, size_t size_of_element, int(IMGUI_CDECL *compare_func)(void const*, void const*)) { if (count > 1) qsort(base, count, size_of_element, compare_func); }
 #endif
 
-// Helpers: Color Blending
+// Helpers: ColorRgb Blending
 IMGUI_API ImU32         ImAlphaBlendColors(ImU32 col_a, ImU32 col_b);
 
 // Helpers: Bit manipulation
@@ -3601,7 +3601,7 @@ namespace ImGui
     IMGUI_API void          SetNextItemRefVal(ImGuiDataType data_type, void* p_data);
     inline bool             IsItemActiveAsInputText() { ImGuiContext& g = *GImGui; return g.ActiveId != 0 && g.ActiveId == g.LastItemData.ID && g.InputTextState.ID == g.LastItemData.ID; } // This may be useful to apply workaround that a based on distinguish whenever an item is active as a text input field.
 
-    // Color
+    // ColorRgb
     IMGUI_API void          ColorTooltip(const char* text, const float* col, ImGuiColorEditFlags flags);
     IMGUI_API void          ColorEditOptionsPopup(const float* col, ImGuiColorEditFlags flags);
     IMGUI_API void          ColorPickerOptionsPopup(const float* ref_col, ImGuiColorEditFlags flags);
