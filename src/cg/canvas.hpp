@@ -17,6 +17,17 @@ using ID = std::size_t;
 
 namespace cg {
 
+    namespace io {
+        struct MouseInputEvent() {
+            int x, y;
+        };
+        struct MouseWheelV() : public MouseInputEvent {
+            int direction;
+        };
+        struct MouseWheelH() : public MouseInputEvent {
+            int direction;
+        };
+
     class CanvasItem {
         friend class Canvas;
     public:
@@ -41,6 +52,9 @@ namespace cg {
     public:
         /* Propagates user input to each Canvas Item on the canvas. */
         void updateInput();
+        void updateInput(MouseInputEvent);
+        void updateInput(MouseWheelV);
+        void updateInput(MouseWheelH);
         /* Propagates a process call to each Canvas Item on the canvas. */
         TimePoint updateProcess(TimePoint lastTime);
         /* Propagates a render call to each Canvas Item on the canvas. */
