@@ -89,6 +89,21 @@ void reshape(int w, int h) {
 }
 
 
+void onMouseWheelEvent(int wheel, int direction, int x, int y) {
+    if (Gui::usingInput())
+        return;
+    switch (wheel) {
+    case 0:
+        canvas.sendInput(cg::io::MouseWheelV{direction, {x, y}});
+    break;
+    case 1:
+        canvas.sendInput(cg::io::MouseWheelH{direction, {x, y}});
+    break;
+    default: // ignore
+    }
+}
+
+
 #if defined(_WIN32) || defined(_WIN64)
     HANDLE _hConsole;
     WORD _saved_attributes;
@@ -119,6 +134,8 @@ int main(int argc, char** argv)
 
     glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y); // tamanho da área interna da janela (coordenadas de tela)
     glutCreateWindow("Trabalho CG [Open GL]: Bandeira do Brasil");
+
+    glutMouseWheelFunc(onMouseWheelEvent);
 
     // Setup Gui Singleton
     Gui::initialize();
