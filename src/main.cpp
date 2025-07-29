@@ -90,7 +90,7 @@ void reshape(int w, int h) {
 
 
 void onMouseWheelEvent(int wheel, int direction, int x, int y) {
-    if (Gui::usingInput())
+    if (Gui::isUsingMouseInput())
         return;
     switch (wheel) {
     case 0:
