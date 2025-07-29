@@ -1,11 +1,11 @@
 #pragma once
-// Fachada para a biblioteca de Interface Gr·fica do Usu·rio.
+// Fachada para a biblioteca de Interface Gr√°fica do Usu√°rio.
 // Declara um anova classe singleton Gui.
 // Implementa o Dear Im Gui com GLUT e OpenGL3.
 
-// WARN -> Neste caso È Header only pois est· sendo usando apenas na main,
-// Caso seja distribuÌdo para outras unidades de cÛdigo, por favor,
-// mova a implementaÁ„o para um arquivo gui.cpp.
+// WARN -> Neste caso √© Header only pois est√° sendo usando apenas na main,
+// Caso seja distribu√≠do para outras unidades de c√≥digo, por favor,
+// mova a implementa√ß√£o para um arquivo gui.cpp.
 
 #include <memory>
 
@@ -23,7 +23,7 @@ class Window;
 class Gui {
     friend class Window;
 public:
-    // ObtÈm a inst‚ncia singleton
+    // Obt√©m a inst√¢ncia singleton
     static Gui& instance() {
         static Gui inst;
         return inst;
@@ -49,8 +49,16 @@ public:
         return Gui::instance().io->Framerate;
     }
 
+    inline static bool isUsingMouseInput() {
+        return Gui::instance().io->WantCaptureMouse();
+    }
+
+    inline static bool isUsingKeyboardInput() {
+        return Gui::instance.io->WantCaptureKeyboard();
+    }
+
 private:
-    // InicializaÁ„o (CriaÁ„o de contexto ImGui, binding OpenGL3/GLUT etc)
+    // Inicializa√ß√£o (Cria√ß√£o de contexto ImGui, binding OpenGL3/GLUT etc)
     inline void _initialize() {
         // 1) Setup ImGui context
         IMGUI_CHECKVERSION();
@@ -74,7 +82,7 @@ private:
 #endif
     }
 
-    // InÌcio de um novo frame ImGui
+    // In√≠cio de um novo frame ImGui
     inline void _newFrame() const {
 #ifdef _DEBUG
         assert_err(_initialized); // Can't create a non initialized GUI context!
@@ -98,7 +106,7 @@ private:
         //glViewport(0, 0, display_w, display_h);
         //glClear(GL_COLOR_BUFFER_BIT);
 
-        // 3. Desenhar o conte˙do do ImGui
+        // 3. Desenhar o conte√∫do do ImGui
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
