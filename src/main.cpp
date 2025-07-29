@@ -21,6 +21,7 @@ cg::Flag *flag = nullptr;
 int init(void)
 {
     auto _flag_ptr = std::make_unique<cg::Flag>();
+
     flag = _flag_ptr.get();
     canvas.insert(std::move(_flag_ptr));
     flag->init();
@@ -88,12 +89,14 @@ void reshape(int w, int h) {
 }
 
 
-HANDLE _hConsole;
-WORD _saved_attributes;
+#if defined(_WIN32) || defined(_WIN64)
+    HANDLE _hConsole;
+    WORD _saved_attributes;
+#endif
 
 int main(int argc, char** argv)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(_WIN64)
     // Get the console handle
     _hConsole = GetStdHandle(STD_ERROR_HANDLE);
 
