@@ -16,6 +16,7 @@ static cg::Canvas canvas;
 
 cg::Flag *flag = nullptr;
 
+cg::Vector3 globalColor; // define a cor selecionada na janela separada
 
 /* Inicialização do renderer */
 int init(void)
@@ -45,14 +46,14 @@ void display()
 
         static bool check = false;
         static float f = 0.0f;
-        static cg::Vector3 color;
+        // static cg::Vector3 color;
 
         Window test("Hello, world!");
 
         test.showText("Teste!");
         test.showCheckBox(&check, "Active");
         test.showSliderFloat(&f, "float");
-        test.showColorEdit(&color, "color");
+        test.showColorEdit(&globalColor, "color");
         
         if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -86,6 +87,26 @@ void reshape(int w, int h) {
     ImGui_ImplGLUT_ReshapeFunc(w, h);
 
     // Lógica personalizada de redimensionamento abaixo
+}
+
+/* Chamada sempre que for detectado um clique do mouse */
+void mouseClick(int button, int state, int x, int y) {
+
+    switch (button)
+    {
+    case GLUT_LEFT_BUTTON:
+        std::cout << "Color:" << globalColor.x << ", " << globalColor.y << ", " << globalColor.z << std::endl;
+        break;
+    case GLUT_MIDDLE_BUTTON:
+        
+        break;
+    case GLUT_RIGHT_BUTTON:
+        
+        break;
+    }
+    
+    // std::cout << "Mouse button clicked at: (" << x << ", " << y << ")" << std::endl;
+    // std::cout << btn << std::endl;
 }
 
 
@@ -129,6 +150,9 @@ int main(int argc, char** argv)
     // Estabelecer callbacks de exibição / redimensão
     glutDisplayFunc(display);
     glutReshapeFunc(reshape); // Necessário para tratamento da GUI
+    
+    // função de detecção de clique do mouse
+    // glutMouseFunc(mouseClick);
 
     glutMainLoop(); // Mostre tudo, e espere
 

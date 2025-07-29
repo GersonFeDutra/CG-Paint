@@ -1,11 +1,11 @@
 #pragma once
-// Fachada para a biblioteca de Interface Gráfica do Usuário.
+// Fachada para a biblioteca de Interface Grï¿½fica do Usuï¿½rio.
 // Declara um anova classe singleton Gui.
 // Implementa o Dear Im Gui com GLUT e OpenGL3.
 
-// WARN -> Neste caso é Header only pois está sendo usando apenas na main,
-// Caso seja distribuído para outras unidades de código, por favor,
-// mova a implementação para um arquivo gui.cpp.
+// WARN -> Neste caso ï¿½ Header only pois estï¿½ sendo usando apenas na main,
+// Caso seja distribuï¿½do para outras unidades de cï¿½digo, por favor,
+// mova a implementaï¿½ï¿½o para um arquivo gui.cpp.
 
 #include <memory>
 
@@ -23,7 +23,7 @@ class Window;
 class Gui {
     friend class Window;
 public:
-    // Obtém a instância singleton
+    // Obtï¿½m a instï¿½ncia singleton
     static Gui& instance() {
         static Gui inst;
         return inst;
@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    // Inicialização (Criação de contexto ImGui, binding OpenGL3/GLUT etc)
+    // Inicializaï¿½ï¿½o (Criaï¿½ï¿½o de contexto ImGui, binding OpenGL3/GLUT etc)
     inline void _initialize() {
         // 1) Setup ImGui context
         IMGUI_CHECKVERSION();
@@ -74,7 +74,7 @@ private:
 #endif
     }
 
-    // Início de um novo frame ImGui
+    // Inï¿½cio de um novo frame ImGui
     inline void _newFrame() const {
 #ifdef _DEBUG
         assert_err(_initialized); // Can't create a non initialized GUI context!
@@ -98,7 +98,7 @@ private:
         //glViewport(0, 0, display_w, display_h);
         //glClear(GL_COLOR_BUFFER_BIT);
 
-        // 3. Desenhar o conteúdo do ImGui
+        // 3. Desenhar o conteï¿½do do ImGui
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
