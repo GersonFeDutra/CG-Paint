@@ -21,6 +21,10 @@ cg::Flag *flag = nullptr;
 static cg::Vector3 globalColor; // define a cor selecionada na janela separada
 static int selectedShape = 0; // point
 
+static bool pointCheck = false;
+static bool lineCheck = false;
+static bool polygonCheck = false;
+
 /* Inicialização do renderer */
 int init(void)
 {
@@ -59,9 +63,25 @@ void display()
 
         Window test("Controls");
         
-        // test.showRadioButton("Point", &pointCheck);
-        // test.showCheckBox(&lineCheck, "Line");
-        // test.showCheckBox(&polygonCheck, "Polygon");)
+        if (test.showCheckBox(&pointCheck, "Point")) {
+            if (pointCheck) {
+                lineCheck = false;
+                polygonCheck = false;
+            }
+        };
+        if (test.showCheckBox(&lineCheck, "Line")) {
+            if (lineCheck) {
+                pointCheck = false;
+                polygonCheck = false;
+            }
+        };
+        if (test.showCheckBox(&polygonCheck, "Polygon")) {
+            if (polygonCheck) {
+                lineCheck = false;
+                pointCheck = false;
+            }
+        };
+        
         test.showColorEdit(&globalColor, "color");
         
         if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)

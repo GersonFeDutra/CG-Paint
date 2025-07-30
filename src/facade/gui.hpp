@@ -173,13 +173,13 @@ public:
         return ImGui::Checkbox(label, active);
     }
 
-    inline void showRadioButton(const char *label = "", bool active = false) const {
-        ImGui::RadioButton(label, active);
-    }
+    // inline void showRadioButton(const char *label = "", bool active = false) const {
+    //     ImGui::RadioButton(label, active);
+    // }
 
-    inline void showRadioButton(const char *label = "", int *v, int v_button) const {
-        ImGui::RadioButton(label, v, v_button);
-    }
+    // inline void showRadioButton(const char *label = "", int *v, int v_button) const {
+    //     ImGui::RadioButton(label, v, v_button);
+    // }
 
     inline void showSliderFloat(float *f, float min, float max, const char *label = "") const {
         ImGui::SliderFloat(label, f, 0.0f, 1.0f);
