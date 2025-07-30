@@ -1,5 +1,6 @@
 ﻿#include "canvas.hpp"
 
+#include "util.hpp"
 
 namespace cg {
 

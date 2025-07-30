@@ -63,7 +63,7 @@ private:
         // 1) Setup ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        
+
         io = &ImGui::GetIO(); (void)*io;
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
@@ -86,7 +86,7 @@ private:
     inline void _newFrame() const {
 #ifdef _DEBUG
         assert_err(_initialized); // Can't create a non initialized GUI context!
-#endif  
+#endif
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGLUT_NewFrame();
         ImGui::NewFrame();
@@ -96,7 +96,7 @@ private:
     inline void _render() const {
 #ifdef _DEBUG
         assert_err(_initialized); // Tried to render a not initialized GUI context!
-#endif  
+#endif
         // 1. Processar dados da interface no frame buffer
         ImGui::Render();
 
@@ -180,6 +180,14 @@ public:
     inline bool showCheckBox(bool* active, const char* label = "") const {
         return ImGui::Checkbox(label, active);
     }
+
+    // inline void showRadioButton(const char *label = "", bool active = false) const {
+    //     ImGui::RadioButton(label, active);
+    // }
+
+    // inline void showRadioButton(const char *label = "", int *v, int v_button) const {
+    //     ImGui::RadioButton(label, v, v_button);
+    // }
 
     inline void showSliderFloat(float *f, float min, float max, const char *label = "") const {
         ImGui::SliderFloat(label, f, 0.0f, 1.0f);

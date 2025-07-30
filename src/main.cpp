@@ -9,9 +9,18 @@
 #include "cg/canvas.hpp"
 #include "cg/canvas_itens/flag.hpp"
 
+#include "facade/gui.hpp"
+
 static cg::Canvas canvas;
 
 cg::Flag *flag = nullptr;
+
+static cg::Vector3 globalColor; // define a cor selecionada na janela separada
+static int selectedShape = 0; // point
+
+static bool pointCheck = false;
+static bool lineCheck = false;
+static bool polygonCheck = false;
 
 
 /* Inicialização do renderer */
@@ -22,11 +31,11 @@ int init(void)
     flag = _flag_ptr.get();
     canvas.insert(std::move(_flag_ptr));
     flag->init();
-    
+
     return EXIT_SUCCESS;
 }
 
-// Referência para a construção matemática da bandeira: <https://youtu.be/yBjX9jLuLSY>
+
 /* Loop principal de desenho. */
 void display()
 {
@@ -39,17 +48,39 @@ void display()
     // os construtores/ destrutores necessários
     {
         static int counter = 0;
-
-        static bool check = false;
         static float f = 0.0f;
-        static cg::Vector3 color;
+        // static cg::Vector3 color;
 
-        Window test("Hello, world!");
+        // testes
+        // Window test("Hello, world!");
 
-        test.showText("Teste!");
-        test.showCheckBox(&check, "Active");
-        test.showSliderFloat(&f, "float");
-        test.showColorEdit(&color, "color");
+        // test.showText("Teste!");
+        // test.showCheckBox(&check, "Active");
+        // test.showSliderFloat(&f, "float");
+        // test.showColorEdit(&globalColor, "color");
+
+        Window test("Controls");
+        
+        if (test.showCheckBox(&pointCheck, "Point")) {
+            if (pointCheck) {
+                lineCheck = false;
+                polygonCheck = false;
+            }
+        };
+        if (test.showCheckBox(&lineCheck, "Line")) {
+            if (lineCheck) {
+                pointCheck = false;
+                polygonCheck = false;
+            }
+        };
+        if (test.showCheckBox(&polygonCheck, "Polygon")) {
+            if (polygonCheck) {
+                lineCheck = false;
+                pointCheck = false;
+            }
+        };
+        
+        test.showColorEdit(&globalColor, "color");
         
         if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -180,7 +211,7 @@ int main(int argc, char** argv)
 
     // 1. Inicialização do GLUT
     glutInit(&argc, argv);
-    
+
     // modo de exibição: frame buffer, modelo de cor, e antialias ativado
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_MULTISAMPLE);
     // double buffering é necessário para tratamentos visuais dinâmicos
