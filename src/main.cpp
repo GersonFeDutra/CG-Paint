@@ -25,6 +25,7 @@ static bool pointCheck = false;
 static bool lineCheck = false;
 static bool polygonCheck = false;
 
+
 /* Inicialização do renderer */
 int init(void)
 {
@@ -37,7 +38,7 @@ int init(void)
     return EXIT_SUCCESS;
 }
 
-// Referência para a construção matemática da bandeira: <https://youtu.be/yBjX9jLuLSY>
+
 /* Loop principal de desenho. */
 void display()
 {
@@ -117,6 +118,7 @@ void reshape(int w, int h) {
 
     // Lógica personalizada de redimensionamento abaixo
 }
+
 
 /* Chamada sempre que for detectado um clique do mouse */
 void mouseClick(int button, int state, int x, int y) {

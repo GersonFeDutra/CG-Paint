@@ -5,3 +5,6 @@ build/
 
 # arquivos temporários
 *.tmp
+
+# Dear Im Gui interface cache.
+imgui.ini

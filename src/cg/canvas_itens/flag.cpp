@@ -1,4 +1,5 @@
-﻿#include <cstdlib>
+﻿// Referência para a construção matemática da bandeira: <https://youtu.be/yBjX9jLuLSY>
+#include <cstdlib>
 
 #include "util.hpp"
 
