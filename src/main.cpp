@@ -18,7 +18,8 @@ static cg::Canvas canvas;
 
 cg::Flag *flag = nullptr;
 
-cg::Vector3 globalColor; // define a cor selecionada na janela separada
+static cg::Vector3 globalColor; // define a cor selecionada na janela separada
+static int selectedShape = 0; // point
 
 /* Inicialização do renderer */
 int init(void)
@@ -45,16 +46,22 @@ void display()
     // os construtores/ destrutores necessários
     {
         static int counter = 0;
-
-        static bool check = false;
         static float f = 0.0f;
         // static cg::Vector3 color;
 
-        Window test("Hello, world!");
+        // testes
+        // Window test("Hello, world!");
 
-        test.showText("Teste!");
-        test.showCheckBox(&check, "Active");
-        test.showSliderFloat(&f, "float");
+        // test.showText("Teste!");
+        // test.showCheckBox(&check, "Active");
+        // test.showSliderFloat(&f, "float");
+        // test.showColorEdit(&globalColor, "color");
+
+        Window test("Controls");
+        
+        // test.showRadioButton("Point", &pointCheck);
+        // test.showCheckBox(&lineCheck, "Line");
+        // test.showCheckBox(&polygonCheck, "Polygon");)
         test.showColorEdit(&globalColor, "color");
         
         if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
