@@ -1,12 +1,14 @@
 ﻿#include "canvas.hpp"
 
+#include "util.hpp"
 
 namespace cg {
 
 	void Canvas::updateInput()
 	{
-		for (auto& item : itens)
+		for (auto& item : itens) {
 			item->_input();
+		}
 	}
 
 	TimePoint Canvas::updateProcess(TimePoint lastTime)

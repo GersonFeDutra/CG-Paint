@@ -12,6 +12,8 @@
 #include "cg/canvas.hpp"
 #include "cg/canvas_itens/flag.hpp"
 
+#include "facade/gui.hpp"
+
 static cg::Canvas canvas;
 
 cg::Flag *flag = nullptr;
@@ -91,6 +93,12 @@ void reshape(int w, int h) {
 
 /* Chamada sempre que for detectado um clique do mouse */
 void mouseClick(int button, int state, int x, int y) {
+    ImGui_ImplGLUT_MouseFunc(button, state, x, y); // passes down the click event to ImGui
+    
+    ImGuiIO &io = ImGui::GetIO();
+    if (io.WantCaptureMouse) { // checks if the click event happens inside the ImGui screen or not
+        return; // if it does, return
+    }
 
     switch (button)
     {
@@ -104,7 +112,8 @@ void mouseClick(int button, int state, int x, int y) {
         
         break;
     }
-    
+
+
     // std::cout << "Mouse button clicked at: (" << x << ", " << y << ")" << std::endl;
     // std::cout << btn << std::endl;
 }
@@ -152,7 +161,7 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape); // Necessário para tratamento da GUI
     
     // função de detecção de clique do mouse
-    // glutMouseFunc(mouseClick);
+    glutMouseFunc(mouseClick);
 
     glutMainLoop(); // Mostre tudo, e espere
 
