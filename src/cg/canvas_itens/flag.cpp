@@ -203,4 +203,9 @@ namespace cg {
 
     }
 
+    void Flag::_input(io::MouseMove input_event)
+    {
+        std::cout << input_event.position.x << ", " << input_event.position.y << '\n';
+    }
+
 }

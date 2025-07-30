@@ -25,5 +25,7 @@ namespace cg {
         void _process(DeltaTime delta) override;
 
         void _render() override;
+
+        void _input(io::MouseMove input_event) override;
     };
 }

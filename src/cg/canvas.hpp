@@ -1,10 +1,12 @@
 ﻿#pragma once
 
-#include "util.hpp"
-
 #include <memory>
 #include <vector>
 #include <chrono>
+
+#include "math.hpp" // Vector2i
+
+#include "util.hpp"
 
 
 template <typename T>
@@ -17,14 +19,49 @@ using ID = std::size_t;
 
 namespace cg {
 
+    namespace io {
+
+        struct MouseInputEvent {
+            Vector2i position; // mouse position on screen
+        };
+        using MouseMove = MouseInputEvent;
+        struct MouseDrag : public MouseInputEvent {};
+        struct MouseRightButtonPressed : public MouseInputEvent {};
+        struct MouseRightButtonReleased : public MouseInputEvent {};
+        struct MouseLeftButtonPressed : public MouseInputEvent {};
+        struct MouseLeftButtonReleased : public MouseInputEvent {};
+        struct MouseWheelV : public MouseInputEvent {
+            int direction; // direction moved △y
+        };
+        struct MouseWheelH : public MouseInputEvent {
+            int direction; // direction moved △x
+        };
+
+    }
+
     class CanvasItem {
         friend class Canvas;
     public:
         CanvasItem() = default;
         virtual ~CanvasItem() = default;
 
-        /* Process user input. */
-        virtual void _input() {}
+        /* Process mouse input from user. [Move] */
+        virtual void _input(io::MouseMove mouse_event) {}
+        /* Process mouse drag input from user. */
+        virtual void _input(io::MouseDrag mouse_event) {}
+        /* Called when right button is pressed. */
+        virtual void _input(io::MouseRightButtonPressed mouse_event) {}
+        /* Called when left button is pressed. */
+        virtual void _input(io::MouseLeftButtonPressed mouse_event) {}
+        /* Called when right button is released. */
+        virtual void _input(io::MouseRightButtonReleased mouse_event) {}
+        /* Called when left button is released. */
+        virtual void _input(io::MouseLeftButtonReleased mouse_event) {}
+        /* Process mouse wheel vertical input from user. */
+        virtual void _input(io::MouseWheelV mouse_event) {}
+        /* Process mouse wheel horizontal input from user. */
+        virtual void _input(io::MouseWheelH mouse_event) {}
+
         /** Process data between variations of delta time △t.
          * @param delta : time stamp between previous frame
          */
@@ -40,9 +77,16 @@ namespace cg {
         //friend class CanvasItem;
     public:
         /* Propagates user input to each Canvas Item on the canvas. */
-        void updateInput();
+        template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
+        void sendInput(IE input_event) {
+            // TODO -> Check if input is inside item area before sending event.
+            for (auto& item : itens)
+                item->_input(input_event);
+        }
+
         /* Propagates a process call to each Canvas Item on the canvas. */
         TimePoint updateProcess(TimePoint lastTime);
+
         /* Propagates a render call to each Canvas Item on the canvas. */
         void updateRender();
 
@@ -65,7 +109,7 @@ namespace cg {
         }
 
         ArrayList<CanvasItem *> select() { // futuramente expôr um modo de selecionar itens externamente
-            ArrayList<CanvasItem*> refs{itens.size()}; // reserva
+            ArrayList<CanvasItem *> refs{itens.size()}; // reserva
             for (auto& item : itens)
                 refs.push_back(item.get());
             return refs;
@@ -73,6 +117,5 @@ namespace cg {
     private:
         ArrayList<std::unique_ptr<CanvasItem>> itens;
     };
-
 
 }

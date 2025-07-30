@@ -2,13 +2,10 @@
 
 #include <cstdlib> // Inclui algumas convenções do C
 #include <cstring> // Manipulação de cadeias de caracteres
-#include <random>
 
 #include "facade/gui.hpp"
 
-#include "cg/math.hpp"
 #include "cg/geometry.hpp"
-
 #include "cg/canvas.hpp"
 #include "cg/canvas_itens/flag.hpp"
 
@@ -89,10 +86,85 @@ void reshape(int w, int h) {
 }
 
 
+void onMouseMoveEvent(int x, int y) {
+    // Delegar entrada ao Dear Im Gui primeiro
+    ImGui_ImplGLUT_MotionFunc(x, y);
+    if (Gui::isUsingMouseInput())
+        return; // A Interface Gráfica do Usuário tem prioridade na entrada. "Camada superior"
+
+    canvas.sendInput(cg::io::MouseMove{ cg::Vector2i{x, y} });
+}
+
+
+void onMouseDragEvent(int x, int y) {
+    ImGui_ImplGLUT_MotionFunc(x, y);
+    if (Gui::isUsingMouseInput())
+        return;
+
+    canvas.sendInput(cg::io::MouseDrag{ cg::Vector2i{x, y} });
+}
+
+
+void onMouseWheelEvent(int wheel, int direction, int x, int y) {
+    ImGui_ImplGLUT_MouseWheelFunc(wheel, direction, x, y);
+    if (Gui::isUsingMouseInput())
+        return;
+
+    switch (wheel) {
+    case 0:
+        canvas.sendInput(cg::io::MouseWheelV{cg::Vector2i{x, y}, direction });
+        break;
+    case 1:
+        canvas.sendInput(cg::io::MouseWheelH{cg::Vector2i{x, y}, direction});
+    break;
+    default: // ignore
+        break;
+    }
+}
+
+
+void onMouseButtonEvent(int button, int state, int x, int y) {
+    ImGui_ImplGLUT_MouseFunc(button, state, x, y);
+    if (Gui::isUsingMouseInput())
+        return;
+
+    switch (button) {
+    case GLUT_LEFT_BUTTON:
+        switch (state) {
+        case GLUT_DOWN:
+            canvas.sendInput(cg::io::MouseLeftButtonPressed{ cg::Vector2i{x, y} });
+            break;
+        case GLUT_UP:
+            canvas.sendInput(cg::io::MouseLeftButtonReleased{ cg::Vector2i{x, y} });
+            break;
+        default: // ignore
+            break;
+        }
+        break;
+    case GLUT_RIGHT_BUTTON:
+        switch (state) {
+        case GLUT_DOWN:
+            canvas.sendInput(cg::io::MouseRightButtonPressed{ cg::Vector2i{x, y} });
+            break;
+        case GLUT_UP:
+            canvas.sendInput(cg::io::MouseRightButtonReleased{ cg::Vector2i{x, y} });
+            break;
+        default: // ignore
+            break;
+        }
+        break;
+    default: // ignore
+        break;
+    }
+}
+
+
+
 #if defined(_WIN32) || defined(_WIN64)
     HANDLE _hConsole;
     WORD _saved_attributes;
 #endif
+
 
 int main(int argc, char** argv)
 {
@@ -119,6 +191,12 @@ int main(int argc, char** argv)
 
     glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y); // tamanho da área interna da janela (coordenadas de tela)
     glutCreateWindow("Trabalho CG [Open GL]: Bandeira do Brasil");
+
+    // Glut Input Events -> Eventos de entrada customizados
+    glutPassiveMotionFunc(onMouseMoveEvent);
+    glutMotionFunc(onMouseDragEvent);
+    glutMouseFunc(onMouseButtonEvent);
+    glutMouseWheelFunc(onMouseWheelEvent);
 
     // Setup Gui Singleton
     Gui::initialize();

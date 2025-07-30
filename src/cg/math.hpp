@@ -25,54 +25,89 @@ template <typename T>
 constexpr T PI = std::numbers::pi_v<T>;
 
 
-struct Vector2 {
-    float x = 0.0f, y = 0.0f;
+template <typename T>
+struct Vec2 {
+    T x = 0, y = 0;
 
-    constexpr Vector2() = default;
     // Construtores
-    constexpr Vector2(float x, float y) : x(x), y(y) {}
+    constexpr Vec2() = default;
+    constexpr Vec2(T x, T y) : x(x), y(y) {}
+
+    // Construtor de conversão (somente quando U→T é válido):
+    template<std::convertible_to<T> U>
+    Vec2(Vec2<U> const& v) : x(v.x) {}
+    // De forma similar para o operador de assinatura:
+    template<std::convertible_to<T> U>
+    Vec2& operator=(Vec2<U> const& v) {
+        x = v.x;
+        y = v.y;
+        return *this;
+    }
 
     // Operadores aritméticos
-    constexpr Vector2 operator/(float f) const { return {x / f, y / f}; }
-    constexpr Vector2 operator*(float f) const { return {x * f, y * f}; }
-    constexpr Vector2 operator+(Vector2 v) const { return {x + v.x, y + v.y}; }
-    constexpr Vector2 operator-(Vector2 v) const { return {x - v.x, y - v.y}; }
-    Vector2& operator+=(Vector2 v) {
+    template <typename S>
+    constexpr Vec2 operator/(S f) const { return {x / f, y / f}; }
+    template <typename S>
+    constexpr Vec2 operator*(S f) const { return {x * f, y * f}; }
+
+    constexpr Vec2 operator+(Vec2 v) const { return {x + v.x, y + v.y}; }
+    constexpr Vec2 operator-(Vec2 v) const { return {x - v.x, y - v.y}; }
+
+    Vec2& operator+=(Vec2 v) {
         x += v.x;
         y += v.y;
         return *this;
     }
-    Vector2& operator-=(Vector2 v) {
+    Vec2& operator-=(Vec2 v) {
         x -= v.x;
         y -= v.y;
         return *this;
     }
 
-    inline float dot() {
+    inline T dot() {
         return x * x + y * y;
     }
 };
 
+using Vector2 = Vec2<float>;
+using Vector2i = Vec2<int>;
 
-struct Vector3 {
-    float x = 0.0f, y = 0.0f, z = 0.0f;
+
+template <typename T>
+struct Vec3 {
+    T x = 0.0f, y = 0.0f, z = 0.0f;
 
     // Construtores
-    constexpr Vector3() = default;
-    Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+    constexpr Vec3() = default;
+    Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+
+    // Construtor de conversão (somente quando U→T é válido):
+    template<std::convertible_to<T> U>
+    Vec3(Vec3<U> const& v) : x(v.x) {}
+    // De forma similar para o operador de assinatura:
+    template<std::convertible_to<T> U>
+    Vec3& operator=(Vec3<U> const& v) {
+        x = v.x;
+        y = v.y;
+        return *this;
+    }
 
     // Operadores aritméticos
-    Vector3 operator/(float f) const { return {x / f, y / f, z / f}; }
-    Vector3 operator*(float f) const { return {x * f, y * f, z * f}; }
-    Vector3 operator+(Vector3 v) const { return {x + v.x, y + v.y, z + v.z}; }
-    Vector3 operator-(Vector3 v) const { return {x - v.x, y - v.y, z - v.z}; }
-    Vector3& operator+=(const Vector3 &v) {
+    template <typename S>
+    Vec3 operator/(S f) const { return {x / f, y / f, z / f}; }
+
+    template <typename S>
+    Vec3 operator*(S f) const { return {x * f, y * f, z * f}; }
+
+    Vec3 operator+(Vec3 v) const { return {x + v.x, y + v.y, z + v.z}; }
+    Vec3 operator-(Vec3 v) const { return {x - v.x, y - v.y, z - v.z}; }
+    Vec3& operator+=(const Vec3 &v) {
         x += v.x;
         y += v.y;
         z += v.z;
         return *this;
     }
-    Vector3& operator-=(const Vector3 &v) {
+    Vec3& operator-=(const Vec3 &v) {
         x -= v.x;
         y -= v.y;
         z -= v.z;
@@ -81,15 +116,14 @@ struct Vector3 {
     inline float dot() {
         return x * x + y * y + z * z;
     }
-    inline Vector3 cross() {
-        return Vector3(y * z, z * x, x * y);
+    inline Vec3 cross() {
+        return Vec3(y * z, z * x, x * y);
     }
 };
 
+using Vector3 = Vec3<float>;
+using Vector3i = Vec3<int>;
 
-struct Color {
-    float r, g, b, a;
-};
 
 struct ColorRgb {
     unsigned char r = 0, g = 0, b = 0;
@@ -97,6 +131,13 @@ struct ColorRgb {
     ColorRgb() = default; // implicit constructor
     ColorRgb(unsigned char r, unsigned char g, unsigned char b) : r(r), g(g), b(b) {}
     Vector3 normalized() const { return Vector3(r / 255.0f, g / 255.0f, b / 255.0f); }
+};
+
+
+struct Color {
+    float r, g, b, a;
+
+    Color(ColorRgb color, float alpha) : r{(float)color.r}, g{(float)color.g}, b{(float)color.b}, a{(float)alpha} {}
 };
 
 
