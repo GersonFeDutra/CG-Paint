@@ -1,5 +1,59 @@
 # Trabalho de Avaliação (Computação Gráfica [CC0029]) - Paint em OpenGL
 
+## Designação [Objetivos]
+
+### 1. Desenvolva uma aplicação em OpenGL usando a linguagem C que permite o usuário a criação de objetos primários, seleção de objetos e transformações geométricas (6,0 pontos). 
+
+- [ ] Objetos primários (usuário define quais objetos e quantas vezes deseja criar):
+    - [ ] Ponto
+    - [ ] Segmento de Reta
+    - [ ] Polígono
+- [ ] Seleção de objetos para poder realizar as transformações geométricas e 
+exclusões:
+    - [ ] Selecionar objetos primários individualmente (ponto, segmento de reta e polígono)
+    - [ ] Excluir objetos selecionados
+- [ ] Transformações geométricas (crie a matriz de transformação e matriz composta, quando necessário):
+    - [ ] Arrastar e soltar (transladar)
+    - [ ] Rotacionar em relação ao centro do objeto
+        - [ ] No ponto é em relação a origem do eixo de coordenadas
+    - [ ] Escalar em relação ao centro do objeto
+        - [ ] No ponto não existe
+    - [ ] Reflexão
+    - [ ] Cisalhamento
+
+> [!NOTE]
+> Obs: para a criação de objetos, seleção de objetos e transformações
+> geométricas podem ser usados os mais diversos eventos como:
+> - Clique do mouse;
+> - Botão de rolagem do mouse;
+> - Teclado do computador.
+
+> [!TIP]
+> Sugestão: use estruturas de dados para construção e manipulação dos objetos
+> primários.
+
+### 2. Além das transformações geométricas, implemente também funcionalidades que possam ... (2,0 pontos):
+
+- [ ] Salvar os objetos geométricos criados em um arquivo
+- [ ] Carregar os objetos geométricos de um arquivo.
+
+### 3. Implemente uma funcionalidade para fazer animação com os objetos primários.
+
+- [ ] Use a criatividade!
+
+### Definição das apresentações
+
+- [ ] Cada grupo deverá preparar e realizar uma apresentação detalhada sobre o projeto desenvolvido, abordando os seguintes aspectos:
+    - [ ] Explique a estrutura de dados utilizada para criar e manipular os objetos geométricos e por que foi escolhida
+    - [ ] Mostre o funcionamento do projeto, incluindo criação, seleção, transformação dos objetos, etc
+    - [ ] Apresentação das implementações dos algoritmos de seleção de objetos
+
+> [!NOTE]
+> **Tempo de apresentação:** 20-30min <br>
+> **Entregar:** Código fonte + Apresentação
+
+---
+
 ## Instalação
 
 Depende do seu sistema operacional. Siga as instruções dadas pela professora: MingW e GLUT (FreeGLUT) no Windows, e G++ com GLU no Linux.

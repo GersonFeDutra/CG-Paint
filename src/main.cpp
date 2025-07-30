@@ -9,7 +9,6 @@
 #include "cg/canvas.hpp"
 #include "cg/canvas_itens/flag.hpp"
 
-#include "facade/gui.hpp"
 
 static cg::Canvas canvas;
 
