@@ -51,10 +51,8 @@ namespace cg {
         //friend class CanvasItem;
     public:
         /* Propagates user input to each Canvas Item on the canvas. */
-        void updateInput();
-        void updateInput(MouseInputEvent);
-        void updateInput(MouseWheelV);
-        void updateInput(MouseWheelH);
+        template <typename IE>
+        void updateInput(IE input_event);
         /* Propagates a process call to each Canvas Item on the canvas. */
         TimePoint updateProcess(TimePoint lastTime);
         /* Propagates a render call to each Canvas Item on the canvas. */
