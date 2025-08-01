@@ -10,7 +10,7 @@ namespace cg {
     Flag::ColorSet Flag::colors;
 
 
-	int Flag::init()
+	Flag::Flag()
 	{
         auto [r, g, b] = colors.GREEN.normalized();
 
@@ -47,8 +47,6 @@ namespace cg {
                 gluOrtho2D(0.0, SIZE.x, 0.0, SIZE.y); // coordenadas limite do viewport normalizadas (em 2D)
             }
         }
-
-        return EXIT_SUCCESS;
 	}
 
     void Flag::_process(DeltaTime delta)

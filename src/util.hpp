@@ -18,7 +18,7 @@
 	#define SET_CLI_YELLOW() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_INTENSITY)
 	#define RESET_CLI() SetConsoleTextAttribute(_hConsole, _saved_attributes)
 #elif defined(__APPLE__) || defined(__MACH__)
-	static_assert(false, "Não implementado para macOS");
+	static_assert(false, "Nï¿½o implementado para macOS");
 #elif defined(__linux__) || defined(__unix__) || defined(unix) || defined(__unix)
 	#define SET_CLI_RED() std::cerr << "\033[31m"
 	#define SET_CLI_GREEN() std::cerr << "\033[32m"
@@ -74,7 +74,7 @@ constexpr void print_success(const char* message, Args...args) {
 inline void print_location_tag(const char* tag,
 	const std::source_location location = std::source_location::current()
 ) {
-	fprintf(stderr, "[%s] %s:%d (%s): ", // Arquivo, linha e função
+	fprintf(stderr, "[%s] %s:%d (%s): ", // Arquivo, linha e funï¿½ï¿½o
 		tag, location.file_name(), location.line(), location.function_name());
 }
 
@@ -124,9 +124,9 @@ inline bool GLLogCall(const std::source_location location = std::source_location
 
 	/* Macro de Debug para chamadas OpenGL */
 	#define GLdebug if (GLDebugScope _gl_debug_scope = GLDebugScope())
-	// Usa o escopo temporário para realizar as chamadas no construtor/destrutor com RAII
+	// Usa o escopo temporï¿½rio para realizar as chamadas no construtor/destrutor com RAII
 
-	// Prefira a versão escopada acima
+	// Prefira a versï¿½o escopada acima
 	//#define GLCall(GL) GLClearError(); GL; GLLogCall()
 #else
 	constexpr bool IS_DEBUG = false; // Is debugger availlable?

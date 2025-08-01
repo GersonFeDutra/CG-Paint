@@ -18,9 +18,7 @@ namespace cg {
     public:
         static constexpr Vector2 SIZE{ 20, 14 };
 
-        Flag() = default;
-
-        int init();
+        Flag();
 
         void _process(DeltaTime delta) override;
 
