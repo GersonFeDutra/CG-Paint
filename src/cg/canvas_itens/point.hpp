@@ -6,18 +6,20 @@
 
 namespace cg
 {
-    class Point : public CanvasItem
+    class Points : public CanvasItem
     {
     public:
-        Point() = default;
+        Points() = default;
+        Points(ColorRgb point_color, ArrayList<int> coords);
 
-        int init(ColorRgb pointColor, ArrayList<int> coords);
-
-        void _process(DeltaTime delta) override;
+        //void _process(DeltaTime delta) override;
 
         void _render() override;
 
-        void _input(io::MouseMove input_event) override;
+        //void _input(io::MouseMove input_event) override;
+    private:
+        ColorRgb pointColor;
+        ArrayList<int> coords;
     };
     
 } // namespace cg

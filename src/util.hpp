@@ -77,7 +77,7 @@ inline void print_location_tag(const char* tag,
 	fprintf(stderr, "[%s] %s:%d (%s): ", // Arquivo, linha e fun��o
 		tag, location.file_name(), location.line(), location.function_name());
 }
-ä
+
 
 /* Clear Open GL Error codes stack. */
 inline void GLClearError()

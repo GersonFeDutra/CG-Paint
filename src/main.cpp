@@ -30,7 +30,6 @@ int init(void)
 
     flag = _flag_ptr.get();
     canvas.insert(std::move(_flag_ptr));
-    flag->init();
 
     return EXIT_SUCCESS;
 }

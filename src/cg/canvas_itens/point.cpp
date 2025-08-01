@@ -6,7 +6,10 @@
 
 namespace cg
 {
-    int Point::init(ColorRgb pointColor, ArrayList<int> coords) {
+    Points::Points(ColorRgb point_color, ArrayList<int> coords) : pointColor(point_color), coords(coords) {}
+
+    void Points::_render()
+    {
         GLdebug {
             glColor3ub(pointColor.r, pointColor.g, pointColor.b);
         }
@@ -15,6 +18,5 @@ namespace cg
                 glVertex2i(coords[0], coords[1]);
             glEnd();
         }
-        return EXIT_SUCCESS;
     }
 } // namespace cg
