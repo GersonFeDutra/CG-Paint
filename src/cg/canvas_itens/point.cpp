@@ -6,7 +6,7 @@
 
 namespace cg
 {
-    Points::Points(ColorRgb point_color, ArrayList<int> coords) : pointColor(point_color), coords(coords) {}
+    Points::Points(ColorRgb point_color, ArrayList<Vector2> point_list) : pointColor(point_color), pointList(point_list) {}
 
     void Points::_render()
     {
@@ -15,7 +15,9 @@ namespace cg
         }
         GLdebug {
             glBegin(GL_POINTS);
-                glVertex2i(coords[0], coords[1]);
+                for (Vector2 point : pointList) {
+                    glVertex2i(point.x, point.y);
+                }
             glEnd();
         }
     }

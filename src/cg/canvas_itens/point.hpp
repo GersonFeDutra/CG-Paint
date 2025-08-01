@@ -10,7 +10,7 @@ namespace cg
     {
     public:
         Points() = default;
-        Points(ColorRgb point_color, ArrayList<int> coords);
+        Points(ColorRgb point_color, ArrayList<Vector2> point_list);
 
         //void _process(DeltaTime delta) override;
 
@@ -19,7 +19,7 @@ namespace cg
         //void _input(io::MouseMove input_event) override;
     private:
         ColorRgb pointColor;
-        ArrayList<int> coords;
+        ArrayList<Vector2> pointList;
     };
     
 } // namespace cg
