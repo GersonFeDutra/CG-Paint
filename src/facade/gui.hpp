@@ -174,11 +174,15 @@ public:
     }
 
     /** Displays a checkbox button inside the window
-     * @param active Controls a bool to represent the active state.
+     * @param active: Controls a bool to represent the active state.
      * Returns true if active.
      */ 
     inline bool showCheckBox(bool* active, const char* label = "") const {
         return ImGui::Checkbox(label, active);
+    }
+
+    inline bool showRadioButton(int* choices, int choice = 0, const char* label = "") const {
+        return ImGui::RadioButton(label, choices, choice);
     }
 
     // inline void showRadioButton(const char *label = "", bool active = false) const {

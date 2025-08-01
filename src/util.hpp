@@ -15,14 +15,16 @@
 	extern WORD _saved_attributes;
 	#define SET_CLI_RED() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_INTENSITY)
 	#define SET_CLI_GREEN() SetConsoleTextAttribute(_hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY)
-	#define SET_CLI_YELLOW() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_INTENSITY)
+	#define SET_CLI_YELLOW() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY)
+	#define SET_CLI_BLUE() SetConsoleTextAttribute(_hConsole, FOREGROUND_BLUE FOREGROUND_INTENSITY)
 	#define RESET_CLI() SetConsoleTextAttribute(_hConsole, _saved_attributes)
 #elif defined(__APPLE__) || defined(__MACH__)
-	static_assert(false, "N�o implementado para macOS");
+	static_assert(false, "Não implementado para macOS");
 #elif defined(__linux__) || defined(__unix__) || defined(unix) || defined(__unix)
 	#define SET_CLI_RED() std::cerr << "\033[31m"
 	#define SET_CLI_GREEN() std::cerr << "\033[32m"
 	#define SET_CLI_YELLOW() std::cerr << "\033[33m"
+	#define SET_CLI_BLUE() std::cerr << "\033[34m"
 	#define RESET_CLI() std::cerr << "\033[m"
 #else
 	static_assert(false, "Sistema operacional desconhecido");

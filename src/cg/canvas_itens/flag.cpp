@@ -56,10 +56,6 @@ namespace cg {
     void Flag::_render()
     {
         GLdebug{
-            glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
-        }
-
-        GLdebug{
                 glColor3ub(colors.YELLOW.r, colors.YELLOW.g, colors.YELLOW.b);
         }
 
