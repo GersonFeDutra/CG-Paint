@@ -11,26 +11,10 @@
 #include "cg/canvas_itens/point.hpp"
 
 
-static constexpr cg::Vector2 WINDOW_SIZE{ cg::Flag::SIZE * 30 }; // aspect ratio: 10:7
-
-static constexpr cg::Transform2D SCREEN_TO_NDC{
-    cg::Vector3{ 2.0f / WINDOW_SIZE.x, 0.0f, 0.0f },
-    cg::Vector3{ 0.0f, -2.0f / WINDOW_SIZE.y, 0.0f },
-    cg::Vector3{ -1.0f, 1.0f, 1.0f },
-}; // Screen coordinates to Normalized Display Coordinates
-
-enum {
-    POINT_CHECK = 0,
-    LINE_CHECK = 1,
-    POLY_CHECK = 2,
-};
-static int current_tool_primitive;
-
-static cg::Canvas canvas;
+static cg::Canvas canvas{ cg::Flag::SIZE * 30 };
 
 cg::Flag *flag = nullptr;
 
-static cg::Color global_color = cg::colors::WHITE; // define a cor selecionada na janela separada
 static int selectedShape = 0; // point
 
 
@@ -49,7 +33,7 @@ int init(void)
 /* Loop principal de desenho. */
 void display()
 {
-    //Gui::newFrame();
+    Gui::newFrame();
 
     GLdebug{
         glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
@@ -61,53 +45,37 @@ void display()
     // Cada janela ser criada num escopo separado para invocar
     // os construtores/ destrutores necessários
     {
-        goto down;
         static int counter = 0;
         static float f = 0.0f;
-        // static cg::Vector3 color;
 
-        // testes
-        // Window test("Hello, world!");
+        Window toolBox("Controls");
 
-        // test.showText("Teste!");
-        // test.showCheckBox(&check, "Active");
-        // test.showSliderFloat(&f, "float");
-        // test.showColorEdit(&global_color, "color");
+        // toolBox.showSliderFloat(&f, "float");
+        // toolBox.showCheckBox(&check, "Active");
+        // toolBox.showText("Teste!");
 
-        Window test("Controls");
-
-        //switch (currentPrimitive)
-        //{
-        //case POINT:
-        //    insert(std::make_unique<Point>(input_event.position));
-        //    break;
-        //default:
-        //    break;
-        //}
-
-        if (test.showRadioButton(&current_tool_primitive, POINT_CHECK, "Point")) {
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
             // use point
         }
-        if (test.showRadioButton(&current_tool_primitive, LINE_CHECK, "Line")) {
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
             // use line
         }
-        if (test.showRadioButton(&current_tool_primitive, POLY_CHECK, "Polygon")) {
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
             // use polygon
         }
         
-        test.showColorEdit((cg::Vector3 *)&global_color.r, "color");
+        toolBox.showColorEdit((cg::Vector3 *)&canvas.toolBox.currentColor.r, "color");
         
-        if (test.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+        if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
-        test.sameLine();
+        toolBox.sameLine();
 
-        test.showText("counter = %d", counter);
+        toolBox.showText("counter = %d", counter);
         
-        test.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
+        toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
     }
-down:
 
-    //Gui::render();
+    Gui::render();
 
     // Sincroniza comandos de desenho não executados,
     // em tempo finito [GLUT_DOUBLE buffering]
@@ -139,7 +107,7 @@ void onMouseMoveEvent(int x, int y) {
     if (Gui::isUsingMouseInput())
         return; // A Interface Gráfica do Usuário tem prioridade na entrada. "Camada superior"
 
-    canvas.sendInput(cg::io::MouseMove{ cg::Vector2i{x, y} });
+    canvas.sendScreenInput<cg::io::MouseMove>(x, y);
 }
 
 
@@ -148,7 +116,7 @@ void onMouseDragEvent(int x, int y) {
     if (Gui::isUsingMouseInput())
         return;
 
-    canvas.sendInput(cg::io::MouseDrag{ cg::Vector2i{x, y} });
+    canvas.sendScreenInput<cg::io::MouseDrag>(x, y);
 }
 
 
@@ -159,11 +127,11 @@ void onMouseWheelEvent(int wheel, int direction, int x, int y) {
 
     switch (wheel) {
     case 0:
-        canvas.sendInput(cg::io::MouseWheelV{cg::Vector2i{x, y}, direction });
+        canvas.sendScreenInput<cg::io::MouseWheelV>(x, y, direction);
         break;
     case 1:
-        canvas.sendInput(cg::io::MouseWheelH{cg::Vector2i{x, y}, direction});
-    break;
+        canvas.sendScreenInput<cg::io::MouseWheelH>(x, y, direction);
+        break;
     default: // ignore
         break;
     }
@@ -180,23 +148,11 @@ void onMouseButtonEvent(int button, int state, int x, int y)
     case GLUT_LEFT_BUTTON:
         switch (state) {
         case GLUT_DOWN:
-            canvas.sendInput(cg::io::MouseLeftButtonPressed{ cg::Vector2i{x, y} });
+            canvas.sendScreenInput<cg::io::MouseLeftButtonPressed>(x, y);
             break;
-        case GLUT_UP:
-
-            switch (current_tool_primitive)
-            {
-            case POINT_CHECK: {
-                cg::ColorRgb color = cg::Color(global_color);
-                cg::Vector2 position = SCREEN_TO_NDC.transform(x, y);
-                canvas.insert(std::make_unique<cg::Point>(position, color));
-            } break;
-            default:
-                break;
-            }
-
-            canvas.sendInput(cg::io::MouseLeftButtonReleased{ cg::Vector2i{x, y} });
-            break;
+        case GLUT_UP: {
+            canvas.sendScreenInput<cg::io::MouseLeftButtonReleased>(x, y);
+        } break;
         default: // ignore
             break;
         }
@@ -204,10 +160,10 @@ void onMouseButtonEvent(int button, int state, int x, int y)
     case GLUT_RIGHT_BUTTON:
         switch (state) {
         case GLUT_DOWN:
-            canvas.sendInput(cg::io::MouseRightButtonPressed{ cg::Vector2i{x, y} });
+            canvas.sendScreenInput<cg::io::MouseRightButtonPressed>(x, y);
             break;
         case GLUT_UP:
-            canvas.sendInput(cg::io::MouseRightButtonReleased{ cg::Vector2i{x, y} });
+            canvas.sendScreenInput<cg::io::MouseRightButtonReleased>(x, y);
             break;
         default: // ignore
             break;
@@ -247,8 +203,9 @@ int main(int argc, char** argv)
 
     //glEnable(GL_MULTISAMPLE);
 
-    glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y); // tamanho da área interna da janela (coordenadas de tela)
-    glutCreateWindow("Trabalho CG [Open GL]: Bandeira do Brasil");
+    auto window_size = canvas.getWindowSize();
+    glutInitWindowSize(window_size.x, window_size.y); // tamanho da área interna da janela (coordenadas de tela)
+    glutCreateWindow("Paint CG");
 
     // Glut Input Events -> Eventos de entrada customizados
     glutPassiveMotionFunc(onMouseMoveEvent);

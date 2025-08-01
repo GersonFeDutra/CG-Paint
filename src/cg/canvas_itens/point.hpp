@@ -16,10 +16,10 @@ namespace cg
         //void _process(DeltaTime delta) override;
 
         void _render() override;
+        void _input(io::MouseDrag mouse_event) override;
 
         //void _input(io::MouseMove input_event) override;
     private:
-        Vector2 position;
         ColorRgb color; // TODO -> alpha blending
         //unsigned size; // TODO -> smooth point
     };

@@ -1,3 +1,4 @@
+#include "point.hpp"
 #include <cstdlib>
 
 #include "util.hpp"
@@ -6,7 +7,7 @@
 
 namespace cg
 {
-    Point::Point(Vector2 position, ColorRgb color) : position(position), color(color) {
+    Point::Point(Vector2 position, ColorRgb color) : CanvasItem{ position }, color{ color } {
         SET_CLI_YELLOW();
         printf("%f, %f\n", position.x, position.y);
         RESET_CLI();
@@ -23,6 +24,11 @@ namespace cg
                 glVertex2f(position.x, position.y);
             glEnd();
         }
+    }
+
+    void Point::_input(io::MouseDrag mouse_event)
+    {
+        position = mouse_event.position;
     }
 
     Points::Points(ColorRgb point_color, ArrayList<Vector2> point_list) : pointColor(point_color), pointList(point_list) {}

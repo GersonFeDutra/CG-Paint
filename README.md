@@ -5,7 +5,7 @@
 ### 1. Desenvolva uma aplicação em OpenGL usando a linguagem C que permite o usuário a criação de objetos primários, seleção de objetos e transformações geométricas (6,0 pontos). 
 
 - [ ] Objetos primários (usuário define quais objetos e quantas vezes deseja criar):
-    - [ ] Ponto
+    - [x] Ponto
     - [ ] Segmento de Reta
     - [ ] Polígono
 - [ ] Seleção de objetos para poder realizar as transformações geométricas e 

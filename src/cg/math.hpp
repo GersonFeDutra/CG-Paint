@@ -190,6 +190,9 @@ struct Mat3 /* Matriz column-major 3x3. Representing a 2D transformation. */
             columns[0].y * x + columns[1].y * y + columns[2].y
         };
     }
+    constexpr inline Vec2<T> transform(std::convertible_to<Vec2<T>> auto v) const {
+        return (*this).transform(v.x, v.y);
+    }
 
     constexpr inline const T get(std::size_t col, std::size_t row) const {
         assert_err(col < 3 && row < 3, "Index out of range.");
