@@ -6,7 +6,7 @@
 
 - [ ] Objetos primários (usuário define quais objetos e quantas vezes deseja criar):
     - [x] Ponto
-    - [ ] Segmento de Reta
+    - [x] Segmento de Reta
     - [ ] Polígono
 - [ ] Seleção de objetos para poder realizar as transformações geométricas e 
 exclusões:

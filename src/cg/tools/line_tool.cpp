@@ -22,15 +22,19 @@ namespace cg {
         return ptr;
 	}
 
-    // TODO -> move iterator to math.hpp for later use.
-    // Gera uma interpolação de from à to usando iteradores.
     class Vec2Interpolator {
     public:
         Vec2Interpolator(Vector2 from, Vector2 to, float step_size)
             : from(from), to(to), step_size(step_size)
         {
             total_distance = from.distance(to);
-            steps = static_cast<int>(total_distance / step_size) + 1;
+
+            if (total_distance < 1e-5f) {
+                steps = 1;
+            }
+            else {
+                steps = std::max(2, static_cast<int>(std::ceil(total_distance / step_size)));
+            }
         }
 
         class Iterator {
@@ -40,14 +44,20 @@ namespace cg {
             }
 
             Vector2 operator*() const {
-                float t = static_cast<float>(step) / interpolator->steps;
+                float t = (interpolator->steps > 1)
+                    ? static_cast<float>(step) / (interpolator->steps - 1)
+                    : 0.0f;
                 return interpolator->from.lerp(interpolator->to, t);
             }
 
-            Iterator& operator++() { step++; return *this; }
-            // Verifica se a direção atual entre os pontos corresponde a direção alvo.
-            // Se o sinal do produto escalar das direções mudar, significa que elas mudaram de direção (passou do ponto alvo).
-            bool operator!=(const Iterator& other) const { return step != other.step; }
+            Iterator& operator++() {
+                step++;
+                return *this;
+            }
+
+            bool operator!=(const Iterator& other) const {
+                return step != other.step;
+            }
 
         private:
             Vec2Interpolator* interpolator;
@@ -55,7 +65,8 @@ namespace cg {
         };
 
         Iterator begin() { return Iterator(this, 0); }
-        Iterator end() { return Iterator(this, steps + 1); } // +1 para incluir o ponto final
+        Iterator end() { return Iterator(this, steps); }
+        int getSteps() const { return steps; }
 
     private:
         Vector2 from;
@@ -65,40 +76,63 @@ namespace cg {
         int steps;
     };
 
-    // FIXME
     void LineTool::_render() {
-        if (!isDrawing)
+        if (!isDrawing || toolBox.isInsideGui)
             return;
 
-        // Draws dashed line
         GLdebug{
-            int alt = 0;
+            const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
-            const float SEGMENT_LENGHT = 2.5f; // length of each segment onto the dashed line.
-            Vector2 start = (line->size() == 0) ? line->position : line->frontVertice();
-            // Convert to screen coordinates to avoid minor precision issues [too close to 0].
-            start = toolBox.canvas->ndcToScreen(start);
-            Vector2 end = toolBox.canvas->ndcToScreen(position);
+            Vector2 start = line->lastVertice();
+            Vector2 screenStart = toolBox.canvas->ndcToScreen(start);
+            Vector2 screenEnd = toolBox.canvas->ndcToScreen(position);
 
-            Vec2Interpolator interpolator(start, end, SEGMENT_LENGHT);
-            auto it = interpolator.begin();
+            float screenDistance = screenStart.distance(screenEnd);
+            if (screenDistance < 1e-5f)
+                return; // avoid low precision issues
+
+            Vec2Interpolator interpolator(screenStart, screenEnd, DASH_LENGTH);
 
             glBegin(GL_LINES);
-            glColor4f(colors::WHITE.r, colors::WHITE.g, colors::WHITE.b, colors::WHITE.a);
+            glColor4f(GHOST_LINE_COLOR.r, GHOST_LINE_COLOR.g, GHOST_LINE_COLOR.b, GHOST_LINE_COLOR.a);
 
-            for (++it; it != interpolator.end(); ++it) {
-                Vector2 current = toolBox.canvas->screenToNdc(*it);
+            bool drawSegment = true;
+            Vector2 prev = screenStart;
+            int segmentCount = 0;
 
-                if (alt == 1 || alt == 2)
-                    glVertex2f(current.x, current.y);
-                alt++;
-                alt %= 3;
+            for (auto it = interpolator.begin(); it != interpolator.end(); ++it) {
+                Vector2 current = *it;
+
+                // Alterna entre traço e espaço a cada DASH_LENGTH
+                if (drawSegment) {
+                    Vector2 ndcPrev = toolBox.canvas->screenToNdc(prev);
+                    Vector2 ndcCurrent = toolBox.canvas->screenToNdc(current);
+
+                    glVertex2f(ndcPrev.x, ndcPrev.y);
+                    glVertex2f(ndcCurrent.x, ndcCurrent.y);
+                }
+
+                // A cada DASH_LENGTH percorrida, alterna o estado
+                segmentCount++;
+                if (segmentCount % 2 == 0) {
+                    drawSegment = !drawSegment;
+                }
+
+                prev = current;
             }
+
             glEnd();
         }
     }
 
+
     void LineTool::_input(io::MouseMove mouse_event)
+    {
+        if (isDrawing)
+            position = mouse_event.position;
+    }
+
+    void LineTool::_input(io::MouseDrag mouse_event)
     {
         if (isDrawing)
             position = mouse_event.position;
@@ -112,6 +146,7 @@ namespace cg {
         else {
             line = (Line *)make(mouse_event.position);
             isDrawing = true;
+            position = mouse_event.position;
         }
     }
 

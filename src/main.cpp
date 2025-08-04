@@ -107,7 +107,7 @@ void onMouseMoveEvent(int x, int y) {
     // Delegar entrada ao Dear Im Gui primeiro
     ImGui_ImplGLUT_MotionFunc(x, y);
 
-    if (Gui::isUsingMouseInput())
+    if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return; // A Interface Gráfica do Usuário tem prioridade na entrada. "Camada superior"
 
     canvas.sendScreenInput<cg::io::MouseMove>(x, y);
@@ -116,7 +116,7 @@ void onMouseMoveEvent(int x, int y) {
 
 void onMouseDragEvent(int x, int y) {
     ImGui_ImplGLUT_MotionFunc(x, y);
-    if (Gui::isUsingMouseInput())
+    if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return;
 
     canvas.sendScreenInput<cg::io::MouseDrag>(x, y);
@@ -125,7 +125,7 @@ void onMouseDragEvent(int x, int y) {
 
 void onMouseWheelEvent(int wheel, int direction, int x, int y) {
     ImGui_ImplGLUT_MouseWheelFunc(wheel, direction, x, y);
-    if (Gui::isUsingMouseInput())
+    if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return;
 
     switch (wheel) {
@@ -144,7 +144,7 @@ void onMouseWheelEvent(int wheel, int direction, int x, int y) {
 void onMouseButtonEvent(int button, int state, int x, int y)
 {
     ImGui_ImplGLUT_MouseFunc(button, state, x, y);
-    if (Gui::isUsingMouseInput())
+    if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return;
 
     switch (button) {

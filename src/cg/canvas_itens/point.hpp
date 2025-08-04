@@ -10,6 +10,8 @@ namespace cg
     class Point : public CanvasItem
     {
     public:
+        inline static const float SIZE = 10.0f;
+    public:
         Point() = default;
         Point(Vector2 position, ColorRgb color = ColorRgb{});
 

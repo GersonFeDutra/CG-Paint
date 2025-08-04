@@ -47,6 +47,7 @@ namespace cg {
 		int polygonEdges = 1;
 
 		Canvas* canvas = nullptr;
+		bool isInsideGui = false;
 	private:
 		std::array<Painter *, N_PRIMITIVES> tools;
 		int currentTool = POINT;

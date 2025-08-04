@@ -23,13 +23,13 @@ namespace cg
             vertices.push_back(vertice);
         }
 
+        // Tamanho da corda, desconsiderando vértice de origem.
         inline size_t size() {
             return vertices.size();
         }
 
-        inline Vector2 frontVertice() {
-            assert_err(!vertices.empty(), "Cannot access single vertice line.");
-            return vertices.front();
+        inline Vector2 lastVertice() {
+            return (size() == 0) ? position : vertices.back();
         }
     private:
         std::vector<Vector2> vertices;

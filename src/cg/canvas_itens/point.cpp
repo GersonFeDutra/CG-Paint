@@ -16,7 +16,7 @@ namespace cg
     void Point::_render()
     {
         GLdebug{
-            glPointSize(10.0f);
+            glPointSize(SIZE);
         }
         GLdebug{
             glBegin(GL_POINTS);
