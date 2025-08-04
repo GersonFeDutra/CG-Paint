@@ -77,8 +77,33 @@ struct Vec2 {
         return *(&x + i);
     }
 
-    constexpr inline T dot() {
-        return x * x + y * y;
+    template <std::convertible_to<T> U>
+    constexpr inline auto dot(Vec2<U> with) const {
+        return x * with.x + y * with.y;
+    }
+
+    constexpr inline T norm() const {
+        return sqrtf(dot(*this));
+    }
+
+    constexpr Vec2<T> normalized() const {
+        return *this / norm();
+    }
+
+    constexpr inline T distance(Vec2<T> to) const {
+        return (to - *this).norm();
+    }
+
+    constexpr inline Vec2<T> direction(Vec2<T> to) const {
+        return (to - *this).normalized();
+    }
+
+    constexpr inline T length() const {
+        return norm();
+    }
+
+    inline Vec2 lerp(Vec2 to, float by) const {
+        return { x + (to.x - x) * by, y + (to.y - y) * by };
     }
 };
 

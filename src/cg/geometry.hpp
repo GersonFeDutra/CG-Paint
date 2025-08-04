@@ -1,5 +1,5 @@
 #pragma once
-#include "cg/math.hpp"
+#include <cg/math.hpp>
 
 #include <algorithm> // std::clamp
 

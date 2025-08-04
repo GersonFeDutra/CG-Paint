@@ -4,99 +4,23 @@
 #include <vector>
 #include <chrono>
 
+#include "util.hpp"
 #include "math.hpp"
 
-#include "util.hpp"
-
+#include "input_event.hpp"
 #include "tool_box.hpp"
+
+#include "canvas_item.hpp"
 
 template <typename T>
 using ArrayList = std::vector<T>; // alias the data structure by the name of what it actually is.
 
-using DeltaTime = float;
-using TimePoint = std::chrono::steady_clock::time_point;
-using ID = std::size_t;
 
 
 namespace cg {
-
-    namespace io {
-        class Canvas;
-
-        struct MouseInputEvent {
-            Vector2 position; // mouse position on screen
-
-            // Transforms mouse Screen Coordinates to Normalized Device Coordinates before creating the event.
-            MouseInputEvent(Vector2 position) : position{ position } {}
-        };
-        using MouseMove = MouseInputEvent;
-        struct MouseDrag : public MouseInputEvent {
-            MouseDrag(Vector2 position) : MouseInputEvent{ position } {}
-        };
-        struct MouseRightButtonPressed : public MouseInputEvent {
-            MouseRightButtonPressed(Vector2 position) : MouseInputEvent{ position } {}
-        };
-        struct MouseRightButtonReleased : public MouseInputEvent {
-            MouseRightButtonReleased(Vector2 position) : MouseInputEvent{ position } {}
-        };
-        struct MouseLeftButtonPressed : public MouseInputEvent {
-            MouseLeftButtonPressed(Vector2 position) : MouseInputEvent{ position } {}
-        };
-        struct MouseLeftButtonReleased : public MouseInputEvent {
-            MouseLeftButtonReleased(Vector2 position) : MouseInputEvent{ position } {}
-        };
-        struct MouseWheelV : public MouseInputEvent {
-            int direction; // direction moved △y
-
-            MouseWheelV(Vector2 position, int direction) : MouseInputEvent{ position }, direction{ direction } {}
-        };
-        struct MouseWheelH : public MouseInputEvent {
-            int direction; // direction moved △x
-
-            MouseWheelH(Vector2 position, int direction) : MouseInputEvent{ position }, direction{ direction } {}
-        };
-
-    }
-
-    class CanvasItem {
-        friend class Canvas;
-    public:
-        CanvasItem() = default;
-        virtual ~CanvasItem() = default;
-        CanvasItem(Vector2 position) : position{ position } {}
-
-        /* Process mouse input from user. [Move] */
-        virtual void _input(io::MouseMove mouse_event) {}
-        /* Process mouse drag input from user. */
-        virtual void _input(io::MouseDrag mouse_event) {}
-        /* Called when right button is pressed. */
-        virtual void _input(io::MouseRightButtonPressed mouse_event) {}
-        /* Called when left button is pressed. */
-        virtual void _input(io::MouseLeftButtonPressed mouse_event) {}
-        /* Called when right button is released. */
-        virtual void _input(io::MouseRightButtonReleased mouse_event) {}
-        /* Called when left button is released. */
-        virtual void _input(io::MouseLeftButtonReleased mouse_event) {}
-        /* Process mouse wheel vertical input from user. */
-        virtual void _input(io::MouseWheelV mouse_event) {}
-        /* Process mouse wheel horizontal input from user. */
-        virtual void _input(io::MouseWheelH mouse_event) {}
-
-        /** Process data between variations of delta time △t.
-         * @param delta : time stamp between previous frame
-         */
-        virtual void _process(DeltaTime delta) {}
-        /* Draw data onto screen with open GL calls. */
-        virtual void _render() {}
-    private:
-        ID id = 0; // It's id location at the canvas.
-    protected:
-        Vector2 position{};
-    };
-
+    using TimePoint = std::chrono::steady_clock::time_point;
 
     class Canvas {
-        //friend class CanvasItem;
     public:
          Canvas(Vector2 window_size) {
             toolBox.addCanvas(this);
@@ -115,26 +39,21 @@ namespace cg {
         inline void sendScreenInput(int x, int y) {
             Vector2 position = screenToNdc(x, y);
             IE input_event{ position };
-            sendInput(input_event);
+            toolBox.captureInput(input_event);
         }
 
         template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
         inline void sendScreenInput(int x, int y, int direction) {
             Vector2 position = screenToNdc(x, y);
             IE input_event{ position, direction };
-            sendInput(input_event);
+            toolBox.captureInput(input_event);
         }
 
-        /* Propagates user input to each Canvas Item on the canvas. */
+        /* Propagates user input to a Canvas Item on the canvas. */
         template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
-        void sendInput(IE input_event) {
+        inline void sendInput(IE input_event) {
             // TODO -> Check if input is inside item area before sending event.
-            for (auto& item : itens)
-                item->_input(input_event);
         }
-        void sendInput(io::MouseLeftButtonPressed input_event);
-        void sendInput(io::MouseLeftButtonReleased input_event);
-        void sendInput(io::MouseDrag input_event);
 
         /* Propagates a process call to each Canvas Item on the canvas. */
         TimePoint updateProcess(TimePoint lastTime);
@@ -171,7 +90,7 @@ namespace cg {
             return windowSize;
         }
 
-        // Apply screen coordinates to Normalized Display Coordinates at a point.
+        // Changes screen coordinates to Normalized Display Coordinates system.
         inline Vector2 screenToNdc(Vector2 point) {
             return _screenToNdc.transform(point);
         }
@@ -179,12 +98,17 @@ namespace cg {
             return _screenToNdc.transform(x, y);
         }
 
+        // Changes Normalized Display Coordinates to Screen Coordinates system.
+        inline Vector2 ndcToScreen(Vector2 point) {
+            return _ndcToScreen.transform(point);
+        }
+
     private:
         Vector2 windowSize; // aspect ratio: 10:7
         Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
+        Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen coordinates
 
         ArrayList<std::unique_ptr<CanvasItem>> itens;
-        CanvasItem* current = nullptr;
     public:
         ToolBox toolBox;
     };

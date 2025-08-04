@@ -203,6 +203,13 @@ public:
         showSliderFloat(f, 0.0f, 1.0f, label);
     }
 
+    inline void showSliderInt(int* value, int min, int max, const char* label = "", const char* format = "") {
+        ImGui::SliderInt(label, value, min, max, format);
+    }
+    inline void showSliderInt(int* value, int max = INT_MAX, const char* label = "", const char* format = "") {
+        ImGui::SliderInt(label, value, 0, max, format);
+    }
+
     inline void showColorEdit(cg::Vector3* color, const char *label = "") {
         ImGui::ColorEdit3(label, (float*)color); // Edit 3 floats representing a color
     }

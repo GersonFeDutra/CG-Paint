@@ -52,16 +52,19 @@ void display()
 
         // toolBox.showSliderFloat(&f, "float");
         // toolBox.showCheckBox(&check, "Active");
-        // toolBox.showText("Teste!");
 
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
-            // use point
-        }
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
-            // use line
-        }
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
-            // use polygon
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")); // use point
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")); // use line
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")); // use polygon
+
+        switch (canvas.toolBox.currentPrimitive) {
+        case cg::ToolBox::Primitives::POLYGON: {
+            toolBox.sameLine();
+            toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
+            toolBox.sameLine();
+            toolBox.showText("[%d]", canvas.toolBox.polygonEdges);
+        } break;
+        default: break;
         }
         
         toolBox.showColorEdit((cg::Vector3 *)&canvas.toolBox.currentColor.r, "color");
