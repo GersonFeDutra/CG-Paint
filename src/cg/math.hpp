@@ -14,9 +14,14 @@
 // Inclui algumas funções matemáticas básicas
 #include <random>
 #include <numbers>
+#include <type_traits>
+
 
 namespace cg
 {
+
+template<typename T, typename U>
+using LargerType = typename std::common_type<T, U>::type;
 
 // TODO -> default tau/pi precision to float
 template <typename T>
@@ -176,61 +181,64 @@ using Vector3i = Vec3<int>;
 
 
 template <typename T>
-struct Mat3 /* Matriz column-major 3x3. Representing a 2D transformation. */
+struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D ocultando a última linha de coordenadas homogêneas. */
 {
-    Vec3<T>columns[3];
+    Vec2<T>columns[3];
 
-    constexpr Mat3() = default;
-    constexpr Mat3(Vec3<T> col_v1, Vec3<T> col_v2, Vec3<T> col_v3) : columns{ col_v1, col_v2, col_v3 } {}
-    constexpr Mat3(Vec2<T> translation) : columns{ {1, 0, 0}, {0, 1, 0}, {translation, 1} } {}
-    constexpr Mat3(Vec2<T> v1_xaxis, Vec2<T> v2_yaxis) : columns{ Vec3<T>{v1_xaxis, 1.0f}, Vec3<T>{v2_yaxis, 1.0f}, Vec3<T>{0, 0, 1} } {}
-    constexpr Mat3(T x1_x, T x2_y, T x3_h, T y1_x, T y2_y, T y3_h, T h1_x, T h2_y, T h3_h) : columns{
-        { x1_x, x2_y, x3_h },
-        { y1_x, y2_y, y3_h },
-        { h1_x, h2_y, h3_h }
+    constexpr Transf2x3() = default;
+    constexpr Transf2x3(Vec2<T> translation) : columns{ {1, 0}, {0, 1}, translation } {}
+    constexpr Transf2x3(Vec2<T> v1_xaxis, Vec2<T> v2_yaxis, Vec2<T> v3_translation = {}) : columns{v1_xaxis, v2_yaxis, v3_translation} {}
+    constexpr Transf2x3(T xaxis_x, T xaxis_y, T yaxis_x, T yaxis_y, T translation_x = 0, T translation_y = 0) : columns{
+        { xaxis_x, xaxis_y },
+        { yaxis_x, yaxis_y },
+        { translation_x, translation_y }
     } {}
+    constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{Vec2<T>{ translation_x, translation_y }} {}
 
-    constexpr Mat3& operator*=(Mat3<T> m) {
-        columns[0] *= m;
-        columns[1] *= m;
-        columns[2] *= m;
+    constexpr Transf2x3& operator*=(Transf2x3<T> m) {
+        columns[0] = m * columns[0];
+        columns[1] = m * columns[1];
+        columns[2] = m * columns[2];
         return *this;
     }
 
-    constexpr Mat3(Angle theta) : columns(
-        Vec3<T>{ cosf(theta), sinf(theta), 0 },
-        Vec3<T>{ -sinf(theta), cosf(theta), 0 },
-        Vec3<T>{ 0, 0, 1 }
+    constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns(
+        { cosf(theta), sinf(theta) },
+        { -sinf(theta), cosf(theta) },
+        translation
     ) {}
-    constexpr inline Mat3& translate(Vec2<T> direction) {
-        return *this *= Mat3<T>{direction};
+
+    constexpr inline Transf2x3& translate(Vec2<T> direction) {
+        return *this *= Transf2x3<T>{direction};
     }
-    constexpr inline Mat3& rotate(float angle) {
-        return *this *= Mat3{angle};
+    constexpr inline Transf2x3& rotate(float angle) {
+        return *this *= Transf2x3{angle};
     }
 
-    constexpr inline Vec2<T> transform(std::convertible_to<T> auto x, std::convertible_to<T> auto y) const {
-        return {
-            columns[0].x * x + columns[1].x * y + columns[2].x,
-            columns[0].y * x + columns[1].y * y + columns[2].y
-        };
+    template <std::convertible_to<T> U>
+    constexpr inline auto transform(Vec2<U> v) const {
+        return (*this) * v;
     }
-    constexpr inline Vec2<T> transform(std::convertible_to<Vec2<T>> auto v) const {
-        return (*this).transform(v.x, v.y);
+    
+    template <std::convertible_to<T> U>
+    constexpr inline auto transform(U x, U y) const {
+        return (*this) * Vec2<LargerType<T, U>>( x, y );
     }
 
     constexpr inline const T get(std::size_t col, std::size_t row) const {
         assert_err(col < 3 && row < 3, "Index out of range.");
+        if (row == 2)
+            return (T)(col == 2); // Homogeneous coordinates.
         return columns[col][row];
     }
 
     constexpr inline T& get(std::size_t col, std::size_t row) {
-        assert_err(col < 3 && row < 3, "Index out of range.");
+        assert_err(col < 3 && row < 2, "Inaccessible index or out of bounds.");
         return columns[col][row];
     }
 
     constexpr inline T& set(std::size_t col, std::size_t row, T value) {
-        assert_err(col < 3 && row < 3, "Index out of range.");
+        assert_err(col < 3 && row < 2, "Inaccessible index or out of bounds.");
         return columns[col][row] = value;
     }
 };
@@ -238,30 +246,36 @@ struct Mat3 /* Matriz column-major 3x3. Representing a 2D transformation. */
 
 // Point transformation.
 template<typename T, std::convertible_to<T> U>
-inline Vec3<std::common_type<T, U>> operator*(const Mat3<T>& m, const Vec3<U>& v) {
+inline Vec2<LargerType<T, U>> operator*(const Transf2x3<T>& m, const Vec2<U>& v) {
     return {
-        m.columns[0].x * v.x + m.columns[1].x * v.y + m.columns[2].x * v.z,
-        m.columns[0].y * v.x + m.columns[1].y * v.y + m.columns[2].y * v.z,
-        m.columns[0].z * v.x + m.columns[1].z * v.y + m.columns[2].z * v.z
+        m.columns[0].x * v.x + m.columns[1].x * v.y + m.columns[2].x,
+        m.columns[0].y * v.x + m.columns[1].y * v.y + m.columns[2].y
     };
 }
 
-template<typename T, std::convertible_to<T> U>
-inline auto& operator*=(const Vec3<U>& v, const Mat3<T>& m) {
-    v.x = m.columns[0].x * v.x + m.columns[1].x * v.y + m.columns[2].x * v.z;
-    v.y = m.columns[0].y * v.x + m.columns[1].y * v.y + m.columns[2].y * v.z;
-    v.z = m.columns[0].z * v.x + m.columns[1].z * v.y + m.columns[2].z * v.z;
-    return v;
-}
-
+// Não definido para respeitar a regra da ordem das matrizes.
+//template<typename T, std::convertible_to<T> U>
+//inline auto& operator*=(Vec2<U>& v, const Transf2x3<T>& m) {
+//    v.x = m.columns[0].x * v.x + m.columns[1].x * v.y + m.columns[2].x;
+//    v.y = m.columns[0].y * v.x + m.columns[1].y * v.y + m.columns[2].y;
+//    return v;
+//}
 
 template <typename T, std::convertible_to<T> U>
-inline Mat3<T> operator*(Mat3<T> a, Mat3<U> b) {
-    a.columns[0] = {a * b.columns[0]};
-    a.columns[1] = {a * b.columns[1]};
-    a.columns[2] = {a * b.columns[2]};
-    return a;
+inline Transf2x3<LargerType<T, U>> operator*(const Transf2x3<T>& a, const Transf2x3<U>& b) {
+    return {
+        { a * b.columns[0] },
+        { a * b.columns[1] },
+        { a * b.columns[2] }
+    };
 }
+
+template <typename T, std::convertible_to<T> U>
+inline Transf2x3<LargerType<T, U>> operator*=(Transf2x3<T>& a, const Transf2x3<U>& b) {
+    return a = a * b;
+}
+
+using Transform2D = Transf2x3<float>;
 
 
 struct ColorRgb {
@@ -313,5 +327,4 @@ namespace colors {
     }
 }
 
-using Transform2D = Mat3<float>;
 } // namespace cg

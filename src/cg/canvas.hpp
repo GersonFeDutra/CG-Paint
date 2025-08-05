@@ -26,14 +26,14 @@ namespace cg {
             toolBox.addCanvas(this);
             windowSize = window_size;
             _screenToNdc = {
-                { 2.0f / window_size.x, 0.0f, 0.0f },
-                { 0.0f, -2.0f / window_size.y, 0.0f },
-                { -1.0f, 1.0f, 1.0f },
+                { 2.0f / window_size.x, 0.0f },
+                { 0.0f, -2.0f / window_size.y },
+                { -1.0f, 1.0f },
             };
             _ndcToScreen = {
-                { window_size.x / 2.0f, 0.0f, 0.0f },
-                { 0.0f, window_size.y / -2.0f, 0.0f },
-                { window_size.x / 2.0f, window_size.y / 2.0f, 1.0f },
+                { window_size.x / 2.0f, 0.0f },
+                { 0.0f, window_size.y / -2.0f },
+                { window_size.x / 2.0f, window_size.y / 2.0f },
             };
         }
 
