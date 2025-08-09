@@ -7,6 +7,7 @@
 
 #include "tools/point_tool.hpp"
 #include "tools/line_tool.hpp"
+#include "tools/polygon_tool.hpp"
 
 
 namespace cg {
@@ -18,7 +19,8 @@ namespace cg {
     ToolBox::ToolBox() {
         static PointTool pointTool{ *this };
         static LineTool lineTool{ *this };
-        tools = { (Painter*)&pointTool, (Painter*)&lineTool };
+        static PolygonTool polygonTool{ *this }; // Guido: deixei como comentário enquanto não implemento com calma
+        tools = { (Painter*)&pointTool, (Painter*)&lineTool, /*(Painter*)&polygonTool*/ };
     }
 
     void ToolBox::addCanvas(Canvas* canvas_ptr) {
@@ -71,6 +73,21 @@ namespace cg {
 
     void ToolBox::captureInput(io::MouseLeftButtonReleased input_event)
     {
+        if (currentPrimitive >= N_PRIMITIVES)
+            return;
+        if (currentTool != currentPrimitive) {
+            // TODO -> update using tool
+            currentTool = currentPrimitive;
+        }
+
+        tools[currentPrimitive]->_input(input_event);
+    }
+
+    void ToolBox::captureInput(io::MouseRightButtonPressed input_event)
+    {
+        if (currentPrimitive != currentTool && currentTool != POLYGON) {
+            return;
+        }
         if (currentPrimitive >= N_PRIMITIVES)
             return;
         if (currentTool != currentPrimitive) {

@@ -6,7 +6,6 @@
 
 #include <cg/geometry.hpp>
 
-
 namespace cg
 {
     class Line : public CanvasItem
@@ -23,13 +22,18 @@ namespace cg
             vertices.push_back(vertice);
         }
 
-        // Tamanho da corda, desconsiderando v�rtice de origem.
+        // Tamanho da corda, desconsiderando v�rtice de origem.
         inline size_t size() {
             return vertices.size();
         }
 
         inline Vector2 lastVertice() {
             return (size() == 0) ? position : vertices.back();
+        }
+
+        // Guido: adicionei essa função pra ver se um ngc funciona no polygon_tool
+        inline std::vector<Vector2> getVertices() {
+            return vertices;
         }
     private:
         std::vector<Vector2> vertices;

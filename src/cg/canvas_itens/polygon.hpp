@@ -1,0 +1,38 @@
+#pragma once
+
+#include <vector>
+
+#include <cg/canvas.hpp>
+#include <cg/geometry.hpp>
+
+#include "cg/canvas_itens/line.hpp"
+
+namespace cg
+{
+    class Polygon : public CanvasItem
+    {
+        public:
+            Polygon() = default;
+            Polygon(Vector2 position, ColorRgb color = ColorRgb{}) : CanvasItem{ position }, insideColor{ color } {}
+
+
+            void _render() override;
+
+            inline void append(Vector2 newVertex) {
+                vertices.push_back(newVertex);
+            }
+
+            // adicionar mais funções aqui embaixo se precisar
+            inline Vector2 lastVertice() {
+                return (vertices.size() == 0) ? position : vertices.back();
+            }
+
+            inline void setVertices(std::vector<Vector2> allVertices) {
+                for (Vector2 vertex : allVertices)
+                    append(vertex);
+            }
+        private:
+            std::vector<Vector2> vertices;
+            ColorRgb insideColor;
+    };
+} // namespace cg

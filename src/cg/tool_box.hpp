@@ -18,7 +18,7 @@ namespace cg {
 	 */
 	class ToolBox {
 		friend class Tool;
-		static constexpr std::size_t N_PRIMITIVES = 2;
+		static constexpr std::size_t N_PRIMITIVES = 2; // Guido: checar se mudar pra 3 dá problema, n entendi direito como isso funciona ainda
 	public:
 		ToolBox();
 
@@ -33,6 +33,7 @@ namespace cg {
 		void captureInput(io::MouseDrag input_event);
 		void captureInput(io::MouseLeftButtonPressed input_event);
 		void captureInput(io::MouseLeftButtonReleased input_event);
+		void captureInput(io::MouseRightButtonPressed input_event);
     public:
 		enum Primitives {
 			POINT = 0,
@@ -41,10 +42,10 @@ namespace cg {
 		};
         int currentPrimitive = POINT;
 	public:
-		// TODO -> Cor secund�ria [alternada com x key]
+		// TODO -> Cor secund�ria [alternada com x key]
 		Color currentColor = cg::colors::WHITE; // Define a cor atual para pintura.
 		// TODO -> Polygon Tool
-		int polygonEdges = 1;
+		// int polygonEdges = 1; // Guido: acho que é desnecessário, mas vou manter como comentário
 
 		Canvas* canvas = nullptr;
 		bool isInsideGui = false;

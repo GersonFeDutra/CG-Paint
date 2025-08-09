@@ -3,15 +3,15 @@
 #include <util.hpp>
 #include <math.h>
 
-#include "line_tool.hpp"
+#include "polygon_tool.hpp"
 
 #include <cg/tool_box.hpp>
-#include <cg/canvas_itens/line.hpp>
+#include <cg/canvas_itens/polygon.hpp>
 
 
 namespace cg {
 
-    CanvasItem* LineTool::make(Vector2 at) {
+    CanvasItem* PolygonTool::make(Vector2 at) {
         assert_err(toolBox.canvas != nullptr, "Canvas was not added.");
 
         // New line primitive
@@ -19,6 +19,17 @@ namespace cg {
         auto line = std::make_unique<Line>(at, color);
         CanvasItem* ptr = line.get();
         toolBox.canvas->insert(std::move(line));
+        return ptr;
+	}
+
+    CanvasItem* PolygonTool::makePolygon(Vector2 at) {
+        assert_err(toolBox.canvas != nullptr, "Canvas was not added.");
+
+        // New polygon primitive
+        ColorRgb color = Color(toolBox.currentColor);
+        auto poly = std::make_unique<Polygon>(at, color);
+        CanvasItem* ptr = poly.get();
+        toolBox.canvas->insert(std::move(poly));
         return ptr;
 	}
 
@@ -76,14 +87,14 @@ namespace cg {
         int steps;
     };
 
-    void LineTool::_render() {
+    void PolygonTool::_render() {
         if (!isDrawing || toolBox.isInsideGui)
             return;
 
         GLdebug{
             const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
-            Vector2 start = line->lastVertice();
+            Vector2 start = polygon->lastVertice();
             Vector2 screenStart = toolBox.canvas->ndcToScreen(start);
             Vector2 screenEnd = toolBox.canvas->ndcToScreen(position);
 
@@ -126,28 +137,40 @@ namespace cg {
     }
 
 
-    void LineTool::_input(io::MouseMove mouse_event)
+    void PolygonTool::_input(io::MouseMove mouse_event)
     {
         if (isDrawing)
             position = mouse_event.position;
     }
 
-    void LineTool::_input(io::MouseDrag mouse_event)
+    void PolygonTool::_input(io::MouseDrag mouse_event)
     {
         if (isDrawing)
             position = mouse_event.position;
     }
 
 
-    void LineTool::_input(io::MouseLeftButtonPressed mouse_event)
+    void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
         if (isDrawing)
-            line->append(mouse_event.position);
+            tempLine->append(mouse_event.position);
         else {
-            line = (Line *)make(mouse_event.position);
+            tempLine = (Line *)make(mouse_event.position);
             isDrawing = true;
             position = mouse_event.position;
+            initialCoords = Vector2(position.x, position.y);
         }
+    }
+
+    void PolygonTool::_input(io::MouseRightButtonPressed mouse_event)
+    {
+        polygon = (Polygon *) makePolygon(initialCoords);
+        polygon->setVertices(tempLine->getVertices());
+
+        isDrawing = false;
+
+        delete tempLine;
+        tempLine = nullptr;
     }
 
 }
