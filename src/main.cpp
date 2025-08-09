@@ -60,9 +60,9 @@ void display()
         switch (canvas.toolBox.currentPrimitive) {
         case cg::ToolBox::Primitives::POLYGON: {
             toolBox.sameLine();
-            toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
+            // toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
             toolBox.sameLine();
-            toolBox.showText("[%d]", canvas.toolBox.polygonEdges);
+            // toolBox.showText("[%d]", canvas.toolBox.polygonEdges);
         } break;
         default: break;
         }
