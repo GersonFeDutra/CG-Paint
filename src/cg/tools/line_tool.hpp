@@ -8,8 +8,8 @@ namespace cg {
 
 	class LineTool : public Painter {
 		const Color GHOST_LINE_COLOR = { 0.15f, 0.35f, .75f, 0.66f };  // Azul claro semi-transparente
-		const float DASH_LENGTH = 2.5f;  // Comprimento do traçejado em pixels
-		const float GAP_LENGTH = 1.0f;    // Comprimento do espaço em pixels
+		const float DASH_LENGTH = 2.5f;  // Comprimento do traï¿½ejado em pixels
+		const float GAP_LENGTH = 1.0f;    // Comprimento do espaï¿½o em pixels
 	public:
 		LineTool(ToolBox& tool_box) : Painter{ tool_box } {}
 		CanvasItem* make(Vector2 at) override;
@@ -21,5 +21,6 @@ namespace cg {
 		void _input(io::MouseLeftButtonPressed mouse_event) override;
 	private:
 		Line* line = nullptr;
+		std::vector<Line *> lines; // added for testing
 	};
 }
