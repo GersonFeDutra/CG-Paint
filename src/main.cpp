@@ -57,8 +57,9 @@ void display()
         if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")); // use line
         if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")); // use polygon
 
+        // TODO [Extra] -> Polígono regular
         // switch (canvas.toolBox.currentPrimitive) {
-        // case cg::ToolBox::Primitives::POLYGON: {
+        // case cg::ToolBox::Primitives::REGULAR_POLYGON: {
         //     toolBox.sameLine();
         //     toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
         //     toolBox.sameLine();
@@ -98,6 +99,9 @@ void reshape(int w, int h) {
 
     // Repassa o evento para o ImGui
     ImGui_ImplGLUT_ReshapeFunc(w, h);
+
+    // Envia o novo tamanho da janela para o canvas
+    canvas.setWindowSize(w, h);
 
     // Lógica personalizada de redimensionamento abaixo
 }

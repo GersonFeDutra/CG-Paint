@@ -103,7 +103,7 @@ namespace cg {
             for (auto it = interpolator.begin(); it != interpolator.end(); ++it) {
                 Vector2 current = *it;
 
-                // Alterna entre tra�o e espa�o a cada DASH_LENGTH
+                // Alterna entre traço e espaço a cada DASH_LENGTH
                 if (drawSegment) {
                     Vector2 ndcPrev = toolBox.canvas->screenToNdc(prev);
                     Vector2 ndcCurrent = toolBox.canvas->screenToNdc(current);
@@ -155,6 +155,7 @@ namespace cg {
 
     void LineTool::_input(io::MouseRightButtonPressed mouse_event) {
         if (isDrawing) isDrawing = false;
+        lines.clear();
     }
 
 }
