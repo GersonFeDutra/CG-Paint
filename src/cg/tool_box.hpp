@@ -18,7 +18,7 @@ namespace cg {
 	 */
 	class ToolBox {
 		friend class Tool;
-		static constexpr std::size_t N_PRIMITIVES = 2; // Guido: checar se mudar pra 3 dá problema, n entendi direito como isso funciona ainda
+		static constexpr std::size_t N_PRIMITIVES = 3; // Guido: mudar pra 3 talvez n dê problema
 	public:
 		ToolBox();
 

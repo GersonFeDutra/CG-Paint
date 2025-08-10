@@ -19,6 +19,8 @@ namespace cg {
         auto line = std::make_unique<Line>(at, color);
         CanvasItem* ptr = line.get();
         toolBox.canvas->insert(std::move(line));
+
+        std::cout << "Made polygon temporary line" << std::endl;
         return ptr;
 	}
 
@@ -30,6 +32,8 @@ namespace cg {
         auto poly = std::make_unique<Polygon>(at, color);
         CanvasItem* ptr = poly.get();
         toolBox.canvas->insert(std::move(poly));
+
+        std::cout << "Made new polygon" << std::endl;
         return ptr;
 	}
 
@@ -94,7 +98,7 @@ namespace cg {
         GLdebug{
             const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
-            Vector2 start = polygon->lastVertice();
+            Vector2 start = tempLine->lastVertice();
             Vector2 screenStart = toolBox.canvas->ndcToScreen(start);
             Vector2 screenEnd = toolBox.canvas->ndcToScreen(position);
 
@@ -164,8 +168,8 @@ namespace cg {
 
     void PolygonTool::_input(io::MouseRightButtonPressed mouse_event)
     {
-        polygon = (Polygon *) makePolygon(initialCoords);
-        polygon->setVertices(tempLine->getVertices());
+        polygons.push_back((Polygon *) makePolygon(initialCoords));
+        polygons.back()->setVertices(tempLine->getVertices());
 
         isDrawing = false;
 

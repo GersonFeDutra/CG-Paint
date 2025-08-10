@@ -19,8 +19,8 @@ namespace cg {
     ToolBox::ToolBox() {
         static PointTool pointTool{ *this };
         static LineTool lineTool{ *this };
-        static PolygonTool polygonTool{ *this }; // Guido: deixei como comentário enquanto não implemento com calma
-        tools = { (Painter*)&pointTool, (Painter*)&lineTool, /*(Painter*)&polygonTool*/ };
+        static PolygonTool polygonTool{ *this }; // Guido: tirei o comentário, uma parte tá funcionando e outra não
+        tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
     }
 
     void ToolBox::addCanvas(Canvas* canvas_ptr) {
@@ -67,6 +67,7 @@ namespace cg {
             // TODO -> update using tool
             currentTool = currentPrimitive;
         }
+        std::cout << "Using left button" << std::endl;
 
         tools[currentPrimitive]->_input(input_event);
     }
@@ -85,9 +86,7 @@ namespace cg {
 
     void ToolBox::captureInput(io::MouseRightButtonPressed input_event)
     {
-        if (currentPrimitive != currentTool && currentTool != POLYGON) {
-            return;
-        }
+        // std::cout << N_PRIMITIVES << ", " << currentTool << ", " << currentPrimitive << std::endl;
         if (currentPrimitive >= N_PRIMITIVES)
             return;
         if (currentTool != currentPrimitive) {
@@ -95,7 +94,10 @@ namespace cg {
             currentTool = currentPrimitive;
         }
 
-        tools[currentPrimitive]->_input(input_event);
+        if (currentTool == 2) {
+            std::cout << "Using right button" << std::endl;
+            tools[currentPrimitive]->_input(input_event);
+        }
     }
 
 } // namespace cg

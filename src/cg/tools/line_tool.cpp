@@ -83,7 +83,7 @@ namespace cg {
         GLdebug{
             const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
-            Vector2 start = line->lastVertice();
+            Vector2 start = lines.back()->lastVertice();
             Vector2 screenStart = toolBox.canvas->ndcToScreen(start);
             Vector2 screenEnd = toolBox.canvas->ndcToScreen(position);
 
