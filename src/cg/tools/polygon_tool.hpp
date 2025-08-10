@@ -23,8 +23,8 @@ namespace cg {
 		void _input(io::MouseLeftButtonPressed mouse_event) override;
         void _input(io::MouseRightButtonPressed mouse_event) override;
 	private:
-		Polygon* polygon = nullptr;
-        Line* tempLine = nullptr;
+		Polygon* polygon = nullptr; // going to change that
+        Line* tempLine = nullptr; // this too
         Vector2 initialCoords;
 	};
 }
