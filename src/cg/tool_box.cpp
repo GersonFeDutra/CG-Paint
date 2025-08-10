@@ -67,7 +67,7 @@ namespace cg {
             // TODO -> update using tool
             currentTool = currentPrimitive;
         }
-        std::cout << "Using left button" << std::endl;
+        // std::cout << "Using left button" << std::endl;
 
         tools[currentPrimitive]->_input(input_event);
     }
@@ -94,8 +94,8 @@ namespace cg {
             currentTool = currentPrimitive;
         }
 
-        if (currentTool == 2) {
-            std::cout << "Using right button" << std::endl;
+        if (currentTool != 0) {
+            // std::cout << "Using right button" << std::endl;
             tools[currentPrimitive]->_input(input_event);
         }
     }

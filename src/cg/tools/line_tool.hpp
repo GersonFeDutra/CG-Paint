@@ -19,6 +19,7 @@ namespace cg {
 		void _input(io::MouseMove mouse_event) override;
 		void _input(io::MouseDrag mouse_event) override;
 		void _input(io::MouseLeftButtonPressed mouse_event) override;
+		void _input(io::MouseRightButtonPressed mouse_event) override;
 	private:
 		Line* line = nullptr;
 		std::vector<Line *> lines; // added for testing

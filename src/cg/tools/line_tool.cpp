@@ -144,7 +144,6 @@ namespace cg {
         if (isDrawing) {
             // line->append(mouse_event.position);
             lines.back()->append(mouse_event.position);
-            isDrawing = false;
         }
         else {
             // line = (Line *)make(mouse_event.position);
@@ -152,6 +151,10 @@ namespace cg {
             isDrawing = true;
             position = mouse_event.position;
         }
+    }
+
+    void LineTool::_input(io::MouseRightButtonPressed mouse_event) {
+        if (isDrawing) isDrawing = false;
     }
 
 }
