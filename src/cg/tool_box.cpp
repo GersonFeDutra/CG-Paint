@@ -19,7 +19,7 @@ namespace cg {
     ToolBox::ToolBox() {
         static PointTool pointTool{ *this };
         static LineTool lineTool{ *this };
-        static PolygonTool polygonTool{ *this }; // Guido: tirei o comentário, uma parte tá funcionando e outra não
+        static PolygonTool polygonTool{ *this }; // Guido: tirei o comentário, uma parte tá funcionando e outra não, vou tentar ver isso agora
         tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
     }
 

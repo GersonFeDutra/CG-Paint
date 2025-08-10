@@ -173,8 +173,10 @@ namespace cg {
 
         isDrawing = false;
 
-        delete tempLine;
+        // delete tempLine;
         tempLine = nullptr;
+
+        std::cout << "Set tempLine variable to null pointer" << std::endl;
     }
 
 }
