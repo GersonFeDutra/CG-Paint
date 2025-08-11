@@ -15,7 +15,9 @@ static cg::Canvas canvas{ cg::Flag::SIZE * 30 };
 
 cg::Flag *flag = nullptr;
 
-static int selectedShape = 0; // point
+// static int selectedShape = 0; // useless line
+
+// static files::FileHandler fileManager
 
 
 /* Inicialização do renderer */
@@ -74,6 +76,9 @@ void display()
         toolBox.sameLine();
 
         toolBox.showText("counter = %d", counter);
+
+        if (toolBox.showButton("Save to file"))
+            ;
         
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
     }
