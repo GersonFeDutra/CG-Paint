@@ -50,16 +50,6 @@ namespace cg {
             // TODO -> Check if input is inside item area before sending event.
         }
 
-        /* idk man */
-        template <typename Subclass>
-        ArrayList<Subclass*> getItemsOfType() const {
-            ArrayList<Subclass*> result;
-            for (const auto& item : itens) {
-                if (auto ptr = dynamic_cast<Subclass*>(item.get())) result.push_back(ptr);
-            }
-            return result;
-        }
-
         /* Propagates a process call to each Canvas Item on the canvas. */
         TimePoint updateProcess(TimePoint lastTime);
 
@@ -126,6 +116,16 @@ namespace cg {
         // Changes Normalized Display Coordinates to Screen Coordinates system.
         inline Vector2 ndcToScreen(Vector2 point) {
             return _ndcToScreen.transform(point);
+        }
+
+        // I'mma fucking kill myself
+        template <typename Subclass>
+        ArrayList<Subclass*> getItemsOfType() const {
+            ArrayList<Subclass*> result;
+            for (const auto& item : itens) {
+                if (auto ptr = dynamic_cast<Subclass*>(item.get())) result.push_back(ptr);
+            }
+            return result;
         }
 
         private:

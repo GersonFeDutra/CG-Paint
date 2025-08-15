@@ -1,15 +1,13 @@
 #pragma once
 
-#include "cg/canvas.hpp"
-
-namespace files
+namespace cg
 {
     class FileHandler {
     public:
         FileHandler() {};
 
-        void saveFile(cg::Canvas currentCanvas);
-        void loadFile(std::string path_to_file, cg::Canvas currentCanvas);
+        void saveFile();
+        void loadFile(std::string path_to_file);
     private:
         std::string defaultFileLocation = "./savedFiles/";
     };

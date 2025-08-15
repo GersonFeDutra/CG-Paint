@@ -10,13 +10,13 @@
 #include "cg/canvas_itens/flag.hpp"
 #include "cg/canvas_itens/point.hpp"
 
-#include "fileSystem/fileHandler.hpp"
+#include "cg/fileSystem/fileHandler.hpp"
 
 static cg::Canvas canvas{ cg::Flag::SIZE * 30 };
 
 cg::Flag *flag = nullptr;
 
-static files::FileHandler fileHandler;
+cg::FileHandler fileHandler;
 
 // static int selectedShape = 0; // useless line
 
@@ -81,8 +81,9 @@ void display()
 
         toolBox.showText("counter = %d", counter);
 
-        if (toolBox.showButton("Save to file"))
-            fileHandler.saveFile(canvas);
+        if (toolBox.showButton("Save to file")) {
+            fileHandler.saveFile();
+        };
         
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
     }
