@@ -24,6 +24,7 @@ namespace cg {
         void _input(io::MouseRightButtonPressed mouse_event) override;
 	private:
 		std::vector<Polygon*> polygons; // going to change that
+		// TODO -> Remover linha temporária após desenho completo
         Line* tempLine = nullptr; // this too
         Vector2 initialCoords;
 	};

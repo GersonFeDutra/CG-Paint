@@ -94,7 +94,7 @@ namespace cg {
             currentTool = currentPrimitive;
         }
 
-        if (currentTool != 0) {
+        if (currentTool != POINT) {
             // std::cout << "Using right button" << std::endl;
             tools[currentPrimitive]->_input(input_event);
         }

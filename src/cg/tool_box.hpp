@@ -18,7 +18,7 @@ namespace cg {
 	 */
 	class ToolBox {
 		friend class Tool;
-		static constexpr std::size_t N_PRIMITIVES = 3; // Guido: mudar pra 3 talvez n dê problema
+		static constexpr std::size_t N_PRIMITIVES = 3; // Altere aqui o tamanho do array para adicionar mais ferramentas.
 	public:
 		ToolBox();
 
@@ -42,10 +42,8 @@ namespace cg {
 		};
         int currentPrimitive = POINT;
 	public:
-		// TODO -> Cor secund�ria [alternada com x key]
+		// TODO -> Cor secundária [alternada com x key]
 		Color currentColor = cg::colors::WHITE; // Define a cor atual para pintura.
-		// TODO -> Polygon Tool
-		// int polygonEdges = 1; // Guido: acho que é desnecessário, mas vou manter como comentário
 
 		Canvas* canvas = nullptr;
 		bool isInsideGui = false;

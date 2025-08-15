@@ -24,18 +24,8 @@ namespace cg {
     public:
          Canvas(Vector2 window_size) {
             toolBox.addCanvas(this);
-            windowSize = window_size;
-            _screenToNdc = {
-                { 2.0f / window_size.x, 0.0f },
-                { 0.0f, -2.0f / window_size.y },
-                { -1.0f, 1.0f },
-            };
-            _ndcToScreen = {
-                { window_size.x / 2.0f, 0.0f },
-                { 0.0f, window_size.y / -2.0f },
-                { window_size.x / 2.0f, window_size.y / 2.0f },
-            };
-        }
+            setWindowSize(window_size);
+         }
 
         /** Send a screen input at screen coordinate.
          * Converts Screen Cordinates to Normalized Display Coordinates before trigger.
@@ -93,6 +83,26 @@ namespace cg {
 
         inline Vector2 getWindowSize() {
             return windowSize;
+        }
+
+        // Update coordinate system
+        inline void setWindowSize(Vector2 to) {
+            windowSize = to;
+            _screenToNdc = {
+                { 2.0f / windowSize.x, 0.0f },
+                { 0.0f, -2.0f / windowSize.y },
+                { -1.0f, 1.0f },
+            };
+            _ndcToScreen = {
+                { windowSize.x / 2.0f, 0.0f },
+                { 0.0f, windowSize.y / -2.0f },
+                { windowSize.x / 2.0f, windowSize.y / 2.0f },
+            };
+        }
+
+        template <std::convertible_to<float> T>
+        inline void setWindowSize(T width, T height) {
+            setWindowSize({ (float)width, (float)height });
         }
 
         // Changes screen coordinates to Normalized Display Coordinates system.

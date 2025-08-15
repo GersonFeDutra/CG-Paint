@@ -8,8 +8,8 @@ namespace cg {
 
 	class LineTool : public Painter {
 		const Color GHOST_LINE_COLOR = { 0.15f, 0.35f, .75f, 0.66f };  // Azul claro semi-transparente
-		const float DASH_LENGTH = 2.5f;  // Comprimento do tra�ejado em pixels
-		const float GAP_LENGTH = 1.0f;    // Comprimento do espa�o em pixels
+		const float DASH_LENGTH = 2.5f;  // Comprimento do tracejado em pixels
+		const float GAP_LENGTH = 1.0f;    // Comprimento do espaço em pixels
 	public:
 		LineTool(ToolBox& tool_box) : Painter{ tool_box } {}
 		CanvasItem* make(Vector2 at) override;
