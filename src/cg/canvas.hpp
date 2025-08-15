@@ -118,7 +118,11 @@ namespace cg {
             return _ndcToScreen.transform(point);
         }
 
-    private:
+        inline ArrayList<std::unique_ptr<CanvasItem>> getItems() {
+            return items;
+        }
+
+        private:
         Vector2 windowSize; // aspect ratio: 10:7
         Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
         Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen coordinates
