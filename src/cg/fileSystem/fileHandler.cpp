@@ -23,8 +23,39 @@ namespace cg
                 outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << obj->SIZE << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
             }
             outputFile << "END_POINTS" << std::endl;
-        }
+            
+            outputFile << "START_LINES" << std::endl;
+            for (Line* obj : linesList) {
+                std::string vertices;
+                for (auto& vertex : obj->getVertices()) {
+                    vertices.append("(");
+                    vertices.append(std::to_string(vertex.x));
+                    vertices.append(", ");
+                    vertices.append(std::to_string(vertex.y));
+                    vertices.append(");");
+                }
+                outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
+            }
+            outputFile << "END_LINES" << std::endl;
+            
+            outputFile << "START_POLYGONS" << std::endl;
+            for (Polygon* obj : polygonList) {
+                std::string vertices;
+                for (auto& vertex : obj->getVertices()) {
+                    vertices.append("(");
+                    vertices.append(std::to_string(vertex.x));
+                    vertices.append(", ");
+                    vertices.append(std::to_string(vertex.y));
+                    vertices.append(");");
+                }
 
-        outputFile.close();
+                outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
+            }
+            outputFile << "END_POLYGONS" << std::endl;            
+            
+            outputFile.close();
+        } else {
+            std::cout << "FILE WAS NOT WRITTEN/CREATED" << std::endl;
+        }
     }
 } // namespace files

@@ -27,12 +27,20 @@ namespace cg
                 return (vertices.size() == 0) ? position : vertices.back();
             }
 
+            inline std::vector<Vector2> getVertices() {
+                return vertices;
+            }
+
             inline void setVertices(std::vector<Vector2> allVertices) {
                 for (Vector2 vertex : allVertices)
                 {
                     // std::cout << "Appended vertex " << (vertex.x, vertex.y) << std::endl;
                     append(vertex);
                 }
+            }
+
+            inline ColorRgb getColor() {
+                return insideColor;
             }
         private:
             std::vector<Vector2> vertices;

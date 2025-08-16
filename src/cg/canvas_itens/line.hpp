@@ -35,6 +35,11 @@ namespace cg
         inline std::vector<Vector2> getVertices() {
             return vertices;
         }
+
+        // Guido: sla to com sono
+        inline ColorRgb getColor() {
+            return color;
+        }
     private:
         std::vector<Vector2> vertices;
         ColorRgb color; // TODO -> alpha blending
