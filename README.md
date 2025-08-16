@@ -34,7 +34,7 @@ exclusões:
 
 ### 2. Além das transformações geométricas, implemente também funcionalidades que possam ... (2,0 pontos):
 
-- [ ] Salvar os objetos geométricos criados em um arquivo
+- [x] Salvar os objetos geométricos criados em um arquivo
 - [ ] Carregar os objetos geométricos de um arquivo.
 
 ### 3. Implemente uma funcionalidade para fazer animação com os objetos primários.
