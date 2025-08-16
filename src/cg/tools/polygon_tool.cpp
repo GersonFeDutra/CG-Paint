@@ -173,6 +173,7 @@ namespace cg {
 
         isDrawing = false;
 
+        toolBox.canvas->remove(tempLine);
         tempLine = nullptr;
 
         std::cout << "Set tempLine variable to null pointer" << std::endl;

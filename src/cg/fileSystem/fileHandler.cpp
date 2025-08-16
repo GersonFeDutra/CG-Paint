@@ -11,6 +11,73 @@
 namespace cg
 {
     std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> FileHandler::loadFile(std::string path_to_file) {
+        ArrayList<cg::Point *> pointsArray;
+        ArrayList<cg::Line *> linesArray;
+        ArrayList<cg::Polygon *> polygonsArray;
+
+        if (path_to_file.empty()) {
+            path_to_file = defaultFileLocation;
+        }
+
+        std::ifstream inputFile(path_to_file);
+
+        if (inputFile.is_open()) {
+            std::string currentLine, info;
+            std::vector<std::string> lineInfo;
+            char token = ':';
+            
+            while (std::getline(inputFile, currentLine)) {
+                if (currentLine.empty()) continue;
+                
+                lineInfo.clear();
+                std::vector<std::string> thingsInfo;
+                std::string tempString;
+                
+                std::istringstream tokenLine(currentLine);
+                
+                while (std::getline(tokenLine, info, token)) {
+                    lineInfo.push_back(info);
+                }
+                
+                if (lineInfo[0] == "PNT") {
+                    Point* newPoint;
+                    // std::cout << lineInfo[1] << "," << lineInfo[2] << "," << lineInfo[3] << std::endl;
+                    
+                    std::istringstream line01(lineInfo[1]);
+                    while (std::getline(line01, info, ',')) {
+                        thingsInfo.push_back(info);
+                    }
+                    newPoint->position.x = std::stof(thingsInfo[0]);
+                    newPoint->position.y = std::stof(thingsInfo[1]);
+                    thingsInfo.clear();
+
+                    // newPoint->SIZE = lineInfo[2]; // por enquanto o tamanho não muda, caso mude é só alterar aqui
+                    
+                    std::istringstream line03(lineInfo[3]);
+                    while (std::getline(line03, info, ',')) {
+                        thingsInfo.push_back(info);
+                    }
+                    ColorRgb pointColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
+                    newPoint->setColor(pointColor);
+
+                    pointsArray.push_back(newPoint);
+                } else if (lineInfo[0] == "LIN") {
+                    Line* newLine;
+
+                } else if (lineInfo[0] == "POL") {
+                    Polygon* newPoly;
+
+                }
+            }
+
+            inputFile.close();
+
+            return std::make_tuple(pointsArray, linesArray, polygonsArray);
+        } else {
+            std::cout << "ERROR! COULDN'T READ FILE" << std::endl;
+
+            // return;
+        }
 
     }
 
@@ -18,40 +85,32 @@ namespace cg
         std::ofstream outputFile(defaultFileLocation);
 
         if (outputFile.is_open()) {
-            outputFile << "START_POINTS" << std::endl;
             for (Point* obj : pointList) {
-                outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << obj->SIZE << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
+                outputFile << "PNT:" << obj->position.x << "," << obj->position.y << ":" << obj->SIZE << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << std::endl;
             }
-            outputFile << "END_POINTS" << std::endl;
             
-            outputFile << "START_LINES" << std::endl;
             for (Line* obj : linesList) {
                 std::string vertices;
                 for (auto& vertex : obj->getVertices()) {
-                    vertices.append("(");
                     vertices.append(std::to_string(vertex.x));
-                    vertices.append(", ");
+                    vertices.append(",");
                     vertices.append(std::to_string(vertex.y));
-                    vertices.append(");");
+                    vertices.append(";");
                 }
-                outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
+                outputFile << "LIN:" << obj->position.x << "," << obj->position.y << ":" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << std::endl;
             }
-            outputFile << "END_LINES" << std::endl;
             
-            outputFile << "START_POLYGONS" << std::endl;
             for (Polygon* obj : polygonList) {
                 std::string vertices;
                 for (auto& vertex : obj->getVertices()) {
-                    vertices.append("(");
                     vertices.append(std::to_string(vertex.x));
-                    vertices.append(", ");
+                    vertices.append(",");
                     vertices.append(std::to_string(vertex.y));
-                    vertices.append(");");
+                    vertices.append(";");
                 }
 
-                outputFile << "(" << obj->position.x << ", " << obj->position.y << "):" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << "" << std::endl;
-            }
-            outputFile << "END_POLYGONS" << std::endl;            
+                outputFile << "POL:" << obj->position.x << "," << obj->position.y << ":" << vertices << ":" << (int) obj->getColor().r << "," << (int) obj->getColor().g << "," << (int) obj->getColor().b << std::endl;
+            }           
             
             outputFile.close();
         } else {

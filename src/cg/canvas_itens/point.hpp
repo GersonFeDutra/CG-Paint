@@ -24,6 +24,10 @@ namespace cg
             return color;
         }
 
+        inline void setColor(ColorRgb newColor) {
+            color = newColor;
+        }
+
         //void _input(io::MouseMove input_event) override;
     private:
         ColorRgb color; // TODO -> alpha blending

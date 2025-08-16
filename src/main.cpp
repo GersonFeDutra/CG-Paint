@@ -129,6 +129,14 @@ void display()
 
             fileHandler.saveFile(pntList, lineList, polyList);
         };
+
+        if (toolBox.showButton("Load from file")) {
+            std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> objects = fileHandler.loadFile("");
+
+            for (auto& point : std::get<0>(objects)) {
+                canvas.insert(std::make_unique<cg::Point>(* point));
+            }
+        }
         
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
     }
