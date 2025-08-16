@@ -118,16 +118,6 @@ namespace cg {
             return _ndcToScreen.transform(point);
         }
 
-        // I'mma fucking kill myself
-        template <typename Subclass>
-        ArrayList<Subclass*> getItemsOfType() const {
-            ArrayList<Subclass*> result;
-            for (const auto& item : itens) {
-                if (auto ptr = dynamic_cast<Subclass*>(item.get())) result.push_back(ptr);
-            }
-            return result;
-        }
-
         private:
         Vector2 windowSize; // aspect ratio: 10:7
         Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
@@ -135,6 +125,12 @@ namespace cg {
 
         ArrayList<std::unique_ptr<CanvasItem>> itens;
     public:
+
+        // I'mma fucking kill myself
+        inline const ArrayList<std::unique_ptr<CanvasItem>>& getItens() const {
+            return itens;
+        }
+        
         ToolBox toolBox;
     };
 

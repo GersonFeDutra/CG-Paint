@@ -20,6 +20,10 @@ namespace cg
         void _render() override;
         void _input(io::MouseDrag mouse_event) override;
 
+        inline ColorRgb getColor() {
+            return color;
+        }
+
         //void _input(io::MouseMove input_event) override;
     private:
         ColorRgb color; // TODO -> alpha blending

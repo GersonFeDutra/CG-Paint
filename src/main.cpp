@@ -9,6 +9,8 @@
 #include "cg/canvas.hpp"
 #include "cg/canvas_itens/flag.hpp"
 #include "cg/canvas_itens/point.hpp"
+#include "cg/canvas_itens/line.hpp"
+#include "cg/canvas_itens/polygon.hpp"
 
 #include "cg/fileSystem/fileHandler.hpp"
 
@@ -33,6 +35,45 @@ int init(void)
 
     return EXIT_SUCCESS;
 }
+
+// get all polygons from canvas
+ArrayList<cg::Polygon *> getPolygons() {
+    ArrayList<cg::Polygon *> returnList;
+
+    for (auto& item : canvas.getItens()) {
+        if (auto derivedClass = dynamic_cast<cg::Polygon *>(item.get())) {
+            returnList.push_back(derivedClass);
+        } else continue;
+    }
+    
+    return returnList;
+}
+// get all lines from canvas
+ArrayList<cg::Line *> getLines() {
+    ArrayList<cg::Line *> returnList;
+
+    for (auto& item : canvas.getItens()) {
+        if (auto derivedClass = dynamic_cast<cg::Line *>(item.get())) {
+            returnList.push_back(derivedClass);
+        } else continue;
+    }
+    
+    return returnList;
+}
+// get all points from canvas
+ArrayList<cg::Point *> getPoints() {
+    ArrayList<cg::Point *> returnList;
+
+    for (auto& item : canvas.getItens()) {
+        if (auto derivedClass = dynamic_cast<cg::Point *>(item.get())) {
+            returnList.push_back(derivedClass);
+        } else continue;
+    }
+    
+    return returnList;
+}
+
+
 
 
 /* Loop principal de desenho. */
@@ -82,7 +123,11 @@ void display()
         toolBox.showText("counter = %d", counter);
 
         if (toolBox.showButton("Save to file")) {
-            fileHandler.saveFile();
+            ArrayList<cg::Polygon *> polyList = getPolygons();
+            ArrayList<cg::Line *> lineList = getLines();
+            ArrayList<cg::Point *> pntList = getPoints();
+
+            fileHandler.saveFile(pntList, lineList, polyList);
         };
         
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
