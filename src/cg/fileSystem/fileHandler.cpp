@@ -43,7 +43,6 @@ namespace cg
                     std::istringstream line01(lineInfo[1]);
                     std::string positionInfo;
                     while (std::getline(line01, positionInfo, ',')) {
-                        std::cout << positionInfo << std::endl;
                         thingsInfo.push_back(positionInfo);
                     }
                     Vector2 pos(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
@@ -59,6 +58,9 @@ namespace cg
                     while (std::getline(line03, info, ',')) {
                         if (info.empty()) continue;
                         thingsInfo.push_back(info);
+                    }
+                    for (std::string pop : thingsInfo) {
+                        std::cout << pop << std::endl;
                     }
                     ColorRgb pointColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
                     newPoint.setColor(pointColor);

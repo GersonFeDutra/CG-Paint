@@ -138,6 +138,10 @@ void display()
             for (auto& point : std::get<0>(objects)) {
                 canvas.insert(std::make_unique<cg::Point>(* point));
             }
+
+            for (auto& item : canvas.getItens()) {
+                std::cout << item->position.x << std::endl;
+            }
         }
         
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
