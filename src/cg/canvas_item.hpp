@@ -39,6 +39,10 @@ namespace cg {
         virtual void _process(DeltaTime delta) {}
         /* Draw data onto screen with open GL calls. */
         virtual void _render() {}
+
+        inline void setPosition(Vector2 pos) {
+            position = pos;
+        }
     private:
         ID id = 0; // It's id location at the canvas.
     public:

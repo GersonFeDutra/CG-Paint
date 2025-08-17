@@ -133,6 +133,8 @@ void display()
         if (toolBox.showButton("Load from file")) {
             std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> objects = fileHandler.loadFile("");
 
+            std::cout << std::get<0>(objects)[0]->position.x << std::endl;
+
             for (auto& point : std::get<0>(objects)) {
                 canvas.insert(std::make_unique<cg::Point>(* point));
             }

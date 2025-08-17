@@ -8,3 +8,6 @@ build/
 
 # Dear Im Gui interface cache.
 imgui.ini
+
+# saved local objx files
+*.objx

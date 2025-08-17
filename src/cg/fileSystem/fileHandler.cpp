@@ -40,27 +40,30 @@ namespace cg
                 }
                 
                 if (lineInfo[0] == "PNT") {
-                    Point* newPoint;
-                    // std::cout << lineInfo[1] << "," << lineInfo[2] << "," << lineInfo[3] << std::endl;
-                    
                     std::istringstream line01(lineInfo[1]);
-                    while (std::getline(line01, info, ',')) {
-                        thingsInfo.push_back(info);
+                    std::string positionInfo;
+                    while (std::getline(line01, positionInfo, ',')) {
+                        std::cout << positionInfo << std::endl;
+                        thingsInfo.push_back(positionInfo);
                     }
-                    newPoint->position.x = std::stof(thingsInfo[0]);
-                    newPoint->position.y = std::stof(thingsInfo[1]);
+                    Vector2 pos(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
                     thingsInfo.clear();
+                    
+                    Point newPoint;
+                    newPoint.setPosition(pos);
 
                     // newPoint->SIZE = lineInfo[2]; // por enquanto o tamanho não muda, caso mude é só alterar aqui
                     
+                    // std::cout << lineInfo[3] << std::endl;
                     std::istringstream line03(lineInfo[3]);
                     while (std::getline(line03, info, ',')) {
+                        if (info.empty()) continue;
                         thingsInfo.push_back(info);
                     }
                     ColorRgb pointColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
-                    newPoint->setColor(pointColor);
+                    newPoint.setColor(pointColor);
 
-                    pointsArray.push_back(newPoint);
+                    pointsArray.push_back(&newPoint);
                 } else if (lineInfo[0] == "LIN") {
                     Line* newLine;
 
