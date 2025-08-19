@@ -131,16 +131,15 @@ void display()
         };
 
         if (toolBox.showButton("Load from file")) {
-            std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> objects = fileHandler.loadFile("");
+            std::tuple<ArrayList<std::unique_ptr<cg::Point>>, ArrayList<std::unique_ptr<cg::Line>>, ArrayList<std::unique_ptr<cg::Polygon>>> objects = fileHandler.loadFile("");
 
-            std::cout << std::get<0>(objects)[0]->position.x << std::endl;
-
-            for (auto& point : std::get<0>(objects)) {
-                canvas.insert(std::make_unique<cg::Point>(* point));
+            for (auto& obj : canvas.getItens()) {
+                canvas.remove(obj.get());
             }
 
-            for (auto& item : canvas.getItens()) {
-                std::cout << item->position.x << std::endl;
+            for (auto& point : std::get<0>(objects)) {
+                // std::cout << point->getColor().r << "," << point->getColor().g << "," << point->getColor().b << std::endl;
+                canvas.insert(std::make_unique<cg::Point>(* point));
             }
         }
         

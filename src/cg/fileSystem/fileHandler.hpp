@@ -11,8 +11,8 @@ namespace cg
     public:
         FileHandler() {};
 
-        void saveFile(ArrayList<cg::Point *> pointList, ArrayList<cg::Line *> linesList, ArrayList<cg::Polygon *> polygonList);
-        std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> loadFile(std::string path_to_file);
+        void saveFile(ArrayList<std::unique_ptr<cg::Point>> pointList, ArrayList<std::unique_ptr<cg::Line>> linesList, ArrayList<std::unique_ptr<cg::Polygon>> polygonList);
+        std::tuple<ArrayList<std::unique_ptr<cg::Point>>, ArrayList<std::unique_ptr<cg::Line>>, ArrayList<std::unique_ptr<cg::Polygon>>> loadFile(std::string path_to_file);
     private:
         std::string defaultFileLocation = "saved_shapes.objx";
     };
