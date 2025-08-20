@@ -14,10 +14,10 @@
 
 namespace cg
 {
-    std::tuple<ArrayList<std::unique_ptr<cg::Point>>, ArrayList<std::unique_ptr<cg::Line>>, ArrayList<std::unique_ptr<cg::Polygon>>> FileHandler::loadFile(std::string path_to_file) {
-        ArrayList<std::unique_ptr<cg::Point>> pointsArray;
-        ArrayList<std::unique_ptr<cg::Line>> linesArray;
-        ArrayList<std::unique_ptr<cg::Polygon>> polygonsArray;
+    std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> FileHandler::loadFile(std::string path_to_file) {
+        ArrayList<cg::Point *> pointsArray;
+        ArrayList<cg::Line *> linesArray;
+        ArrayList<cg::Polygon *> polygonsArray;
 
         if (path_to_file.empty()) {
             path_to_file = defaultFileLocation;
@@ -68,7 +68,9 @@ namespace cg
                     
                     ColorRgb pointColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
                     
-                    auto newPoint = std::make_unique<Point>(pos, pointColor);
+                    Point * newPoint;
+                    newPoint->setColor(pointColor);
+                    newPoint->setPosition(pos);
                     
                     pointsArray.push_back(newPoint);
                 } else if (lineInfo[0] == "LIN") {
@@ -91,7 +93,7 @@ namespace cg
 
     }
 
-    void FileHandler::saveFile(ArrayList<std::unique_ptr<cg::Point>> pointList, ArrayList<std::unique_ptr<cg::Line>> linesList, ArrayList<std::unique_ptr<cg::Polygon>> polygonList) {
+    void FileHandler::saveFile(ArrayList<cg::Point *> pointList, ArrayList<cg::Line *> linesList, ArrayList<cg::Polygon *> polygonList) {
         std::ofstream outputFile(defaultFileLocation);
 
         if (outputFile.is_open()) {

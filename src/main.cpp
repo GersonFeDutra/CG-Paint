@@ -131,7 +131,7 @@ void display()
         };
 
         if (toolBox.showButton("Load from file")) {
-            std::tuple<ArrayList<std::unique_ptr<cg::Point>>, ArrayList<std::unique_ptr<cg::Line>>, ArrayList<std::unique_ptr<cg::Polygon>>> objects = fileHandler.loadFile("");
+            std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> objects = fileHandler.loadFile("");
 
             for (auto& obj : canvas.getItens()) {
                 canvas.remove(obj.get());
