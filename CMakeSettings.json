@@ -21,6 +21,18 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": ""
+    },
+    {
+      "name": "x64-Release-WSL",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "remoteMachineName": "${defaultRemoteMachineName}",
+      "remoteCMakeListsRoot": "${projectDir}/out",
+      "cmakeExecutable": "/usr/bin/cmake",
+      "remoteBuildRoot": "$WSL_DISTRO_NAME:/home/nexus/build",
+      "remoteInstallRoot": "$WSL_DISTRO_NAME:/home/nexus/install",
+      "remoteCopySources": true,
+      "remoteCopyBuildOutput": true
     }
   ]
 }

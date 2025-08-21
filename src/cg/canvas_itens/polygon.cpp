@@ -7,13 +7,13 @@ namespace cg {
     // ponteiro acessível aos callbacks para salvar vértices criados pelo combine
     static thread_local std::vector<std::unique_ptr<GLdouble[]>>* currentStorage = nullptr;
 
-    static void CALLBACK tessError(GLenum errorCode) {
+    static void TESS_CALLBACK tessError(GLenum errorCode) {
         const GLubyte* err = gluErrorString(errorCode);
         print_error("Tessellation Error: %s\n", err);
     }
 
 
-    static void CALLBACK tessCombine(const GLdouble coords[3], void* /*vertex_data*/[4],
+    static void TESS_CALLBACK tessCombine(const GLdouble coords[3], void* /*vertex_data*/[4],
         const GLfloat /*weight*/[4], void** outData) {
         if (!currentStorage) {
             // fallback: aloca e devolve (ainda seria um leak se s_currentStorage==nullptr)
@@ -66,11 +66,11 @@ namespace cg {
                     return;
 				}
 
-                gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK*)())glBegin);
-                gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK*)())glEnd);
-                gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK*)())glVertex3dv);
-                gluTessCallback(tess, GLU_TESS_ERROR, (void (CALLBACK*)())tessError);
-                gluTessCallback(tess, GLU_TESS_COMBINE, (GLvoid(CALLBACK*)()) &tessCombine);
+                gluTessCallback(tess, GLU_TESS_BEGIN, (void (TESS_CALLBACK*)())glBegin);
+                gluTessCallback(tess, GLU_TESS_END, (void (TESS_CALLBACK*)())glEnd);
+                gluTessCallback(tess, GLU_TESS_VERTEX, (void (TESS_CALLBACK*)())glVertex3dv);
+                gluTessCallback(tess, GLU_TESS_ERROR, (void (TESS_CALLBACK*)())tessError);
+                gluTessCallback(tess, GLU_TESS_COMBINE, (GLvoid(TESS_CALLBACK*)()) &tessCombine);
 
                 gluTessBeginPolygon(tess, nullptr);
                 gluTessBeginContour(tess);
