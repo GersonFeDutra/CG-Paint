@@ -138,8 +138,13 @@ void display()
             }
 
             for (auto& point : std::get<0>(objects)) {
-                // std::cout << point->getColor().r << "," << point->getColor().g << "," << point->getColor().b << std::endl;
                 canvas.insert(std::make_unique<cg::Point>(* point));
+            }
+            for (auto& line : std::get<1>(objects)) {
+                canvas.insert(std::make_unique<cg::Line>(* line));
+            }
+            for (auto& poly : std::get<2>(objects)) {
+                canvas.insert(std::make_unique<cg::Polygon>(* poly));
             }
         }
         

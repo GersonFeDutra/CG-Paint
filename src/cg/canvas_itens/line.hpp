@@ -40,6 +40,15 @@ namespace cg
         inline ColorRgb getColor() {
             return color;
         }
+
+        
+        inline void setColor(ColorRgb lineColor) {
+            color = lineColor;
+        }
+
+        inline void setVertices(std::vector<Vector2> lineVertices) {
+            vertices = lineVertices;
+        }
     private:
         std::vector<Vector2> vertices;
         ColorRgb color; // TODO -> alpha blending
