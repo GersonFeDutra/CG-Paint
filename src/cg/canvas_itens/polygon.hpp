@@ -40,12 +40,17 @@ namespace cg
                 return vertices;
             }
 
+            inline ColorRgb getColor() {
+                return insideColor;
+            }
+
+            
             inline void setVertices(std::vector<Vector2> allVertices) {
-                for (Vector2 vertex : allVertices)
-                {
-                    // std::cout << "Appended vertex " << (vertex.x, vertex.y) << std::endl;
-                    append(vertex);
-                }
+                vertices = allVertices;
+            }
+
+            inline void setColor(ColorRgb color) {
+                insideColor = color;
             }
 
             inline Color& getColor() {
@@ -55,6 +60,7 @@ namespace cg
             inline Color getColor() const {
                 return innerColor;
             }
+
         private:
             std::vector<Vector2> vertices;
             Color innerColor;

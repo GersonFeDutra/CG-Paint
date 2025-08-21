@@ -42,43 +42,111 @@ namespace cg
                 while (std::getline(tokenLine, info, token)) {
                     lineInfo.push_back(info);
                 }
-                
-                // std::cout << tokenLine.get() << std::endl;
 
                 if (lineInfo[0] == "PNT") {
                     std::istringstream line01(lineInfo[1]);
                     std::string positionInfo;
+
                     while (std::getline(line01, positionInfo, ',')) {
                         thingsInfo.push_back(positionInfo);
                     }
-                    // std::cout << "test1" << std::endl;
                     Vector2 pos(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
                     thingsInfo.clear();
                     
-                    
-                    // newPoint->SIZE = lineInfo[2]; // por enquanto o tamanho não muda, caso mude é só alterar aqui
-                    // std::cout << "test2" << std::endl;
-                    // std::cout << lineInfo[3] << std::endl;
                     std::istringstream line03(lineInfo[3]);
                     while (std::getline(line03, info, ',')) {
                         if (info.empty()) continue;
                         thingsInfo.push_back(info);
                     }
-                    // std::cout << "test3" << std::endl;
                     
                     ColorRgb pointColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
                     
-                    Point * newPoint;
+                    Point * newPoint = new Point();
+                    
                     newPoint->setColor(pointColor);
                     newPoint->setPosition(pos);
-                    
+
                     pointsArray.push_back(newPoint);
                 } else if (lineInfo[0] == "LIN") {
-                    Line* newLine;
+                    std::istringstream line01(lineInfo[1]);
+                    std::string positionInfo;
 
+                    while (std::getline(line01, positionInfo, ',')) {
+                        thingsInfo.push_back(positionInfo);
+                    }
+                    Vector2 pos(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
+                    thingsInfo.clear();
+
+                    std::vector<Vector2> lineVertex;
+                    std::istringstream line02(lineInfo[2]);
+                    while (std::getline(line02, info, ';')) {
+                        std::istringstream infoVertex(info);
+                        std::string tempstr;
+
+                        while (std::getline(infoVertex, tempstr, ',')) {
+                            thingsInfo.push_back(tempstr);
+                        }
+
+                        Vector2 vector(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
+                        lineVertex.push_back(vector);
+                        thingsInfo.clear();
+                    }
+                    
+                    std::istringstream line03(lineInfo[3]);
+                    while (std::getline(line03, info, ',')) {
+                        if (info.empty()) continue;
+                        thingsInfo.push_back(info);
+                    }
+                    
+                    ColorRgb lineColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
+                    
+                    Line* newLine = new Line();
+                    
+                    newLine->setColor(lineColor);
+                    newLine->setPosition(pos);
+                    newLine->setVertices(lineVertex);
+
+                    linesArray.push_back(newLine);
                 } else if (lineInfo[0] == "POL") {
-                    Polygon* newPoly;
+                    std::istringstream line01(lineInfo[1]);
+                    std::string positionInfo;
 
+                    while (std::getline(line01, positionInfo, ',')) {
+                        thingsInfo.push_back(positionInfo);
+                    }
+                    Vector2 pos(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
+                    thingsInfo.clear();
+
+                    std::vector<Vector2> polyVertex;
+                    std::istringstream line02(lineInfo[2]);
+                    while (std::getline(line02, info, ';')) {
+                        std::istringstream infoVertex(info);
+                        std::string tempstr;
+
+                        while (std::getline(infoVertex, tempstr, ',')) {
+                            thingsInfo.push_back(tempstr);
+                        }
+
+                        Vector2 vector(std::stof(thingsInfo[0]), std::stof(thingsInfo[1]));
+                        polyVertex.push_back(vector);
+                        thingsInfo.clear();
+                    }
+                    
+                    std::istringstream line03(lineInfo[3]);
+                    while (std::getline(line03, info, ',')) {
+                        if (info.empty()) continue;
+                        thingsInfo.push_back(info);
+                    }
+                    
+                    ColorRgb polyColor((unsigned char) std::stoi(thingsInfo[0]), (unsigned char) std::stoi(thingsInfo[1]), (unsigned char) std::stoi(thingsInfo[2]));
+                    
+                    Polygon* newPoly = new Polygon();
+                    
+                    newPoly->setColor(polyColor);
+                    newPoly->setPosition(pos);
+                    newPoly->setVertices(polyVertex);
+
+                    polygonsArray.push_back(newPoly);
                 }
             }
 
