@@ -34,6 +34,22 @@ namespace cg {
 		void captureInput(io::MouseLeftButtonPressed input_event);
 		void captureInput(io::MouseLeftButtonReleased input_event);
 		void captureInput(io::MouseRightButtonPressed input_event);
+
+		inline Color getColor() const {
+			return *colorPtr;
+		}
+		inline Color* getColorPtr() {
+			return colorPtr;
+		}
+		inline void bindColorPtr(Color* to) {
+			assert_err(to != nullptr, "Must not bind to a nullptr");
+			colorPtr = to;
+		}
+		inline void unbindColorPtr() {
+			warn(colorPtr == &currentColor, "color was not bind before");
+			currentColor = *colorPtr;
+			colorPtr = &currentColor;
+		}
     public:
 		enum Primitives {
 			POINT = 0,
@@ -43,11 +59,11 @@ namespace cg {
         int currentPrimitive = POINT;
 	public:
 		// TODO -> Cor secundária [alternada com x key]
-		Color currentColor = cg::colors::WHITE; // Define a cor atual para pintura.
-
 		Canvas* canvas = nullptr;
 		bool isInsideGui = false;
 	private:
+		Color currentColor = cg::colors::WHITE;
+		Color *colorPtr = &currentColor; // Define a cor atual para pintura.
 		std::array<Painter *, N_PRIMITIVES> tools;
 		int currentTool = POINT;
 	};

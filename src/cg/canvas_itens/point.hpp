@@ -13,24 +13,28 @@ namespace cg
         inline static const float SIZE = 10.0f;
     public:
         Point() = default;
-        Point(Vector2 position, ColorRgb color = ColorRgb{});
+        Point(Vector2 position, Color color = Color{});
 
         //void _process(DeltaTime delta) override;
 
         void _render() override;
         void _input(io::MouseDrag mouse_event) override;
 
-        inline ColorRgb getColor() {
+        inline Color& getColor() {
             return color;
         }
 
-        inline void setColor(ColorRgb newColor) {
+        inline Color getColor() const {
+            return color;
+        }
+
+        inline void setColor(Color newColor) {
             color = newColor;
         }
 
         //void _input(io::MouseMove input_event) override;
     private:
-        ColorRgb color; // TODO -> alpha blending
+        Color color; // TODO -> alpha blending
         //unsigned size; // TODO -> smooth point
     };
 
@@ -38,7 +42,7 @@ namespace cg
     {
     public:
         Points() = default;
-        Points(ColorRgb point_color, ArrayList<Vector2> point_list);
+        Points(Color point_color, ArrayList<Vector2> point_list);
 
         //void _process(DeltaTime delta) override;
 
@@ -46,7 +50,7 @@ namespace cg
 
         //void _input(io::MouseMove input_event) override;
     private:
-        ColorRgb pointColor;
+        Color pointColor;
         ArrayList<Vector2> pointList;
     };
 

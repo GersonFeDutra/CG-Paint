@@ -4,6 +4,7 @@
 
 #include <cg/canvas.hpp>
 #include <cg/geometry.hpp>
+#include <cg/geometry/triangulation.hpp>
 
 #include "cg/canvas_itens/line.hpp"
 
@@ -13,7 +14,7 @@ namespace cg
     {
         public:
             Polygon() = default;
-            Polygon(Vector2 position, ColorRgb color = ColorRgb{}) : CanvasItem{ position }, insideColor{ color } {}
+            Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ position }, innerColor{ color } {}
 
 
             void _render() override;
@@ -22,8 +23,16 @@ namespace cg
                 vertices.push_back(newVertex);
             }
 
-            // adicionar mais funções aqui embaixo se precisar
-            inline Vector2 lastVertice() {
+            // Polygon size ignoring the vertice on its start position.
+            inline size_t size() {
+                return vertices.size();
+            }
+
+            inline Vector2& lastVertice() {
+                return (vertices.size() == 0) ? position : vertices.back();
+            }
+
+            inline Vector2 lastVertice() const {
                 return (vertices.size() == 0) ? position : vertices.back();
             }
 
@@ -39,11 +48,17 @@ namespace cg
                 }
             }
 
-            inline ColorRgb getColor() {
-                return insideColor;
+            inline Color& getColor() {
+                return innerColor;
+            }
+
+            inline Color getColor() const {
+                return innerColor;
             }
         private:
             std::vector<Vector2> vertices;
-            ColorRgb insideColor;
+            Color innerColor;
+            //Color contourColor; // TODO
+            Triangulation triangulation;
     };
 } // namespace cg

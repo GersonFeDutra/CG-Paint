@@ -12,7 +12,6 @@ namespace cg {
 	class PointTool : public Painter {
 	public:
 		PointTool(ToolBox& tool_box);
-		CanvasItem* make(Vector2 at) override;
 
 		void _render() override;
 

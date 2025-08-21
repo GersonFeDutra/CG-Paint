@@ -19,9 +19,12 @@ namespace cg {
 	public:
 		Painter(ToolBox& tool_box) : Tool{tool_box} {}
 
-		virtual CanvasItem* make(Vector2 at) = 0;
+		void appendToCanvas(CanvasItem* item);
+
+		void _render() override;
+		virtual void _onRender() {};
 	protected:
-		bool isDrawing = false;
+		bool isDrawing = false; // _render only if isDrawing
 	};
 
 	// TODO

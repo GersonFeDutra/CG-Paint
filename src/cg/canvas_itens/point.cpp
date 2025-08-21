@@ -7,7 +7,7 @@
 
 namespace cg
 {
-    Point::Point(Vector2 position, ColorRgb color) : CanvasItem{ position }, color{ color } {
+    Point::Point(Vector2 position, Color color) : CanvasItem{ position }, color{ color } {
         SET_CLI_YELLOW();
         printf("%f, %f\n", position.x, position.y);
         RESET_CLI();
@@ -20,7 +20,7 @@ namespace cg
         }
         GLdebug{
             glBegin(GL_POINTS);
-                glColor3ub(color.r, color.g, color.b);
+                glColor3f(color.r, color.g, color.b);
                 glVertex2f(position.x, position.y);
             glEnd();
         }
@@ -31,12 +31,12 @@ namespace cg
         position = mouse_event.position;
     }
 
-    Points::Points(ColorRgb point_color, ArrayList<Vector2> point_list) : pointColor(point_color), pointList(point_list) {}
+    Points::Points(Color point_color, ArrayList<Vector2> point_list) : pointColor(point_color), pointList(point_list) {}
 
     void Points::_render()
     {
         GLdebug {
-            glColor3ub(pointColor.r, pointColor.g, pointColor.b);
+            glColor3f(pointColor.r, pointColor.g, pointColor.b);
         }
         GLdebug {
             glBegin(GL_POINTS);

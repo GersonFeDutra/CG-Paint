@@ -12,20 +12,19 @@
 
 namespace cg {
 
-    // Declare as ferramentas aqui.
-
-
-    // Passe as ferramentas para o array (lembre-se de alterar o tamanho dele em N_PRIMITIVES).
-    ToolBox::ToolBox() {
-        static PointTool pointTool{ *this };
-        static LineTool lineTool{ *this };
-        static PolygonTool polygonTool{ *this }; // Guido: tirei o comentário, uma parte tá funcionando e outra não, vou tentar ver isso agora
-        tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
-    }
+    ToolBox::ToolBox() : tools{nullptr, nullptr, nullptr} {}
 
     void ToolBox::addCanvas(Canvas* canvas_ptr) {
         assert_err(canvas == nullptr, "Canvas already added.");
         canvas = canvas_ptr;
+
+        // Declare as ferramentas aqui.
+        static PointTool pointTool{ *this };
+        static LineTool lineTool{ *this };
+        static PolygonTool polygonTool{ *this };
+
+        // Passe as ferramentas para o array (lembre-se de alterar o tamanho dele em N_PRIMITIVES).
+        tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
     }
 
     void ToolBox::_render()

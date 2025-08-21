@@ -95,6 +95,7 @@ void display()
         static float f = 0.0f;
 
         Window toolBox("Controls");
+        // TODO -> Use Icon buttons for each tool
 
         // toolBox.showSliderFloat(&f, "float");
         // toolBox.showCheckBox(&check, "Active");
@@ -114,7 +115,7 @@ void display()
         // default: break;
         // }
         
-        toolBox.showColorEdit((cg::Vector3 *)&canvas.toolBox.currentColor.r, "color");
+        toolBox.showColorEdit((cg::Vector3 *)&(canvas.toolBox.getColorPtr()->r), "color");
         
         if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;

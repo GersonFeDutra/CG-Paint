@@ -10,121 +10,13 @@
 
 
 namespace cg {
-
-    CanvasItem* LineTool::make(Vector2 at) {
-        assert_err(toolBox.canvas != nullptr, "Canvas was not added.");
-
-        // New line primitive
-        ColorRgb color = Color(toolBox.currentColor);
-        auto line = std::make_unique<Line>(at, color);
-        CanvasItem* ptr = line.get();
-        toolBox.canvas->insert(std::move(line));
-        return ptr;
-	}
-
-    class Vec2Interpolator {
-    public:
-        Vec2Interpolator(Vector2 from, Vector2 to, float step_size)
-            : from(from), to(to), step_size(step_size)
-        {
-            total_distance = from.distance(to);
-
-            if (total_distance < 1e-5f) {
-                steps = 1;
-            }
-            else {
-                steps = std::max(2, static_cast<int>(std::ceil(total_distance / step_size)));
-            }
-        }
-
-        class Iterator {
-        public:
-            Iterator(Vec2Interpolator* interpolator, int step)
-                : interpolator(interpolator), step(step) {
-            }
-
-            Vector2 operator*() const {
-                float t = (interpolator->steps > 1)
-                    ? static_cast<float>(step) / (interpolator->steps - 1)
-                    : 0.0f;
-                return interpolator->from.lerp(interpolator->to, t);
-            }
-
-            Iterator& operator++() {
-                step++;
-                return *this;
-            }
-
-            bool operator!=(const Iterator& other) const {
-                return step != other.step;
-            }
-
-        private:
-            Vec2Interpolator* interpolator;
-            int step;
-        };
-
-        Iterator begin() { return Iterator(this, 0); }
-        Iterator end() { return Iterator(this, steps); }
-        int getSteps() const { return steps; }
-
-    private:
-        Vector2 from;
-        Vector2 to;
-        float step_size;
-        float total_distance;
-        int steps;
-    };
-
-    void LineTool::_render() {
-        if (!isDrawing || toolBox.isInsideGui)
-            return;
-
-        GLdebug{
-            const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
-
-            Vector2 start = lines.back()->lastVertice();
-            Vector2 screenStart = toolBox.canvas->ndcToScreen(start);
-            Vector2 screenEnd = toolBox.canvas->ndcToScreen(position);
-
-            float screenDistance = screenStart.distance(screenEnd);
-            if (screenDistance < 1e-5f)
-                return; // avoid low precision issues
-
-            Vec2Interpolator interpolator(screenStart, screenEnd, DASH_LENGTH);
-
-            glBegin(GL_LINES);
-            glColor4f(GHOST_LINE_COLOR.r, GHOST_LINE_COLOR.g, GHOST_LINE_COLOR.b, GHOST_LINE_COLOR.a);
-
-            bool drawSegment = true;
-            Vector2 prev = screenStart;
-            int segmentCount = 0;
-
-            for (auto it = interpolator.begin(); it != interpolator.end(); ++it) {
-                Vector2 current = *it;
-
-                // Alterna entre traço e espaço a cada DASH_LENGTH
-                if (drawSegment) {
-                    Vector2 ndcPrev = toolBox.canvas->screenToNdc(prev);
-                    Vector2 ndcCurrent = toolBox.canvas->screenToNdc(current);
-
-                    glVertex2f(ndcPrev.x, ndcPrev.y);
-                    glVertex2f(ndcCurrent.x, ndcCurrent.y);
-                }
-
-                // A cada DASH_LENGTH percorrida, alterna o estado
-                segmentCount++;
-                if (segmentCount % 2 == 0) {
-                    drawSegment = !drawSegment;
-                }
-
-                prev = current;
-            }
-
-            glEnd();
-        }
+    LineTool::LineTool(ToolBox& tool_box) : Painter{ tool_box }, ghostLine{ toolBox.canvas } {
+        ghostLine.from = ghostLine.to = &position;
     }
 
+    void LineTool::_onRender() {
+        ghostLine._render();
+    }
 
     void LineTool::_input(io::MouseMove mouse_event)
     {
@@ -141,21 +33,37 @@ namespace cg {
 
     void LineTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
+        // ghost line `from` aways points to `position`
+        // ghost line `to` aways points to the current line's `lastVertice`
+
         if (isDrawing) {
-            // line->append(mouse_event.position);
-            lines.back()->append(mouse_event.position);
+            if (line->size() == 0)
+                appendToCanvas(line); // add to canvas when line vertices become > 1
+
+            line->append(mouse_event.position);
+            ghostLine.from = &(line->lastVertice());
         }
         else {
-            // line = (Line *)make(mouse_event.position);
-            lines.push_back((Line *) make(mouse_event.position));
+            // New line primitive
+            line = new Line(mouse_event.position, toolBox.getColor());
+            toolBox.bindColorPtr(&line->getColor());
+			position = mouse_event.position; // update position to the first vertice
+            ghostLine.from = &line->lastVertice();
             isDrawing = true;
-            position = mouse_event.position;
         }
     }
 
+    // TODO -> Accept with Enter
+    // TODO -> Cancel with Escape
     void LineTool::_input(io::MouseRightButtonPressed mouse_event) {
-        if (isDrawing) isDrawing = false;
-        lines.clear();
+        isDrawing = false;
+
+        if (line != nullptr && line->size() == 0)
+            delete line; // do not make a line with single vertice
+
+        line = nullptr;
+        ghostLine.from = &position;
+        toolBox.unbindColorPtr();
     }
 
 }
