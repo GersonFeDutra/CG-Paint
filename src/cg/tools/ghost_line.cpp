@@ -19,31 +19,31 @@ namespace cg {
         if (from == to || *from == *to)
             return;
 
-        //GLdebug{
+        GLdebug{
             const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
-            Vector2 screenStart = canvas->ndcToScreen(*from);
-            Vector2 screenEnd = canvas->ndcToScreen(*to);
+            Vector2 _from = *from;
+            Vector2 _to = *to;
 
-            float screenDistance = screenStart.distance(screenEnd);
+            float screenDistance = _from.distance(_to);
             if (screenDistance < 1e-5f)
                 return; // avoid low precision issues
 
-            Vec2Interpolator interpolator(screenStart, screenEnd, DASH_LENGTH);
+            Vec2Interpolator interpolator(_from, _to, DASH_LENGTH);
 
             glBegin(GL_LINES);
             glColor4f(color.r, color.g, color.b, color.a);
 
             bool drawSegment = true;
-            Vector2 prev = screenStart;
+            Vector2 prev = _from;
             int segmentCount = 0;
 
             for (Vector2 current : interpolator) {
 
                 // Alterna entre traço e espaço a cada DASH_LENGTH
                 if (drawSegment) {
-                    Vector2 ndcPrev = canvas->screenToNdc(prev);
-                    Vector2 ndcCurrent = canvas->screenToNdc(current);
+                    Vector2 ndcPrev = prev;
+                    Vector2 ndcCurrent = current;
 
                     glVertex2f(ndcPrev.x, ndcPrev.y);
                     glVertex2f(ndcCurrent.x, ndcCurrent.y);
@@ -59,7 +59,7 @@ namespace cg {
             }
 
             glEnd();
-        //}
+        }
 	}
 
 }

@@ -12,10 +12,6 @@
 
 #include "canvas_item.hpp"
 
-template <typename T>
-using ArrayList = std::vector<T>; // alias the data structure by the name of what it actually is.
-
-
 
 namespace cg {
     using TimePoint = std::chrono::steady_clock::time_point;
@@ -33,9 +29,6 @@ namespace cg {
         template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
         inline void sendScreenInput(int x, int y) {
             Vector2 position = screenToWorld(x, y);
-            auto [_x, _y] = position;
-            std::cout << "Mouse moved to: " << _x << ", " << _y << std::endl;
-
             IE input_event{ position };
             toolBox.captureInput(input_event);
         }

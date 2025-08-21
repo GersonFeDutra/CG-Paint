@@ -1,5 +1,6 @@
 #include "triangulation.hpp"
 
+#include <vector>
 #include <cmath>
 #include <cstring>
 #include <iostream>
@@ -32,7 +33,7 @@ namespace cg {
         return h;
     }
 
-    void Triangulation::quantizePolygon(const std::vector<Vector2>& pts, std::vector<int64_t>& outQuant, float quant) {
+    void Triangulation::quantizePolygon(const ArrayList<Vector2>& pts, ArrayList<int64_t>& outQuant, float quant) {
         outQuant.clear();
         outQuant.reserve(1 + pts.size() * 2);
         outQuant.push_back(static_cast<int64_t>(pts.size()));
@@ -44,8 +45,26 @@ namespace cg {
             outQuant.push_back(yi);
         }
     }
+    void Triangulation::quantizePolygon(Vector2 position, const ArrayList<Vector2>& pts, ArrayList<int64_t>& outQuant, float quant) {
+        outQuant.clear();
+        outQuant.reserve(1 + (pts.size() + 1) * 2);
+        outQuant.push_back(static_cast<int64_t>(pts.size()));
+        const double scale = 1.0 / static_cast<double>(quant);
+        { // position
+            int64_t xi = std::llround(static_cast<double>(position.x) * scale);
+            int64_t yi = std::llround(static_cast<double>(position.y) * scale);
+            outQuant.push_back(xi);
+            outQuant.push_back(yi);
+        }
+        for (const auto& p : pts) {
+            int64_t xi = std::llround(static_cast<double>(p.x) * scale);
+            int64_t yi = std::llround(static_cast<double>(p.y) * scale);
+            outQuant.push_back(xi);
+            outQuant.push_back(yi);
+        }
+    }
 
-    uint64_t Triangulation::hashQuantized(const std::vector<int64_t>& q) {
+    uint64_t Triangulation::hashQuantized(const ArrayList<int64_t>& q) {
         return fnv1a64(q.data(), q.size() * sizeof(int64_t));
     }
 
@@ -93,7 +112,7 @@ namespace cg {
 
     /* ----------------- Run GLU tessellator ----------------- */
 
-    bool Triangulation::runGluTessellate(const std::vector<Vector2>& contour) {
+    bool Triangulation::runGluTessellate(const ArrayList<Vector2>& contour) {
         triVerts_.clear();
         triIndices_.clear();
         // liberamos alocações anteriores (se houver)
@@ -103,7 +122,7 @@ namespace cg {
         if (contour.size() < 3) return false;
 
         // preparar pontos iniciais (TessVertex) e triVerts_ com os pontos originais
-        std::vector<TessVertex*> initial;
+        ArrayList<TessVertex*> initial;
         initial.reserve(contour.size());
         for (size_t i = 0; i < contour.size(); ++i) {
             TessVertex* tv = new TessVertex();
@@ -151,7 +170,7 @@ namespace cg {
         gluDeleteTess(tess);
 
         // free temporary TessVertex objects (we already copied final verts into triVerts_, combine-created verts also pushed there)
-        for (TessVertex* p : allocated_) delete p;
+        //for (TessVertex* p : allocated_) delete p;
         allocated_.clear();
 
         s_current_ = nullptr;
@@ -170,7 +189,7 @@ namespace cg {
         valid_ = false;
     }
 
-    bool Triangulation::triangulateIfNeeded(const std::vector<Vector2>& contour, float quant) {
+    bool Triangulation::triangulateIfNeeded(Vector2 position, const ArrayList<Vector2>& contour, float quant) {
         lastQuantStep_ = quant;
         // special cases handled by caller, but handle here too
         if (contour.size() < 3) {
@@ -184,7 +203,43 @@ namespace cg {
         }
 
         // quantize + hash
-        std::vector<int64_t> q;
+        ArrayList<int64_t> q;
+        quantizePolygon(position, contour, q, quant);
+        uint64_t h = hashQuantized(q);
+
+        if (valid_ && h == lastHash_) {
+            if (lastQuant_ == q) {
+                // identical, reuse
+                return true;
+            }
+            // hash collision or quantization difference -> re-tess
+        }
+
+        // need to retessellate
+        bool ok = runGluTessellate(contour);
+        err(!ok, "Triangulation Failed!");
+        // update cache even if tess failed (so we don't loop forever); if fail we still store lastHash/lastQuant
+        lastHash_ = h;
+        lastQuant_.swap(q);
+        valid_ = ok || (!ok && !triIndices_.empty());
+        return valid_;
+    }
+
+    bool Triangulation::triangulateIfNeeded(const ArrayList<Vector2>& contour, float quant) {
+        lastQuantStep_ = quant;
+        // special cases handled by caller, but handle here too
+        if (contour.size() < 3) {
+            // cache simple copy for fallback
+            triVerts_ = contour;
+            triIndices_.clear();
+            lastHash_ = 0;
+            lastQuant_.clear();
+            valid_ = true;
+            return true;
+        }
+
+        // quantize + hash
+        ArrayList<int64_t> q;
         quantizePolygon(contour, q, quant);
         uint64_t h = hashQuantized(q);
 

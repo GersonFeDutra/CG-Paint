@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cassert>
 #include <iostream>
+#include <vector>
 #include <source_location>
 
 #include "api.hpp" // Includes the Open GL API, so you can include just this utilities header.
@@ -29,6 +30,9 @@
 #else
 	static_assert(false, "Sistema operacional desconhecido");
 #endif
+
+template <typename T>
+using ArrayList = std::vector<T>; // alias the data structure by the name of what it actually is.
 
 
 template <typename... Args>
