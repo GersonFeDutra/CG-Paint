@@ -1,18 +1,38 @@
 #include "polygon.hpp"
 
-namespace cg
-{
+
+namespace cg {
+
     void Polygon::_render() {
-        if (vertices.empty()) {
+        // TODO -> do not use a copy vector
+        std::vector<Vector2> pts;
+        pts.push_back(position);
+        for (auto& v : vertices) pts.push_back(v);
+
+        if (pts.size() < 3) {
+            /* TODO -> desenha ponto/ linha */
             return;
         }
+
         GLdebug{
-			glBegin(GL_POLYGON);
-				glColor3ub(insideColor.r, insideColor.g, insideColor.b);
-				glVertex2f(position.x, position.y);
-				for (auto& vertice : vertices)
-					glVertex2f(vertice.x, vertice.y);
-			glEnd();
-		}
+            glColor3f(innerColor.r, innerColor.g, innerColor.b);
+        }
+        GLdebug{
+            // triangula se necessário
+            triangulation.triangulateIfNeeded(pts);
+
+            // desenha vários triângulos formando um polígono:
+            const auto& tverts = triangulation.verts();
+            const auto& tidx = triangulation.indices();
+            if (!tidx.empty()) {
+                glBegin(GL_TRIANGLES);
+                for (size_t i = 0; i + 2 < tidx.size(); ++i) {
+                    const Vector2& p = tverts[tidx[i]];
+                    glVertex2f(p.x, p.y);
+                }
+                glEnd();
+            }
+            // desenha contorno...
+        }
     }
-} // namespace cg
+}

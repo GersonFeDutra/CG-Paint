@@ -46,6 +46,6 @@ namespace cg {
     private:
         ID id = 0; // It's id location at the canvas.
     public:
-        Vector2 position{};
+        Vector2 position{}; // TODO -> Remove + use model transform matrix
     };
 }

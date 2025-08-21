@@ -32,14 +32,17 @@ namespace cg {
          */
         template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
         inline void sendScreenInput(int x, int y) {
-            Vector2 position = screenToNdc(x, y);
+            Vector2 position = screenToWorld(x, y);
+            auto [_x, _y] = position;
+            std::cout << "Mouse moved to: " << _x << ", " << _y << std::endl;
+
             IE input_event{ position };
             toolBox.captureInput(input_event);
         }
 
         template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
         inline void sendScreenInput(int x, int y, int direction) {
-            Vector2 position = screenToNdc(x, y);
+            Vector2 position = screenToWorld(x, y);
             IE input_event{ position, direction };
             toolBox.captureInput(input_event);
         }
@@ -88,6 +91,12 @@ namespace cg {
         // Update coordinate system
         inline void setWindowSize(Vector2 to) {
             windowSize = to;
+            _screenToWorld = {
+                { 1.0f, 0.0f },
+                { 0.0f, -1.0f },
+                { -windowSize.x / 2.0f, windowSize.y / 2.0f },
+			};
+            // TODO -> Remove
             _screenToNdc = {
                 { 2.0f / windowSize.x, 0.0f },
                 { 0.0f, -2.0f / windowSize.y },
@@ -105,6 +114,14 @@ namespace cg {
             setWindowSize({ (float)width, (float)height });
         }
 
+        // Changes screen coordinates to World Coordinates system.
+        inline Vector2 screenToWorld(Vector2 point) {
+			return _screenToWorld.transform(point);
+        }
+        inline Vector2 screenToWorld(int x, int y) {
+            return _screenToWorld.transform(x, y);
+        }
+
         // Changes screen coordinates to Normalized Display Coordinates system.
         inline Vector2 screenToNdc(Vector2 point) {
             return _screenToNdc.transform(point);
@@ -120,8 +137,9 @@ namespace cg {
 
         private:
         Vector2 windowSize; // aspect ratio: 10:7
+		Transform2D _screenToWorld; // Screen coordinates to World coordinates
         Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
-        Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen coordinates
+        Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen Coordinates
 
         ArrayList<std::unique_ptr<CanvasItem>> itens;
     public:

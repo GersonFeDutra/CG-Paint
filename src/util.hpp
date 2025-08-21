@@ -144,13 +144,28 @@ template<typename... Args>
 void warn(const char* message, Args... args,
 	const std::source_location location = std::source_location::current()
 ) {
-	SET_CLI_YELLOW();
+	if constexpr (IS_DEBUG) {
+		SET_CLI_YELLOW();
 
-	print_location_tag("Warning", location);
-	fprintf(stderr, message, args...); // Mensagem formatada
+		print_location_tag("Warning", location);
+		fprintf(stderr, message, args...); // Mensagem formatada
 
-	RESET_CLI();
+		RESET_CLI();
+	}
 }
+
+// Prints a warning message within a given condition
+template<typename... Args>
+void warn(bool condition, const char* message, Args... args,
+	const std::source_location location = std::source_location::current()
+) {
+	if constexpr (IS_DEBUG) {
+		if (condition) {
+			warn(message, args..., location);
+		}
+	}
+}
+
 
 // Prints an error message
 template<typename... Args>
@@ -167,6 +182,18 @@ void err(const char* message, Args... args,
 	}
 }
 
+// Prints a err message within a given condition
+template<typename... Args>
+void err(bool condition, const char* message, Args... args,
+	const std::source_location location = std::source_location::current()
+) {
+	if constexpr (IS_DEBUG) {
+		if (condition) {
+			err(message, args..., location);
+		}
+	}
+}
+
 // Prints a sucess message
 template<typename... Args>
 void suc(const char* message, Args... args,
@@ -179,6 +206,18 @@ void suc(const char* message, Args... args,
 		fprintf(stderr, message, args...); // Mensagem formatada
 
 		RESET_CLI();
+	}
+}
+
+// Prints a success message within a given condition
+template<typename... Args>
+void suc(bool condition, const char* message, Args... args,
+	const std::source_location location = std::source_location::current()
+) {
+	if constexpr (IS_DEBUG) {
+		if (condition) {
+			suc(message, args..., location);
+		}
 	}
 }
 

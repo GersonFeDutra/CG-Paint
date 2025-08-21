@@ -30,6 +30,11 @@ int init(void)
 {
     //auto _flag_ptr = std::make_unique<cg::Flag>();
 
+    auto half_size = canvas.getWindowSize() / 2.0f;
+    glClearColor(0.1333f, 0.1333f, 0.1333f, 0.0f); // cor de fundo
+    glMatrixMode(GL_PROJECTION);
+    gluOrtho2D(-half_size.x, half_size.x, -half_size.y, half_size.y); // coordenadas limite do viewport normalizadas (em 2D)
+
     //flag = _flag_ptr.get();
     //canvas.insert(std::move(_flag_ptr));
 
@@ -95,13 +100,33 @@ void display()
         static float f = 0.0f;
 
         Window toolBox("Controls");
+        // TODO -> Use Icon buttons for each tool
 
         // toolBox.showSliderFloat(&f, "float");
-        // toolBox.showCheckBox(&check, "Active");
+        // toolBox.showCheckBox(&check, "Active
+        
+        // glut cursor
+        static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
+		static unsigned last_cursor = GLUT_CURSOR_INHERIT;
+        unsigned current_cursor = GLUT_CURSOR_INHERIT;
 
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")); // use point
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")); // use line
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")); // use polygon
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
+            tool_cursor = current_cursor;
+        } // use point
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
+			tool_cursor = GLUT_CURSOR_CROSSHAIR;
+        } // use line
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
+            tool_cursor = GLUT_CURSOR_CROSSHAIR;
+        } // use polygon
+
+        if (!canvas.toolBox.isInsideGui)
+            current_cursor = tool_cursor;
+
+        if (current_cursor != last_cursor) {
+            glutSetCursor(current_cursor);
+            last_cursor = current_cursor;
+        }
 
         // TODO [Extra] -> Polígono regular
         // switch (canvas.toolBox.currentPrimitive) {
@@ -114,7 +139,7 @@ void display()
         // default: break;
         // }
         
-        toolBox.showColorEdit((cg::Vector3 *)&canvas.toolBox.currentColor.r, "color");
+        toolBox.showColorEdit((cg::Vector3 *)&(canvas.toolBox.getColorPtr()->r), "color");
         
         if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -169,11 +194,22 @@ void reshape(int w, int h) {
         glViewport(0, 0, w, h);
     }
 
-    // Repassa o evento para o ImGui
-    ImGui_ImplGLUT_ReshapeFunc(w, h);
+    glMatrixMode(GL_PROJECTION);
+	glLoadIdentity(); // Reseta a matriz de projeção
+
+    cg::Vector2 window_size( w, h );
+	cg::Vector2 half_size = window_size / 2.0f;
+    gluOrtho2D(-half_size.x, half_size.x, -half_size.y, half_size.y); // coordenadas limite do viewport normalizadas (em 2D)
+
+	// TODO -> Deslocar a origem do mundo usando o botão do meio do mouse
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity(); // Reseta a matriz de modelo
 
     // Envia o novo tamanho da janela para o canvas
-    canvas.setWindowSize(w, h);
+    canvas.setWindowSize(window_size);
+
+    // Repassa o evento para o ImGui
+    ImGui_ImplGLUT_ReshapeFunc(w, h);
 
     // Lógica personalizada de redimensionamento abaixo
 }

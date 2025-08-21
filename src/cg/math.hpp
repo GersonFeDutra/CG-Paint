@@ -32,6 +32,8 @@ constexpr T PI = std::numbers::pi_v<T>;
 
 using Angle = float; // Angle in radians.
 
+template <typename T>
+class Vec2Interpolator; // forward definition
 
 template <typename T>
 struct Vec2 {
@@ -51,15 +53,6 @@ struct Vec2 {
         y = v.y;
         return *this;
     }
-
-    // Operadores aritméticos
-    template <typename S>
-    constexpr Vec2 operator/(S f) const { return {x / f, y / f}; }
-    template <typename S>
-    constexpr Vec2 operator*(S f) const { return {x * f, y * f}; }
-
-    constexpr Vec2 operator+(Vec2 v) const { return {x + v.x, y + v.y}; }
-    constexpr Vec2 operator-(Vec2 v) const { return {x - v.x, y - v.y}; }
 
     Vec2& operator+=(Vec2 v) {
         x += v.x;
@@ -107,10 +100,34 @@ struct Vec2 {
         return norm();
     }
 
+    /* Get linear interpolation next step. */
     inline Vec2 lerp(Vec2 to, float by) const {
         return { x + (to.x - x) * by, y + (to.y - y) * by };
     }
+
+    /* Returns a linear interpolation Iterator towards `to` by the given amount. */
+    template <std::convertible_to<T> U>
+    Vec2Interpolator<LargerType<T, U>> lerpIterator(Vec2<U> to, float by) const;
 };
+
+// Operadores aritméticos
+template <typename T, std::convertible_to<T> U>
+constexpr Vec2<LargerType<T, U>> operator/(Vec2<T> v, U scalar) { return { v.x / scalar, v.y / scalar }; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr Vec2<LargerType<T, U>> operator*(Vec2<T> v, U scalar) { return { v.x * scalar, v.y * scalar }; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr Vec2<LargerType<T, U>> operator+(Vec2<T> u, Vec2<U> v) { return { u.x + v.x, u.y + v.y }; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr Vec2<LargerType<T, U>> operator-(Vec2<T> u, Vec2<U> v) { return { u.x - v.x, u.y - v.y }; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator==(Vec2<T> u, Vec2<U> v) { return u.x == v.x && u.y == v.y; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator!=(Vec2<T> u, Vec2<U> v) { return !(u == v); }
 
 using Vector2 = Vec2<float>;
 using Vector2i = Vec2<int>;
@@ -264,9 +281,9 @@ inline Vec2<LargerType<T, U>> operator*(const Transf2x3<T>& m, const Vec2<U>& v)
 template <typename T, std::convertible_to<T> U>
 inline Transf2x3<LargerType<T, U>> operator*(const Transf2x3<T>& a, const Transf2x3<U>& b) {
     return {
-        { a * b.columns[0] },
-        { a * b.columns[1] },
-        { a * b.columns[2] }
+        a * b.columns[0],
+        a * b.columns[1],
+        a * b.columns[2]
     };
 }
 
@@ -284,6 +301,12 @@ struct ColorRgb {
     constexpr ColorRgb() = default; // implicit constructor
     constexpr ColorRgb(unsigned char r, unsigned char g, unsigned char b) : r(r), g(g), b(b) {}
     inline Vector3 normalized() const { return Vector3(r / 255.0f, g / 255.0f, b / 255.0f); }
+    bool operator==(ColorRgb c) {
+        return r == c.r && g == c.g && b == c.b;
+    }
+    bool operator!=(ColorRgb other) {
+        return !(*this == other);
+    }
 };
 
 
@@ -325,6 +348,68 @@ namespace colors {
             (std::rand() % 256)
         );
     }
+}
+
+template <typename T>
+class Vec2Interpolator {
+    const float ZERO_ERROR = 1e-5f; // comparação com zero
+public:
+    Vec2Interpolator(Vec2<T> from, Vec2<T> to, float step_size)
+        : from(from), to(to), step_size(step_size)
+    {
+        total_distance = from.distance(to);
+
+        if (total_distance < ZERO_ERROR) {
+            steps = 1;
+        }
+        else {
+            steps = std::max(2, static_cast<int>(std::ceil(total_distance / step_size)));
+        }
+    }
+
+    class Iterator {
+    public:
+        Iterator(Vec2Interpolator* interpolator, int step)
+            : interpolator(interpolator), step(step) {
+        }
+
+        Vec2<T> operator*() const {
+            float t = (interpolator->steps > 1)
+                ? static_cast<float>(step) / (interpolator->steps - 1)
+                : 0.0f;
+            return interpolator->from.lerp(interpolator->to, t);
+        }
+
+        Iterator& operator++() {
+            step++;
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return step != other.step;
+        }
+
+    private:
+        Vec2Interpolator* interpolator;
+        int step;
+    };
+
+    Iterator begin() { return Iterator(this, 0); }
+    Iterator end() { return Iterator(this, steps); }
+    int getSteps() const { return steps; }
+
+private:
+    Vec2<T> from;
+    Vec2<T> to;
+    float step_size;
+    float total_distance;
+    int steps;
+};
+
+template <typename T>
+template <std::convertible_to<T> U>
+inline Vec2Interpolator<LargerType<T, U>> Vec2<T>::lerpIterator(Vec2<U> to, float by) const {
+    return { *this, to, by };
 }
 
 } // namespace cg
