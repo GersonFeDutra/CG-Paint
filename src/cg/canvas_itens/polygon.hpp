@@ -40,9 +40,9 @@ namespace cg
                 return vertices;
             }
 
-            inline ColorRgb getColor() {
-                return insideColor;
-            }
+            // inline ColorRgb getColor() {
+            //     return innerColor;
+            // }
 
             
             inline void setVertices(std::vector<Vector2> allVertices) {
@@ -50,7 +50,7 @@ namespace cg
             }
 
             inline void setColor(ColorRgb color) {
-                insideColor = color;
+                innerColor = color;
             }
 
             inline Color& getColor() {
