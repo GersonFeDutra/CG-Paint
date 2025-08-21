@@ -103,11 +103,30 @@ void display()
         // TODO -> Use Icon buttons for each tool
 
         // toolBox.showSliderFloat(&f, "float");
-        // toolBox.showCheckBox(&check, "Active");
+        // toolBox.showCheckBox(&check, "Active
+        
+        // glut cursor
+        static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
+		static unsigned last_cursor = GLUT_CURSOR_INHERIT;
+        unsigned current_cursor = GLUT_CURSOR_INHERIT;
 
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")); // use point
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")); // use line
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")); // use polygon
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
+            tool_cursor = current_cursor;
+        } // use point
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
+			tool_cursor = GLUT_CURSOR_CROSSHAIR;
+        } // use line
+        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
+            tool_cursor = GLUT_CURSOR_CROSSHAIR;
+        } // use polygon
+
+        if (!canvas.toolBox.isInsideGui)
+            current_cursor = tool_cursor;
+
+        if (current_cursor != last_cursor) {
+            glutSetCursor(current_cursor);
+            last_cursor = current_cursor;
+        }
 
         // TODO [Extra] -> Polígono regular
         // switch (canvas.toolBox.currentPrimitive) {
