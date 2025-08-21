@@ -30,6 +30,11 @@ int init(void)
 {
     //auto _flag_ptr = std::make_unique<cg::Flag>();
 
+    auto half_size = canvas.getWindowSize() / 2.0f;
+    glClearColor(0.1333f, 0.1333f, 0.1333f, 0.0f); // cor de fundo
+    glMatrixMode(GL_PROJECTION);
+    gluOrtho2D(-half_size.x, half_size.x, -half_size.y, half_size.y); // coordenadas limite do viewport normalizadas (em 2D)
+
     //flag = _flag_ptr.get();
     //canvas.insert(std::move(_flag_ptr));
 
@@ -165,11 +170,22 @@ void reshape(int w, int h) {
         glViewport(0, 0, w, h);
     }
 
-    // Repassa o evento para o ImGui
-    ImGui_ImplGLUT_ReshapeFunc(w, h);
+    glMatrixMode(GL_PROJECTION);
+	glLoadIdentity(); // Reseta a matriz de projeção
+
+    cg::Vector2 window_size( w, h );
+	cg::Vector2 half_size = window_size / 2.0f;
+    gluOrtho2D(-half_size.x, half_size.x, -half_size.y, half_size.y); // coordenadas limite do viewport normalizadas (em 2D)
+
+	// TODO -> Deslocar a origem do mundo usando o botão do meio do mouse
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity(); // Reseta a matriz de modelo
 
     // Envia o novo tamanho da janela para o canvas
-    canvas.setWindowSize(w, h);
+    canvas.setWindowSize(window_size);
+
+    // Repassa o evento para o ImGui
+    ImGui_ImplGLUT_ReshapeFunc(w, h);
 
     // Lógica personalizada de redimensionamento abaixo
 }
