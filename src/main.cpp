@@ -310,7 +310,7 @@ void printGLInfo() {
     if (shading)
         print_success("GLSL Version: [%s]", shading);
 #endif
-}
+}\
 
 
 int main(int argc, char** argv)

@@ -27,4 +27,5 @@ namespace cg {
 		GhostLine lines[2];
         Vector2 initialCoords;
 	};
+
 }
