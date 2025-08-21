@@ -4,6 +4,11 @@
 
 namespace cg {
 
+    static void CALLBACK tessError(GLenum errorCode) {
+        const GLubyte* err = gluErrorString(errorCode);
+        print_error("Tessellation Error: %s\n", err);
+    }
+
     void Polygon::_render() {
 
         GLdebug{
@@ -23,20 +28,26 @@ namespace cg {
                 glEnd();
             } break;
             default: {
-                return;
+                std::vector<Vec3<GLdouble>> tmp_vertices; // precisa ser alocado para converter no formato esperado
+				tmp_vertices.reserve(vertices.size() + 1);
+
                 GLUtesselator* tess = gluNewTess();
 
-                //gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK*)())glBegin);
-                //gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK*)())glEnd);
-                //gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK*)())glVertex2dv);
-                //gluTessCallback(tess, GLU_TESS_ERROR, (void (CALLBACK*)())tessError);
+                gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK*)())glBegin);
+                gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK*)())glEnd);
+                gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK*)())glVertex2dv);
+                gluTessCallback(tess, GLU_TESS_ERROR, (void (CALLBACK*)())tessError);
 
                 gluTessBeginPolygon(tess, nullptr);
                 gluTessBeginContour(tess);
 
-                for (auto& v : vertices) {
-                    double* coords = new double[3]{v.x, v.y, 0.0}; // precisa ser alocado
-                    gluTessVertex(tess, coords, coords);
+                { // Position como ponto inicial
+                    tmp_vertices.emplace_back(Vec3<GLdouble>(position));
+                    gluTessVertex(tess, &tmp_vertices.back().x, &tmp_vertices.back().x);
+                }
+                for (auto vertice : vertices) {
+                    tmp_vertices.emplace_back(Vec3<GLdouble>(vertice));
+                    gluTessVertex(tess, &tmp_vertices.back().x, &tmp_vertices.back().x);
                 }
 
                 gluTessEndContour(tess);

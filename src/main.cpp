@@ -300,14 +300,16 @@ void printGLInfo() {
     const char* version = (const char*)glGetString(GL_VERSION);
     const char* renderer = (const char*)glGetString(GL_RENDERER);
     const char* vendor   = (const char*)glGetString(GL_VENDOR);
+
+    print_success("OpenGL Version: [%s]", version);
+    print_success("Renderer: [%s]", renderer);
+    print_success("Vendor: [%s]", vendor);
+
+#ifdef GL_SHADING_LANGUAGE_VERSION
     const char* shading  = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-
-    print_success("OpenGL Version: {%s}", version);
-    print_success("Renderer: {%s}", renderer);
-    print_success("Vendor: {%s}", vendor);
-
     if (shading)
-        print_success("GLSL Version: {%s}", shading);
+        print_success("GLSL Version: [%s]", shading);
+#endif
 }
 
 
