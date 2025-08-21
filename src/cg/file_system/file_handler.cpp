@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "fileHandler.hpp"
+#include "file_handler.hpp"
 
 #include <cg/math.hpp>
 #include <cg/canvas_itens/line.hpp>

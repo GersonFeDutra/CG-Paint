@@ -12,7 +12,7 @@
 #include "cg/canvas_itens/line.hpp"
 #include "cg/canvas_itens/polygon.hpp"
 
-#include "cg/fileSystem/fileHandler.hpp"
+#include "cg/file_system/file_handler.hpp"
 
 static cg::Canvas canvas{ cg::Flag::SIZE * 30 };
 
