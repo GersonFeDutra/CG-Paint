@@ -38,7 +38,12 @@ using ArrayList = std::vector<T>; // alias the data structure by the name of wha
 template <typename... Args>
 constexpr void print_warning(const char* message, Args...args) {
 	SET_CLI_YELLOW();
-	fprintf(stderr, message, args...);
+	if constexpr (sizeof...(Args) > 0) {
+		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+	}
+	else {
+		std::fprintf(stderr, "%s", message); // Mensagem formatada
+	}
 	fputc('\n', stderr);
 	RESET_CLI();
 }
@@ -46,7 +51,12 @@ constexpr void print_warning(const char* message, Args...args) {
 template <typename... Args>
 constexpr void print_error(const char* message, Args...args) {
 	SET_CLI_RED();
-	fprintf(stderr, message, args...);
+	if constexpr (sizeof...(Args) > 0) {
+		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+	}
+	else {
+		std::fprintf(stderr, "%s", message); // Mensagem formatada
+	}
 	fputc('\n', stderr);
 	RESET_CLI();
 }
@@ -54,7 +64,12 @@ constexpr void print_error(const char* message, Args...args) {
 template <typename... Args>
 constexpr void print_success(const char* message, Args...args) {
 	SET_CLI_GREEN();
-	fprintf(stderr, message, args...);
+	if constexpr (sizeof...(Args) > 0) {
+		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+	}
+	else {
+		std::fprintf(stderr, "%s", message); // Mensagem formatada
+	}
 	fputc('\n', stderr);
 	RESET_CLI();
 }
@@ -152,7 +167,12 @@ void warn(const char* message, Args... args,
 		SET_CLI_YELLOW();
 
 		print_location_tag("Warning", location);
-		fprintf(stderr, message, args...); // Mensagem formatada
+		if constexpr (sizeof...(Args) > 0) {
+			std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+		}
+		else {
+			std::fprintf(stderr, "%s", message); // Mensagem formatada
+		}
 
 		RESET_CLI();
 	}
@@ -180,7 +200,12 @@ void err(const char* message, Args... args,
 		SET_CLI_YELLOW();
 
 		print_location_tag("Error", location);
-		fprintf(stderr, message, args...); // Mensagem formatada
+		if constexpr (sizeof...(Args) > 0) {
+			std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+		}
+		else {
+			std::fprintf(stderr, "%s", message); // Mensagem formatada
+		}
 
 		RESET_CLI();
 	}
@@ -198,7 +223,7 @@ void err(bool condition, const char* message, Args... args,
 	}
 }
 
-// Prints a sucess message
+// Prints a success message
 template<typename... Args>
 void suc(const char* message, Args... args,
 	const std::source_location location = std::source_location::current()
@@ -207,7 +232,12 @@ void suc(const char* message, Args... args,
 		SET_CLI_YELLOW();
 
 		print_location_tag("Success", location);
-		fprintf(stderr, message, args...); // Mensagem formatada
+		if constexpr (sizeof...(Args) > 0) {
+			std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+		}
+		else {
+			std::fprintf(stderr, "%s", message); // Mensagem formatada
+		}
 
 		RESET_CLI();
 	}
@@ -236,8 +266,14 @@ constexpr void assert_err(bool condition, const char* message = nullptr, Args ..
 			SET_CLI_YELLOW();
 
 			print_location_tag("Assertion", location);
-			if (message)
-				fprintf(stderr, message, args...); // Mensagem formatada
+			if (message) {
+				if constexpr (sizeof...(Args) > 0) {
+					std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+				}
+				else {
+					std::fprintf(stderr, "%s", message); // Mensagem formatada
+				}
+			}
 			my_assert(condition);
 
 			RESET_CLI();

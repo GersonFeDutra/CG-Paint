@@ -50,7 +50,7 @@ ArrayList<cg::Polygon *> getPolygons() {
             returnList.push_back(derivedClass);
         } else continue;
     }
-    
+
     return returnList;
 }
 // get all lines from canvas
@@ -62,7 +62,7 @@ ArrayList<cg::Line *> getLines() {
             returnList.push_back(derivedClass);
         } else continue;
     }
-    
+
     return returnList;
 }
 // get all points from canvas
@@ -74,7 +74,7 @@ ArrayList<cg::Point *> getPoints() {
             returnList.push_back(derivedClass);
         } else continue;
     }
-    
+
     return returnList;
 }
 
@@ -104,7 +104,7 @@ void display()
 
         // toolBox.showSliderFloat(&f, "float");
         // toolBox.showCheckBox(&check, "Active
-        
+
         // glut cursor
         static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
 		static unsigned last_cursor = GLUT_CURSOR_INHERIT;
@@ -138,9 +138,9 @@ void display()
         // } break;
         // default: break;
         // }
-        
+
         toolBox.showColorEdit((cg::Vector3 *)&(canvas.toolBox.getColorPtr()->r), "color");
-        
+
         if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         toolBox.sameLine();
@@ -172,7 +172,7 @@ void display()
                 canvas.insert(std::make_unique<cg::Polygon>(* poly));
             }
         }
-        
+
         toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
     }
 
@@ -181,7 +181,7 @@ void display()
     // Sincroniza comandos de desenho não executados,
     // em tempo finito [GLUT_DOUBLE buffering]
     glutSwapBuffers();
-    
+
     // Força atualização contínua. Garantindo execução imediata.
     glutPostRedisplay(); // Recomendado para uso com a GUI
 }
@@ -310,7 +310,7 @@ void printGLInfo() {
     if (shading)
         print_success("GLSL Version: [%s]", shading);
 #endif
-}\
+}
 
 
 int main(int argc, char** argv)
