@@ -3,8 +3,7 @@
 #include <vector>
 
 #include <cg/canvas.hpp>
-#include <cg/geometry.hpp>
-#include <cg/geometry/triangulation.hpp>
+#include <cg/math.hpp>
 
 #include "cg/canvas_itens/line.hpp"
 
@@ -65,6 +64,5 @@ namespace cg
             std::vector<Vector2> vertices;
             Color innerColor;
             //Color contourColor; // TODO
-            Triangulation triangulation;
     };
 } // namespace cg

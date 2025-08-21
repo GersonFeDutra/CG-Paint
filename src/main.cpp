@@ -296,6 +296,21 @@ void onMouseButtonEvent(int button, int state, int x, int y)
 #endif
 
 
+void printGLInfo() {
+    const char* version = (const char*)glGetString(GL_VERSION);
+    const char* renderer = (const char*)glGetString(GL_RENDERER);
+    const char* vendor   = (const char*)glGetString(GL_VENDOR);
+    const char* shading  = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+    print_success("OpenGL Version: {%s}", version);
+    print_success("Renderer: {%s}", renderer);
+    print_success("Vendor: {%s}", vendor);
+
+    if (shading)
+        print_success("GLSL Version: {%s}", shading);
+}
+
+
 int main(int argc, char** argv)
 {
 #if defined(_WIN32) || defined(_WIN64)
@@ -321,6 +336,8 @@ int main(int argc, char** argv)
     auto window_size = canvas.getWindowSize();
     glutInitWindowSize(window_size.x, window_size.y); // tamanho da área interna da janela (coordenadas de tela)
     glutCreateWindow("Paint CG");
+
+    printGLInfo();
 
     // Glut Input Events -> Eventos de entrada customizados
     glutPassiveMotionFunc(onMouseMoveEvent);

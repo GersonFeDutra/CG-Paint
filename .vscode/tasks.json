@@ -4,7 +4,7 @@
     {
       "label": "Build (Python Wrapper)",
       "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["build.py"],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -24,7 +24,7 @@
     {
       "label": "Run App (Python Wrapper)",
       "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["build.py", "--run"],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -48,7 +48,7 @@
     {
       "label": "Build and Run App (Python Wrapper)",
       "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["build.py", "--run"],
       "dependsOrder": "sequence",
       "problemMatcher": [],

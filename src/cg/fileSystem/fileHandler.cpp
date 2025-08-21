@@ -8,16 +8,17 @@
 
 #include "fileHandler.hpp"
 
-#include "cg/canvas_itens/line.hpp"
-#include "cg/canvas_itens/point.hpp"
-#include "cg/canvas_itens/polygon.hpp"
+#include <cg/math.hpp>
+#include <cg/canvas_itens/line.hpp>
+#include <cg/canvas_itens/point.hpp>
+#include <cg/canvas_itens/polygon.hpp>
 
 namespace cg
 {
-    std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> FileHandler::loadFile(std::string path_to_file) {
-        ArrayList<cg::Point *> pointsArray;
-        ArrayList<cg::Line *> linesArray;
-        ArrayList<cg::Polygon *> polygonsArray;
+    std::tuple<ArrayList<Point *>, ArrayList<Line *>, ArrayList<Polygon *>> FileHandler::loadFile(std::string path_to_file) {
+        ArrayList<Point *> pointsArray;
+        ArrayList<Line *> linesArray;
+        ArrayList<Polygon *> polygonsArray;
 
         if (path_to_file.empty()) {
             path_to_file = defaultFileLocation;
