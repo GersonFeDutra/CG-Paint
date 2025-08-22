@@ -40,7 +40,7 @@ namespace cg {
 
             for (Vector2 current : interpolator) {
 
-                // Alterna entre traço e espaço a cada DASH_LENGTH
+                // Alterna entre traï¿½o e espaï¿½o a cada DASH_LENGTH
                 if (drawSegment) {
                     Vector2 ndcPrev = prev;
                     Vector2 ndcCurrent = current;
@@ -63,5 +63,3 @@ namespace cg {
 	}
 
 }
-
-template std::ostream& cg::operator<< <float>(std::ostream&, cg::Vec2<float>);

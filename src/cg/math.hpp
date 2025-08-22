@@ -17,6 +17,7 @@
 #include <type_traits>
 #include <iostream>
 #include <fstream>
+#include <concepts>
 
 
 namespace cg
@@ -111,19 +112,40 @@ struct Vec2 {
     template <std::convertible_to<T> U>
     Vec2Interpolator<LargerType<T, U>> lerpIterator(Vec2<U> to, float by) const;
 
-    friend std::ostream& operator<< <T>(std::ostream& os, const Vec2<T>& v);
-    friend std::istream& operator>> <T>(std::istream& is, Vec2<T>& v);
+    template <typename U>
+    friend std::ostream& operator<<(std::ostream& os, const Vec2<U>& v);
+    template <typename U>
+    friend std::istream& operator>>(std::istream& is, Vec2<U>& v);
     
-    friend std::ofstream& operator<< <T>(std::ofstream& ofs, const Vec2<T>& v);
-    friend std::ifstream& operator>> <T>(std::ifstream& ifs, Vec2<T>& v);
+    template <typename U>
+    friend std::ofstream& operator<<(std::ofstream& ofs, const Vec2<U>& v);
+    template <typename U>
+    friend std::ifstream& operator>>(std::ifstream& ifs, Vec2<U>& v);
 };
 
 // Friends
+#if defined(_WIN32) || defined(_WIN64)
+// Formato aceito apenas pelo windows (estou usando MSVC), por alguma razão
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Vec2<T>& v) {
     return os << '(' << v.x << ", " << v.y << ')';
 }
-
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
+    ofs << '(' << v.x << ", " << v.y << ')'; // Save in the format (x, y)
+    return ofs;
+}
+#else
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Vec2<T>& v) {
+    return os << '(' << v.x << ", " << v.y << ')';
+}
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
+    ofs << '(' << v.x << ", " << v.y << ')'; // Save in the format (x, y)
+    return ofs;
+}
+#endif
 template <typename T>
 inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
     try {
@@ -135,11 +157,6 @@ inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
         is.setstate(std::ios::failbit);
     }
     return is;
-}
-template <typename T>
-inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
-    ofs << '(' << v.x << ", " << v.y << ')'; // Save in the format (x, y)
-    return ofs;
 }
 template <typename T>
 inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
@@ -269,17 +286,40 @@ struct Vec3 {
         return Vec3(y * z, z * x, x * y);
     }
 
-    friend std::ostream& operator<< <T>(std::ostream& os, const Vec3<T>& v);
-    friend std::istream& operator>> <T>(std::istream& is, Vec3<T>& v);
+    template<typename U>
+    friend std::ostream& operator<<(std::ostream& os, const Vec3<U>& v);
+    template<typename U>
+    friend std::istream& operator>>(std::istream& is, Vec3<U>& v);
 
-    friend std::ofstream& operator<< <T>(std::ofstream& ofs, const Vec3<T>& v);
-    friend std::ifstream& operator>> <T>(std::ifstream& ifs, Vec3<T>& v);
+    template<typename U>
+    friend std::ofstream& operator<<(std::ofstream& ofs, const Vec3<U>& v);
+    template<typename U>
+    friend std::ifstream& operator>>(std::ifstream& ifs, Vec3<U>& v);
 };
 // Friends
+
+#if defined(_WIN32) || defined(_WIN64)
+// Formato aceito apenas pelo windows (estou usando MSVC), por alguma razão
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Vec3<T>& v) {
     return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
 }
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
+    ofs << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // Save in the format (x, y, z)
+    return ofs;
+}
+#else
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Vec3<T>& v) {
+    return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+}
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
+    ofs << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // Save in the format (x, y, z)
+    return ofs;
+}
+#endif
 template <typename T>
 inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
     try {
@@ -291,11 +331,6 @@ inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
         is.setstate(std::ios::failbit);
     }
     return is;
-}
-template <typename T>
-inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
-    ofs << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // Save in the format (x, y, z)
-    return ofs;
 }
 template <typename T>
 inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
