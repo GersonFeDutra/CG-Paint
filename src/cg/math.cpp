@@ -30,9 +30,68 @@ namespace cg {
     std::ifstream& operator>>(std::ifstream& ifs, Color& c)
     {
         try {
-            char s;
-            if (!(ifs >> s >> c.r >> s >> c.g >> s >> c.b >> s >> c.a >> s))  // Load in the format (r, g, b, a)
+            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                ifs.ignore(); // Ignore leading whitespace
+
+            Color parsed;
+            // Load in the format (x, y)
+            if (ifs.peek() == '(')
+                ifs.ignore(); // Ignore '('
+            else
+                ifs.setstate(std::ios::failbit);
+
+            // Read red
+            if (!(ifs >> parsed.r)) {
                 ifs.setstate(std::ios::failbit); // marca falha no stream
+                return ifs;
+            }
+
+            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                ifs.ignore(); // Ignore leading whitespace
+            if (ifs.peek() == ',')
+                ifs.ignore(); // Ignore ','
+            else
+                ifs.setstate(std::ios::failbit);
+
+            // Read green
+            if (!(ifs >> parsed.g)) {
+                ifs.setstate(std::ios::failbit); // marca falha no stream
+                return ifs;
+            }
+
+            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                ifs.ignore(); // Ignore leading whitespace
+            if (ifs.peek() == ',')
+                ifs.ignore(); // Ignore ','
+            else
+                ifs.setstate(std::ios::failbit);
+
+            // Read blue
+            if (!(ifs >> parsed.b)) {
+                ifs.setstate(std::ios::failbit); // marca falha no stream
+                return ifs;
+            }
+
+            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                ifs.ignore(); // Ignore leading whitespace
+            if (ifs.peek() == ',')
+                ifs.ignore(); // Ignore ','
+            else
+                ifs.setstate(std::ios::failbit);
+
+			// Read alpha
+            if (!(ifs >> parsed.a)) {
+                ifs.setstate(std::ios::failbit); // marca falha no stream
+                return ifs;
+			}
+            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                ifs.ignore(); // Ignore leading whitespace
+            if (ifs.peek() == ')')
+                ifs.ignore(); // Ignore ')'
+            else
+                ifs.setstate(std::ios::failbit);
+
+            c = parsed; // Assign parsed values to c
         }
         catch (...) {
             ifs.setstate(std::ios::failbit);

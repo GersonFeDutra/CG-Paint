@@ -34,7 +34,7 @@ namespace cg {
     {
         enum { NONE, SAVE, LOAD } clicked = NONE;
         // Cada janela deve ser criada num escopo separado para
-        // invocar os construtores/ destrutores necessários
+        // invocar os construtores/ destrutores necessÃ¡rios
         {  // Mostra uma janela simples.
             static int counter = 0;
             static float f = 0.0f;
@@ -68,7 +68,7 @@ namespace cg {
                 last_cursor = current_cursor;
             }
 
-            // TODO [Extra] -> Polígono regular
+            // TODO [Extra] -> PolÃ­gono regular
             // switch (canvas.toolBox.currentPrimitive) {
             // case cg::ToolBox::Primitives::REGULAR_POLYGON: {
             //     toolBox.sameLine();
@@ -255,57 +255,126 @@ namespace cg {
             if (dummie != "Points:")
                 print_warning("Invalid file format. Expected 'Points:' but got '%s', continuing...", dummie.c_str());
             else {
-				ifs >> dummie; // Read "["
-                if (dummie != "[")
-                    print_warning("Invalid file format. Expected '[' but got '%s', continuing...", dummie.c_str());
+                while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                    ifs.ignore(); // Ignore leading whitespace
+
+                if (char s = ifs.peek(); s != '[')
+                    print_warning("Invalid file format. Expected '[' but got '%c', continuing...", s);
                 else {
-                    while (ifs.peek() != ']') {
-                        if (ifs.eof()) {
-                            print_warning("Unexpected end of file while reading points.");
-                            return;
-						}
-                        auto point = std::make_unique<cg::Point>();
-                        point->_deserialize(ifs);
-						canvas->insert(std::move(point));
+                    ifs.ignore(); // Ignore '['
+                    while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                        ifs.ignore(); // Ignore leading whitespace
+
+                    if (char s = ifs.peek(); s != ']') {
+                        while (ifs.peek() != ']') {
+                            auto point = std::make_unique<cg::Point>();
+                            try {
+                                point->_deserialize(ifs);
+                            }
+                            catch (const std::exception& e) {
+                                print_error("Failed to deserialize point: %s", e.what());
+                                return;
+							}
+                            if (ifs.eof()) {
+                                print_warning("Unexpected end of file while reading points.");
+                                return;
+						    }
+						    canvas->insert(std::move(point));
+                            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                                ifs.ignore(); // Ignore leading whitespace
+                        }
+                        if (ifs.peek() == ']') {
+                            ifs.ignore(); // Ignore ']'
+                        }
+						else
+							print_warning("Invalid file format. Expected ']' but got '%c', continuing...", ifs.peek());
                     }
+                    else
+						ifs.ignore(); // empty
                 }
             }
 			ifs >> dummie; // Read "Lines:"
             if (dummie != "Lines:")
                 print_warning("Invalid file format. Expected 'Lines:' but got '%s', continuing...", dummie.c_str());
             else {
-                ifs >> dummie; // Read "["
-                if (dummie != "[")
-                    print_warning("Invalid file format. Expected '[' but got '%s', continuing...", dummie.c_str());
+                while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                    ifs.ignore(); // Ignore leading whitespace
+
+                if (char s = ifs.peek(); s != '[')
+                    print_warning("Invalid file format. Expected '[' but got '%c', continuing...", s);
                 else {
-                    while (ifs.peek() != ']') {
-                        if (ifs.eof()) {
-                            print_warning("Unexpected end of file while reading lines.");
-                            return;
+                    ifs.ignore(); // Ignore '['
+                    while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                        ifs.ignore(); // Ignore leading whitespace
+
+                    if (char s = ifs.peek(); s != ']') {
+                        while (ifs.peek() != ']') {
+                            auto line = std::make_unique<cg::Line>();
+                            try {
+                                line->_deserialize(ifs);
+                            }
+                            catch (const std::exception& e) {
+                                print_error("Failed to deserialize line: %s", e.what());
+                                return;
+							}
+                            if (ifs.eof()) {
+                                print_warning("Unexpected end of file while reading lines.");
+                                return;
+                            }
+                            canvas->insert(std::move(line));
+                            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                                ifs.ignore(); // Ignore leading whitespace
                         }
-                        auto line = std::make_unique<cg::Line>();
-                        line->_deserialize(ifs);
-                        canvas->insert(std::move(line));
+                        if (ifs.peek() == ']') {
+                            ifs.ignore(); // Ignore ']'
+                        }
+                        else
+                            print_warning("Invalid file format. Expected ']' but got '%c', continuing...", ifs.peek());
                     }
+                    else
+						ifs.ignore(); // empty
                 }
 			}
 			ifs >> dummie; // Read "Polygons:"
             if (dummie != "Polygons:")
                 print_warning("Invalid file format. Expected 'Polygons:' but got '%s', continuing...", dummie.c_str());
             else {
-				ifs >> dummie; // Read "["
-                if (dummie != "[")
+                while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                    ifs.ignore(); // Ignore leading whitespace
+
+                if (char s = ifs.peek(); s != '[')
                     print_warning("Invalid file format. Expected '[' but got '%s', continuing...", dummie.c_str());
                 else {
-                    while (ifs.peek() != ']') {
-                        if (ifs.eof()) {
-                            print_warning("Unexpected end of file while reading polygons.");
-                            return;
+                    ifs.ignore(); // Ignore '['
+                    while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                        ifs.ignore(); // Ignore leading whitespace
+
+                    if (char s = ifs.peek(); s != ']') {
+                        while (dummie != "]") {
+                            auto polygon = std::make_unique<cg::Polygon>();
+                            try {
+                                polygon->_deserialize(ifs);
+                            }
+                            catch (const std::exception& e) {
+                                print_error("Failed to deserialize polygon: %s", e.what());
+                                return;
+							}
+                            if (ifs.eof()) {
+                                print_warning("Unexpected end of file while reading polygons.");
+                                return;
+                            }
+                            canvas->insert(std::move(polygon));
+                            while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+                                ifs.ignore(); // Ignore leading whitespace
                         }
-                        auto polygon = std::make_unique<cg::Polygon>();
-                        polygon->_deserialize(ifs);
-                        canvas->insert(std::move(polygon));
+                        if (ifs.peek() == ']') {
+                            ifs.ignore(); // Ignore ']'
+                        }
+                        else
+                            print_warning("Invalid file format. Expected ']' but got '%c', continuing...", ifs.peek());
                     }
+                    else
+						ifs.ignore(); // empty
 				}
 			}
 

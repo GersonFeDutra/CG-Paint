@@ -144,9 +144,42 @@ inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
 template <typename T>
 inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
     try {
-        char c;
-        if (!(ifs >> c >> v.x >> c >> v.y >> c)) // Load in the format (x, y)
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+			ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == EOF) {
+            ifs.setstate(std::ios::failbit);
+            return ifs;
+		}
+
+        Vec2<T> parsed;
+        // Load in the format (x, y)
+        if (ifs.peek() == '(')
+		    ifs.ignore(); // Ignore '('
+        else
+            ifs.setstate(std::ios::failbit);
+
+        if (!(ifs >> parsed.x)) {
             ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+        }
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+            ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == ',')
+            ifs.ignore(); // Ignore ','
+        else
+            ifs.setstate(std::ios::failbit);
+
+        if (!(ifs >> parsed.y)) {
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+		}
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+			ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == ')')
+            ifs.ignore(); // Ignore ')'
+        else
+			ifs.setstate(std::ios::failbit);
+		v = parsed; // Assign the parsed value to the Vec2
     }
     catch (...) {
         ifs.setstate(std::ios::failbit);
@@ -267,9 +300,55 @@ inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
 template <typename T>
 inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
     try {
-        char c;
-        if (!(ifs >> c >> v.x >> c >> v.y >> c >> v.z >> c)) // Load in the format (x, y, z)
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+            ifs.ignore(); // Ignore leading whitespace
+
+        Vec3<T> parsed;
+        // Load in the format (x, y)
+        if (ifs.peek() == '(')
+            ifs.ignore(); // Ignore '('
+        else
+            ifs.setstate(std::ios::failbit);
+
+		// Read x
+        if (!(ifs >> parsed.x)) {
             ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+        }
+
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+            ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == ',')
+            ifs.ignore(); // Ignore ','
+        else
+            ifs.setstate(std::ios::failbit);
+
+		// Read y
+        if (!(ifs >> parsed.y)) {
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+        }
+
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+            ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == ',')
+            ifs.ignore(); // Ignore ','
+        else
+            ifs.setstate(std::ios::failbit);
+
+		// Read z
+        if (!(ifs >> parsed.z)) {
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+        }
+        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
+            ifs.ignore(); // Ignore leading whitespace
+        if (ifs.peek() == ')')
+            ifs.ignore(); // Ignore ')'
+        else
+            ifs.setstate(std::ios::failbit);
+
+		v = parsed; // Assign parsed values to v
     }
     catch (...) {
         ifs.setstate(std::ios::failbit);

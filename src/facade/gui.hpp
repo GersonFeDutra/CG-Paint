@@ -8,6 +8,7 @@
 // mova a implementação para um arquivo gui.cpp.
 
 #include <memory>
+#include <filesystem>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -88,11 +89,41 @@ private:
         ImGui_ImplOpenGL3_Init();
 
         // Configura o callback de reshape do GLUT para o ImGui
-        //ImGui_ImplGLUT_InstallFuncs(); // Usaremos um input customizado na main.
+        //ImGui_ImplGLUT_InstallFuncs(); // Usamos um input customizado na main.
 
-#ifdef _DEBUG
+        // Detecta e usa o último caminho usado via arquivo de cache
+        std::string localdata_dir = get_localdata_dir_path();
+        std::string app_cache_dir = localdata_dir + "/CGPaint";
+        std::filesystem::create_directories(app_cache_dir); // Garante que a pasta existe
+        std::string cache_file = app_cache_dir + "/last_path.cache";
+        std::string last_path;
+
+        if (std::filesystem::exists(cache_file)) {
+            std::ifstream fin(cache_file);
+            std::getline(fin, last_path);
+            fin.close();
+            if (!last_path.empty() && std::filesystem::exists(last_path)) {
+                dialogConfigPath = last_path;
+            }
+            else {
+                last_path = get_documents_dir_path();
+                dialogConfigPath = last_path;
+                std::ofstream fout(cache_file);
+                fout << last_path << std::endl;
+                fout.close();
+            }
+        }
+        else {
+            last_path = get_documents_dir_path();
+            dialogConfigPath = last_path;
+            std::ofstream fout(cache_file);
+            fout << last_path << std::endl;
+            fout.close();
+        }
+
+    #ifdef _DEBUG
         _initialized = true;
-#endif
+    #endif
     }
 
     // Início de um novo frame ImGui
@@ -128,6 +159,19 @@ private:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void cacheLastPath(const std::string& path) {
+        // Salva o último caminho selecionado no arquivo de cache
+        std::string localdata_dir = get_localdata_dir_path();
+        std::string app_cache_dir = localdata_dir + "/CGPaint";
+        std::filesystem::create_directories(app_cache_dir); // Garante que a pasta existe
+        std::string cache_file = app_cache_dir + "/last_path.cache";
+        std::ofstream fout(cache_file);
+        if (fout.is_open()) {
+            fout << path << std::endl;
+            fout.close();
+        }
+	}
+
     inline void _process() {
         // Processa o diálogo se estiver aberto
         if (dialogOpen != nullptr && ImGuiFileDialog::Instance()->Display(dialogOpen)) {
@@ -139,6 +183,7 @@ private:
                 //std::ifstream file(filePathName, std::ios::binary); // TODO -> Versão binária
                 std::ifstream file(filePathName);
                 if (file.is_open()) {
+				    cacheLastPath(filePathName);
                     print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
                     if (openFileCallback) {
                         openFileCallback(file);
@@ -162,10 +207,12 @@ private:
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
                 std::cout << "Arquivo selecionado: " << filePathName << std::endl;
+
                 //std::ofstream file(filePathName, std::ios::binary); // TODO -> Versão binária
                 std::ofstream file(filePathName);
                 if (file.is_open()) {
                     print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
+					cacheLastPath(filePathName);
                     if (saveFileCallback) {
                         saveFileCallback(file);
                         saveFileCallback = nullptr;
@@ -198,14 +245,14 @@ private:
     }
 
     inline void _openFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ifstream&)>&& callback) {
-        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters);
+        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters, { {}, {}, dialogConfigPath });
         dialogOpen = key;
         openFileCallback = std::move(callback);
     }
 
     inline void _saveFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ofstream&)>&& callback) {
-        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters);
-        dialogOpen = key;
+        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters, { {}, {}, dialogConfigPath });
+        dialogSave = key;
         saveFileCallback = std::move(callback);
     }
 
@@ -214,6 +261,7 @@ private:
     const char* dialogSave = nullptr;
     std::function<void(std::ifstream&)> openFileCallback = nullptr;
     std::function<void(std::ofstream&)> saveFileCallback = nullptr;
+    std::string dialogConfigPath{};
 
     Gui() = default;
     ~Gui() = default;
