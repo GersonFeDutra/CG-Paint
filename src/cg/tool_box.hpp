@@ -35,6 +35,9 @@ namespace cg {
 		void captureInput(io::MouseLeftButtonReleased input_event);
 		void captureInput(io::MouseRightButtonPressed input_event);
 
+		void save();
+		void load();
+
 		inline Color getColor() const {
 			return *colorPtr;
 		}

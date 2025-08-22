@@ -12,9 +12,8 @@ namespace cg
     class Polygon : public CanvasItem
     {
     public:
-        Polygon() = default;
-        Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ position }, innerColor{ color } {}
-
+        Polygon() : CanvasItem(TypeInfo::POLYGON) {}
+        Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::POLYGON, position }, innerColor{ color }, countourColor{ color } {}
 
         void _render() override;
 
@@ -60,10 +59,17 @@ namespace cg
             return innerColor;
         }
 
+        // Inherited via CanvasItem
+        std::ostream& _print(std::ostream& os) const override;
+        std::ofstream& _serialize(std::ofstream& ofs) const override;
+        std::ifstream& _deserialize(std::ifstream& ifs) override;
     private:
         std::vector<Vector2> vertices;
         Color innerColor;
-        //Color contourColor; // TODO
+		Color countourColor; // TODO -> Implement contour color
+		float width = 1.0f; // TODO -> Implement line width
+        // TODO -> anti-alias
+
     };
 
 } // namespace cg

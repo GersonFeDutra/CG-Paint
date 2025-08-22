@@ -4,6 +4,7 @@
 
 #include <cg/canvas.hpp>
 
+#include <cg/math.hpp>
 #include <cg/geometry.hpp>
 
 
@@ -12,8 +13,8 @@ namespace cg
     class Line : public CanvasItem
     {
     public:
-        Line() = default;
-        Line(Vector2 position, Color color = Color{}) : CanvasItem{ position }, color{ color } {}
+        Line() : CanvasItem(TypeInfo::LINE) {}
+        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, position }, color{ color } {}
 
         //void _process(DeltaTime delta) override;
 
@@ -57,10 +58,15 @@ namespace cg
         inline void setVertices(std::vector<Vector2> lineVertices) {
             vertices = lineVertices;
         }
+
+        // Inherited via CanvasItem
+        std::ostream& _print(std::ostream& os) const override;
+        std::ofstream& _serialize(std::ofstream& ofs) const override;
+        std::ifstream& _deserialize(std::ifstream& ifs) override;
     private:
         std::vector<Vector2> vertices;
         Color color; // TODO -> alpha blending
-        //unsigned size; // TODO -> smooth point
+		float width = 1.0f; // TODO -> anti-alias
     };
 
 } // namespace cg

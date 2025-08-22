@@ -12,17 +12,9 @@
 #include "cg/canvas_itens/line.hpp"
 #include "cg/canvas_itens/polygon.hpp"
 
-#include "cg/file_system/file_handler.hpp"
-
 static cg::Canvas canvas{ cg::Flag::SIZE * 30 };
 
 cg::Flag *flag = nullptr;
-
-cg::FileHandler fileHandler;
-
-// static int selectedShape = 0; // useless line
-
-// static files::FileHandler fileManager
 
 
 /* Inicialização do renderer */
@@ -41,45 +33,6 @@ int init(void)
     return EXIT_SUCCESS;
 }
 
-// get all polygons from canvas
-ArrayList<cg::Polygon *> getPolygons() {
-    ArrayList<cg::Polygon *> returnList;
-
-    for (auto& item : canvas.getItens()) {
-        if (auto derivedClass = dynamic_cast<cg::Polygon *>(item.get())) {
-            returnList.push_back(derivedClass);
-        } else continue;
-    }
-
-    return returnList;
-}
-// get all lines from canvas
-ArrayList<cg::Line *> getLines() {
-    ArrayList<cg::Line *> returnList;
-
-    for (auto& item : canvas.getItens()) {
-        if (auto derivedClass = dynamic_cast<cg::Line *>(item.get())) {
-            returnList.push_back(derivedClass);
-        } else continue;
-    }
-
-    return returnList;
-}
-// get all points from canvas
-ArrayList<cg::Point *> getPoints() {
-    ArrayList<cg::Point *> returnList;
-
-    for (auto& item : canvas.getItens()) {
-        if (auto derivedClass = dynamic_cast<cg::Point *>(item.get())) {
-            returnList.push_back(derivedClass);
-        } else continue;
-    }
-
-    return returnList;
-}
-
-
-
 
 /* Loop principal de desenho. */
 void display()
@@ -92,91 +45,8 @@ void display()
 
     canvas.updateRender();
 
-    // Mostra uma janela simples.
-    // Cada janela ser criada num escopo separado para invocar
-    // os construtores/ destrutores necessários
-    {
-        static int counter = 0;
-        static float f = 0.0f;
-
-        Window toolBox("Controls");
-        // TODO -> Use Icon buttons for each tool
-
-        // toolBox.showSliderFloat(&f, "float");
-        // toolBox.showCheckBox(&check, "Active
-
-        // glut cursor
-        static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
-		static unsigned last_cursor = GLUT_CURSOR_INHERIT;
-        unsigned current_cursor = GLUT_CURSOR_INHERIT;
-
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
-            tool_cursor = current_cursor;
-        } // use point
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
-			tool_cursor = GLUT_CURSOR_CROSSHAIR;
-        } // use line
-        if (toolBox.showRadioButton(&canvas.toolBox.currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
-            tool_cursor = GLUT_CURSOR_CROSSHAIR;
-        } // use polygon
-
-        if (!canvas.toolBox.isInsideGui)
-            current_cursor = tool_cursor;
-
-        if (current_cursor != last_cursor) {
-            glutSetCursor(current_cursor);
-            last_cursor = current_cursor;
-        }
-
-        // TODO [Extra] -> Polígono regular
-        // switch (canvas.toolBox.currentPrimitive) {
-        // case cg::ToolBox::Primitives::REGULAR_POLYGON: {
-        //     toolBox.sameLine();
-        //     toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
-        //     toolBox.sameLine();
-        //     toolBox.showText("[%d]", canvas.toolBox.polygonEdges);
-        // } break;
-        // default: break;
-        // }
-
-        toolBox.showColorEdit((cg::Vector3 *)&(canvas.toolBox.getColorPtr()->r), "color");
-
-        if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        toolBox.sameLine();
-
-        toolBox.showText("counter = %d", counter);
-
-        if (toolBox.showButton("Save to file")) {
-            ArrayList<cg::Polygon *> polyList = getPolygons();
-            ArrayList<cg::Line *> lineList = getLines();
-            ArrayList<cg::Point *> pntList = getPoints();
-
-            fileHandler.saveFile(pntList, lineList, polyList);
-        };
-
-        if (toolBox.showButton("Load from file")) {
-            std::tuple<ArrayList<cg::Point *>, ArrayList<cg::Line *>, ArrayList<cg::Polygon *>> objects = fileHandler.loadFile("");
-
-            for (auto& obj : canvas.getItens()) {
-                canvas.remove(obj.get());
-            }
-
-            for (auto& point : std::get<0>(objects)) {
-                canvas.insert(std::make_unique<cg::Point>(* point));
-            }
-            for (auto& line : std::get<1>(objects)) {
-                canvas.insert(std::make_unique<cg::Line>(* line));
-            }
-            for (auto& poly : std::get<2>(objects)) {
-                canvas.insert(std::make_unique<cg::Polygon>(* poly));
-            }
-        }
-
-        toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
-    }
-
     Gui::render();
+    Gui::endFrame();
 
     // Sincroniza comandos de desenho não executados,
     // em tempo finito [GLUT_DOUBLE buffering]
@@ -188,7 +58,7 @@ void display()
 
 
 /* Chamada sempre que a janela for redimensionada */
-void reshape(int w, int h) {
+static void reshape(int w, int h) {
     // 1. Atualiza o viewport
     GLdebug {
         glViewport(0, 0, w, h);
@@ -215,7 +85,7 @@ void reshape(int w, int h) {
 }
 
 
-void onMouseMoveEvent(int x, int y) {
+static void onMouseMoveEvent(int x, int y) {
     // Delegar entrada ao Dear Im Gui primeiro
     ImGui_ImplGLUT_MotionFunc(x, y);
 
@@ -226,7 +96,7 @@ void onMouseMoveEvent(int x, int y) {
 }
 
 
-void onMouseDragEvent(int x, int y) {
+static void onMouseDragEvent(int x, int y) {
     ImGui_ImplGLUT_MotionFunc(x, y);
     if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return;
@@ -235,7 +105,7 @@ void onMouseDragEvent(int x, int y) {
 }
 
 
-void onMouseWheelEvent(int wheel, int direction, int x, int y) {
+static void onMouseWheelEvent(int wheel, int direction, int x, int y) {
     ImGui_ImplGLUT_MouseWheelFunc(wheel, direction, x, y);
     if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
         return;
@@ -253,7 +123,7 @@ void onMouseWheelEvent(int wheel, int direction, int x, int y) {
 }
 
 
-void onMouseButtonEvent(int button, int state, int x, int y)
+static void onMouseButtonEvent(int button, int state, int x, int y)
 {
     ImGui_ImplGLUT_MouseFunc(button, state, x, y);
     if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
@@ -288,6 +158,35 @@ void onMouseButtonEvent(int button, int state, int x, int y)
         break;
     }
 }
+
+static void onSpecialKeyPressed(int key, int x, int y)
+{
+    ImGui_ImplGLUT_SpecialFunc(key, x, y);
+
+    // TODO -> Delegar implementação para ToolBox
+    switch (key) {
+    case GLUT_KEY_F1:
+        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::POINT;
+        break;
+    case GLUT_KEY_F2:
+        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::LINE;
+        break;
+    case GLUT_KEY_F3:
+        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::POLYGON;
+        break;
+    default: // ignore
+        if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
+            return;
+        break;
+    }
+}
+
+
+void onKeyboardKeyPressed(unsigned char key, int x, int y)
+{
+    ImGui_ImplGLUT_KeyboardFunc(key, x, y);
+}
+
 
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -346,6 +245,8 @@ int main(int argc, char** argv)
     glutMotionFunc(onMouseDragEvent);
     glutMouseFunc(onMouseButtonEvent);
     glutMouseWheelFunc(onMouseWheelEvent);
+	glutSpecialFunc(onSpecialKeyPressed); // Função de teclas especiais
+	glutKeyboardFunc(onKeyboardKeyPressed); // Função de teclas normais
 
     // Setup Gui Singleton
     Gui::initialize();

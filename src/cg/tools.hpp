@@ -12,6 +12,11 @@ namespace cg {
 		Tool(ToolBox& tool_box) : toolBox{ tool_box } {}
 	protected:
 		ToolBox& toolBox;
+
+		// Inherited via CanvasItem
+		std::ostream& _print(std::ostream& os) const override { return os; }
+		std::ofstream& _serialize(std::ofstream& ofs) const override { return ofs; }
+		std::ifstream& _deserialize(std::ifstream& ifs) override { return ifs; }
 	};
 
 	/* Ferramenta que permite criar e modelar itens de Canvas. */

@@ -2,6 +2,7 @@
 
 #include "../canvas.hpp"
 
+#include <cg/math.hpp>
 #include <cg/geometry.hpp>
 
 
@@ -25,5 +26,10 @@ namespace cg {
         void _render() override;
 
         void _input(io::MouseMove input_event) override;
+
+        // Inherited via CanvasItem
+        std::ostream& _print(std::ostream& os) const override;
+        std::ofstream& _serialize(std::ofstream& ofs) const override;
+        std::ifstream& _deserialize(std::ifstream& ifs) override;
     };
 }

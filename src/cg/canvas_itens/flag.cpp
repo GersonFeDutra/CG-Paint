@@ -10,7 +10,7 @@ namespace cg {
     Flag::ColorSet Flag::colors;
 
 
-	Flag::Flag()
+    Flag::Flag() : CanvasItem(TypeInfo::OTHER)
 	{
         auto [r, g, b] = colors.GREEN.normalized();
 
@@ -201,6 +201,24 @@ namespace cg {
     void Flag::_input(io::MouseMove input_event)
     {
         std::cout << input_event.position.x << ", " << input_event.position.y << '\n';
+    }
+
+    std::ostream& Flag::_print(std::ostream& os) const
+    {
+        // TODO
+        return os;
+    }
+
+    std::ofstream& Flag::_serialize(std::ofstream& ofs) const
+    {
+        // TODO
+        return ofs;
+    }
+
+    std::ifstream& Flag::_deserialize(std::ifstream& ifs)
+    {
+        // TODO
+        return ifs;
     }
 
 }

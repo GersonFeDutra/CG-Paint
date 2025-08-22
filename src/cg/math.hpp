@@ -15,6 +15,8 @@
 #include <random>
 #include <numbers>
 #include <type_traits>
+#include <iostream>
+#include <fstream>
 
 
 namespace cg
@@ -108,7 +110,49 @@ struct Vec2 {
     /* Returns a linear interpolation Iterator towards `to` by the given amount. */
     template <std::convertible_to<T> U>
     Vec2Interpolator<LargerType<T, U>> lerpIterator(Vec2<U> to, float by) const;
+
+    friend std::ostream& operator<< <T>(std::ostream& os, const Vec2<T>& v);
+    friend std::istream& operator>> <T>(std::istream& is, Vec2<T>& v);
+    
+    friend std::ofstream& operator<< <T>(std::ofstream& ofs, const Vec2<T>& v);
+    friend std::ifstream& operator>> <T>(std::ifstream& ifs, Vec2<T>& v);
 };
+
+// Friends
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Vec2<T>& v) {
+    return os << '(' << v.x << ", " << v.y << ')';
+}
+
+template <typename T>
+inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
+    try {
+        char c;
+        if (!(is >> c >> v.x >> c >> v.y >> c)) // Read in the format (x, y)
+            is.setstate(std::ios::failbit); // marca falha no stream
+    }
+    catch (...) {
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
+    ofs << '(' << v.x << ", " << v.y << ')'; // Save in the format (x, y)
+    return ofs;
+}
+template <typename T>
+inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
+    try {
+        char c;
+        if (!(ifs >> c >> v.x >> c >> v.y >> c)) // Load in the format (x, y)
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+    }
+    catch (...) {
+        ifs.setstate(std::ios::failbit);
+    }
+    return ifs;
+}
 
 // Operadores aritméticos
 template <typename T, std::convertible_to<T> U>
@@ -191,7 +235,47 @@ struct Vec3 {
     constexpr inline Vec3 cross() {
         return Vec3(y * z, z * x, x * y);
     }
+
+    friend std::ostream& operator<< <T>(std::ostream& os, const Vec3<T>& v);
+    friend std::istream& operator>> <T>(std::istream& is, Vec3<T>& v);
+
+    friend std::ofstream& operator<< <T>(std::ofstream& ofs, const Vec3<T>& v);
+    friend std::ifstream& operator>> <T>(std::ifstream& ifs, Vec3<T>& v);
 };
+// Friends
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Vec3<T>& v) {
+    return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+}
+template <typename T>
+inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
+    try {
+        char c;
+        if (!(is >> c >> v.x >> c >> v.y >> c >> v.z >> c)) // Read in the format (x, y, z)
+            is.setstate(std::ios::failbit); // marca falha no stream
+    }
+    catch (...) {
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+template <typename T>
+inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
+    ofs << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // Save in the format (x, y, z)
+    return ofs;
+}
+template <typename T>
+inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
+    try {
+        char c;
+        if (!(ifs >> c >> v.x >> c >> v.y >> c >> v.z >> c)) // Load in the format (x, y, z)
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+    }
+    catch (...) {
+        ifs.setstate(std::ios::failbit);
+    }
+    return ifs;
+}
 
 using Vector3 = Vec3<float>;
 using Vector3i = Vec3<int>;
@@ -325,6 +409,12 @@ struct Color {
             (unsigned char)(b * 255),
         };
     }
+
+    friend std::ostream& operator<<(std::ostream& os, Color c);
+    friend std::istream& operator>>(std::istream& is, Color& c);
+
+    friend std::ofstream& operator<<(std::ofstream& ofs, Color c);
+    friend std::ifstream& operator>>(std::ifstream& ifs, Color& c);
 };
 
 namespace colors {

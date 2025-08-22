@@ -12,9 +12,17 @@ namespace cg {
     class CanvasItem {
         friend class Canvas;
     public:
-        CanvasItem() = default;
+        enum class TypeInfo {
+            POINT = 0,
+            LINE,
+            POLYGON,
+            OTHER,
+        };
+    public:
+		CanvasItem() = default;
+        CanvasItem(TypeInfo type_info) : typeInfo{type_info} {}
         virtual ~CanvasItem() = default;
-        CanvasItem(Vector2 position) : position{ position } {}
+        CanvasItem(TypeInfo type_info, Vector2 position) : typeInfo{ type_info }, position{ position } {}
 
         /* Process mouse input from user. [Move] */
         virtual void _input(io::MouseMove mouse_event) {}
@@ -43,8 +51,24 @@ namespace cg {
         inline void setPosition(Vector2 pos) {
             position = pos;
         }
+        
+        inline TypeInfo getTypeInfo() const {
+            return typeInfo;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const CanvasItem& item);
+        friend std::istream& operator>>(std::istream& is, CanvasItem& item);
+        virtual std::ostream& _print(std::ostream& os) const = 0;
+        virtual std::istream& _read(std::istream& is);
+
+        friend std::ofstream& operator<<(std::ofstream& ofs, const CanvasItem& item);
+        friend std::ifstream& operator>>(std::ifstream& ifs, CanvasItem& item);
+        virtual std::ofstream& _serialize(std::ofstream& ofs) const = 0;
+		virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
+
     private:
         ID id = 0; // It's id location at the canvas.
+        TypeInfo typeInfo = TypeInfo::OTHER; // Type info for later serialization
     public:
         Vector2 position{}; // TODO -> Remove + use model transform matrix
     };

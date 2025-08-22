@@ -17,7 +17,7 @@
 	#define SET_CLI_RED() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_INTENSITY)
 	#define SET_CLI_GREEN() SetConsoleTextAttribute(_hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY)
 	#define SET_CLI_YELLOW() SetConsoleTextAttribute(_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY)
-	#define SET_CLI_BLUE() SetConsoleTextAttribute(_hConsole, FOREGROUND_BLUE FOREGROUND_INTENSITY)
+	#define SET_CLI_BLUE() SetConsoleTextAttribute(_hConsole, FOREGROUND_BLUE | FOREGROUND_INTENSITY)
 	#define RESET_CLI() SetConsoleTextAttribute(_hConsole, _saved_attributes)
 #elif defined(__APPLE__) || defined(__MACH__)
 	static_assert(false, "Não implementado para macOS");

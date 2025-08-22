@@ -2,6 +2,7 @@
 
 #include "../canvas.hpp"
 
+#include <cg/math.hpp>
 #include <cg/geometry.hpp>
 
 
@@ -12,7 +13,7 @@ namespace cg
     public:
         inline static const float SIZE = 10.0f;
     public:
-        Point() = default;
+        Point() : CanvasItem(TypeInfo::POINT) {}
         Point(Vector2 position, Color color = Color{});
 
         //void _process(DeltaTime delta) override;
@@ -33,9 +34,15 @@ namespace cg
         }
 
         //void _input(io::MouseMove input_event) override;
+
+        // Inherited via CanvasItem
+        std::ostream& _print(std::ostream& os) const override;
+        std::ofstream& _serialize(std::ofstream& ofs) const override;
+        std::ifstream& _deserialize(std::ifstream& ifs) override;
     private:
         Color color; // TODO -> alpha blending
-        //unsigned size; // TODO -> smooth point
+		unsigned size = SIZE; // TODO -> smooth point
+
     };
 
     class Points : public CanvasItem

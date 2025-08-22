@@ -1,11 +1,11 @@
 #include "ghost_line.hpp"
-#include "ghost_line.hpp"
-
 
 #include <cg/canvas.hpp>
+#include <cg/math.hpp>
 
 
 namespace cg {
+
     GhostLine::GhostLine(Canvas* canvas) : canvas{ canvas } {}
 
     GhostLine::GhostLine(Vector2* from, Vector2* to, Canvas* canvas) : from{ from }, to{ to }, canvas{ canvas } {}
@@ -63,3 +63,5 @@ namespace cg {
 	}
 
 }
+
+template std::ostream& cg::operator<< <float>(std::ostream&, cg::Vec2<float>);

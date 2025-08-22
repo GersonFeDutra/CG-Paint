@@ -54,6 +54,11 @@ namespace cg {
 
         inline void insert(std::unique_ptr<CanvasItem> item) {
             item->id = itens.size();
+
+            // incrementa o contador de tipos
+            if ((int)item->getTypeInfo() < (int)CanvasItem::TypeInfo::OTHER)
+			    typeCount[(int)item->getTypeInfo()]++;
+
             itens.push_back(std::move(item));
         }
 
@@ -67,6 +72,11 @@ namespace cg {
                 std::swap(item->id, itens[last]->id);
                 std::swap(itens[id], itens[last]);
             }
+            
+            // decrementa o contador de tipos
+            if ((int)item->getTypeInfo() < (int)CanvasItem::TypeInfo::OTHER)
+			    typeCount[(int)itens.back()->getTypeInfo()]--;
+
             itens.pop_back(); // aqui o unique_ptr no fim do vetor é destruído e liberado do CanvasItem
         }
 
@@ -128,16 +138,25 @@ namespace cg {
             return _ndcToScreen.transform(point);
         }
 
-        private:
+        inline size_t getTypeCount(CanvasItem::TypeInfo of_type) {
+			return typeCount[(int)of_type];
+        }
+
+        inline void clear() {
+            itens.clear();
+            for (int i = 0; i < 3; ++i) // reset typeCount
+				typeCount[i] = 0;
+        }
+    private:
         Vector2 windowSize; // aspect ratio: 10:7
 		Transform2D _screenToWorld; // Screen coordinates to World coordinates
         Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
         Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen Coordinates
 
         ArrayList<std::unique_ptr<CanvasItem>> itens;
+        size_t typeCount[3];
     public:
 
-        // I'mma fucking kill myself
         inline const ArrayList<std::unique_ptr<CanvasItem>>& getItens() const {
             return itens;
         }

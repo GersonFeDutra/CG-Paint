@@ -1,14 +1,13 @@
 #include "point.hpp"
 #include <cstdlib>
 
-#include "util.hpp"
+#include <util.hpp>
 
-#include "point.hpp"
 
 namespace cg
 {
-    Point::Point(Vector2 position, Color color) : CanvasItem{ position }, color{ color } {
-        SET_CLI_YELLOW();
+    Point::Point(Vector2 position, Color color) : CanvasItem{ TypeInfo::POINT, position }, color{ color } {
+        SET_CLI_BLUE();
         printf("%f, %f\n", position.x, position.y);
         RESET_CLI();
     }
@@ -29,6 +28,30 @@ namespace cg
     void Point::_input(io::MouseDrag mouse_event)
     {
         position = mouse_event.position;
+    }
+
+    std::ostream& Point::_print(std::ostream& os) const
+    {
+        return os << "Point: " << position << ", size: " << size << ", color: " << color;
+    }
+
+    std::ofstream& Point::_serialize(std::ofstream& fs) const
+    {
+        fs << position << " size: " << size << " color: " << color;
+        return fs;
+    }
+
+    std::ifstream& Point::_deserialize(std::ifstream& fs)
+    {
+        try {
+            std::string dummy;
+            if (!(fs >> position >> dummy >> size >> dummy >> color))
+                fs.setstate(std::ios::failbit); // marca falha no stream
+        }
+        catch (...) {
+            fs.setstate(std::ios::failbit);
+        }
+        return fs;
     }
 
     Points::Points(Color point_color, ArrayList<Vector2> point_list) : pointColor(point_color), pointList(point_list) {}

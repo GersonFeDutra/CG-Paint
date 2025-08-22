@@ -9,12 +9,14 @@
 
 #include <memory>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "imgui/imgui_impl_glut.h"
-#include "util.hpp"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_impl_glut.h>
+#include <imgui_filedialog/ImGuiFileDialog.h>
 
-#include "cg/math.hpp" // Vector3
+#include <util.hpp>
+
+#include <cg/math.hpp> // Vector3
 
 
 // Forward declarations
@@ -37,6 +39,10 @@ public:
         Gui::instance()._newFrame();
     }
 
+    inline static void endFrame() {
+        Gui::instance()._endFrame();
+    }
+
     inline static void render() {
         Gui::instance()._render();
     }
@@ -55,6 +61,13 @@ public:
 
     inline static bool isUsingKeyboardInput() {
         return Gui::instance().io->WantCaptureKeyboard;
+    }
+
+    inline static void openFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ifstream&)>&& callback) {
+        Gui::instance()._openFileDialog(key, title, filters, std::move(callback));
+    }
+    inline static void saveFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ofstream&)>&& callback) {
+        Gui::instance()._saveFileDialog(key, title, filters, std::move(callback));
     }
 
 private:
@@ -91,12 +104,17 @@ private:
         ImGui_ImplGLUT_NewFrame();
         ImGui::NewFrame();
     }
+    inline void _endFrame() const {
+        ImGui::EndFrame();
+    }
 
     // Renderiza tudo que foi enfileirado no ImGui
-    inline void _render() const {
+    inline void _render() {
 #ifdef _DEBUG
         assert_err(_initialized); // Tried to render a not initialized GUI context!
 #endif
+		_process();
+
         // 1. Processar dados da interface no frame buffer
         ImGui::Render();
 
@@ -108,6 +126,62 @@ private:
 
         // 3. Desenhar o conteúdo do ImGui
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    inline void _process() {
+        // Processa o diálogo se estiver aberto
+        if (dialogOpen != nullptr && ImGuiFileDialog::Instance()->Display(dialogOpen)) {
+            // Verifica se o usuário selecionou um arquivo
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::cout << "Arquivo selecionado: " << filePathName << std::endl;
+
+                //std::ifstream file(filePathName, std::ios::binary); // TODO -> Versão binária
+                std::ifstream file(filePathName);
+                if (file.is_open()) {
+                    print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
+                    if (openFileCallback) {
+                        openFileCallback(file);
+                        openFileCallback = nullptr;
+                    }
+                    else {
+                        print_error("Callback de abertura de arquivo não definida!");
+                    }
+                    file.close();
+                }
+                else {
+                    print_error("Falha ao abrir o arquivo: %s", filePathName.c_str());
+                }
+            }
+            // Fecha o diálogo
+            ImGuiFileDialog::Instance()->Close();
+
+        }
+        else if (dialogSave != nullptr && ImGuiFileDialog::Instance()->Display(dialogSave)) {
+            // Verifica se o usuário selecionou um arquivo
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::cout << "Arquivo selecionado: " << filePathName << std::endl;
+                //std::ofstream file(filePathName, std::ios::binary); // TODO -> Versão binária
+                std::ofstream file(filePathName);
+                if (file.is_open()) {
+                    print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
+                    if (saveFileCallback) {
+                        saveFileCallback(file);
+                        saveFileCallback = nullptr;
+                    }
+                    else {
+                        print_error("Callback de salvamento de arquivo não definida!");
+                    }
+                    file.close();
+                }
+                else {
+                    print_error("Falha ao abrir o arquivo: %s", filePathName.c_str());
+                }
+            }
+            // Fecha o diálogo
+            ImGuiFileDialog::Instance()->Close();
+        }
     }
 
     // Limpa tudo ao encerrar
@@ -123,7 +197,24 @@ private:
 #endif
     }
 
+    inline void _openFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ifstream&)>&& callback) {
+        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters);
+        dialogOpen = key;
+        openFileCallback = std::move(callback);
+    }
+
+    inline void _saveFileDialog(const char* key, const char* title, const char* filters, std::function<void(std::ofstream&)>&& callback) {
+        ImGuiFileDialog::Instance()->OpenDialog(key, title, filters);
+        dialogOpen = key;
+        saveFileCallback = std::move(callback);
+    }
+
 private:
+    const char* dialogOpen = nullptr;
+    const char* dialogSave = nullptr;
+    std::function<void(std::ifstream&)> openFileCallback = nullptr;
+    std::function<void(std::ofstream&)> saveFileCallback = nullptr;
+
     Gui() = default;
     ~Gui() = default;
     Gui(const Gui&) = delete;
@@ -215,6 +306,7 @@ public:
     }
 
 private:
+
     inline void assertAppending() const {
 #ifdef _DEBUG
         assert_err(Gui::instance().appendingWindow == this,

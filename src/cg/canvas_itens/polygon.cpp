@@ -1,4 +1,5 @@
 #include <util.hpp>
+
 #include "polygon.hpp"
 
 
@@ -101,5 +102,67 @@ namespace cg {
 				// tmp_vertices é desalocado automaticamente ao sair do escopo
             }
         }
+    }
+    std::ostream& Polygon::_print(std::ostream& os) const
+    {
+        os << "Polygon: " << position << ", width: " << width << ", colors: [inner: " << innerColor << ", countour: " << countourColor << "], vertices[";
+
+        auto vertice = vertices.begin();
+        if (vertice < vertices.end()) {
+            os << *vertice;
+            for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
+                os << ", " << *vertice;
+        }
+        return os << ']';
+    }
+
+    std::ofstream& Polygon::_serialize(std::ofstream& ofs) const
+    {
+        ofs << position << " width: " << width << " colors: [inner: " << innerColor << " countour: " << countourColor << "] vertices[";
+
+        auto vertice = vertices.begin();
+        if (vertice < vertices.end()) {
+            ofs << *vertice;
+            for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
+                ofs << ", " << *vertice;
+        }
+        else
+            ofs << ' '; // se não houver vértices, imprime separador vazio
+        ofs << ']';
+        return ofs;
+    }
+
+    std::ifstream& Polygon::_deserialize(std::ifstream& ifs)
+    {
+        try {
+            std::string dummy;
+            if (!(ifs >> position >> dummy >> width >> dummy >> dummy >> innerColor >> dummy >> countourColor >> dummy >> dummy))
+                ifs.setstate(std::ios::failbit); // marca falha no stream
+
+            vertices.clear();
+            // Lê os vértices
+
+            while (std::isspace(ifs.peek()))
+                ifs.ignore();
+            if (ifs.peek() == ']') {
+                ifs.ignore();
+                return ifs; // não há vértices
+            }
+
+            Vector2 vertice;
+            while (ifs >> vertice) {
+                vertices.push_back(vertice);
+                while (std::isspace(ifs.peek()))
+                    ifs.ignore(); // ignora espaços em branco
+                if (ifs.peek() == ',')
+                    ifs.ignore(); // ignora vírgula
+                else if (ifs.peek() == ']')
+                    break; // fim da lista de vértices
+            }
+        }
+        catch (...) {
+            ifs.setstate(std::ios::failbit);
+        }
+        return ifs;
     }
 }

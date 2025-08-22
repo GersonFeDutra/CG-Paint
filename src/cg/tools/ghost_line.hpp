@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cg/math.hpp>
 #include <cg/geometry.hpp>
 
 
