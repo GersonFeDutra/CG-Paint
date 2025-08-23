@@ -31,6 +31,25 @@ namespace cg {
         *outData = raw;
     }
 
+    // Seleção de polígono (ray casting)
+    // Determina se a posição do mouse está dentro de um polígono usando o algoritmo de "ray casting".
+    bool Polygon::isSelected(Vector2 mousePos) const
+    {
+        bool inside = false;
+        size_t n = vertices.size();
+
+        // Percorre cada aresta do polígono 
+        for (size_t i = 0, j = n - 1; i < n; j = i++) {
+            // Verifica se a linha horizontal passando pelo mouse cruza a aresta (vertices[j], vertices[i])
+            if (((vertices[i].y > mousePos.y) != (vertices[j].y > mousePos.y)) &&
+                (mousePos.x < (vertices[j].x - vertices[i].x) *
+                    (mousePos.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x)) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
     void Polygon::_render() {
 
         GLdebug{

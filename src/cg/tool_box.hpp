@@ -35,6 +35,9 @@ namespace cg {
 		void captureInput(io::MouseLeftButtonReleased input_event);
 		void captureInput(io::MouseRightButtonPressed input_event);
 
+		void captureInput(io::SpecialKeyInputEvent input_event);
+		void captureInput(io::KeyboardInputEvent input_event);
+
 		void save();
 		void load();
 
@@ -53,22 +56,23 @@ namespace cg {
 			currentColor = *colorPtr;
 			colorPtr = &currentColor;
 		}
-    public:
-		enum Primitives {
-			POINT = 0,
-			LINE = 1,
-			POLYGON = 2,
-		};
-        int currentPrimitive = POINT;
 	public:
 		// TODO -> Cor secundária [alternada com x key]
 		Canvas* canvas = nullptr;
 		bool isInsideGui = false;
+    private:
+		enum Tools {
+			POINT = 0,
+			LINE = 1,
+			POLYGON = 2,
+			SELECT = 3,
+		};
 	private:
+		int currentTool = POINT;
+		std::array<Painter *, N_PRIMITIVES> tools;
+
 		Color currentColor = cg::colors::WHITE;
 		Color *colorPtr = &currentColor; // Define a cor atual para pintura.
-		std::array<Painter *, N_PRIMITIVES> tools;
-		int currentTool = POINT;
 	};
 
 }

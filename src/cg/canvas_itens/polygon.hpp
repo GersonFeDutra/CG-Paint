@@ -5,7 +5,8 @@
 #include <cg/canvas.hpp>
 #include <cg/math.hpp>
 
-#include "cg/canvas_itens/line.hpp"
+#include "../canvas_item.hpp"
+
 
 namespace cg
 {
@@ -14,6 +15,18 @@ namespace cg
     public:
         Polygon() : CanvasItem(TypeInfo::POLYGON) {}
         Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::POLYGON, position }, innerColor{ color }, countourColor{ color } {}
+        Polygon(std::vector<Vector2> verts) : CanvasItem{ TypeInfo::POLYGON } {
+            if (verts.empty())
+				return;
+			position = verts.front();
+
+			vertices.reserve(verts.size() - 1);
+            for (auto& vert : verts)
+				vertices.push_back(vert); // Store relative to position
+        }
+
+        // Verifica se o polígono foi selecionado pelo mouse
+        bool isSelected(Vector2 mousePos) const override;
 
         void _render() override;
 

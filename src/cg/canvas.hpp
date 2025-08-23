@@ -26,22 +26,29 @@ namespace cg {
         /** Send a screen input at screen coordinate.
          * Converts Screen Cordinates to Normalized Display Coordinates before trigger.
          */
-        template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
+        template <typename IE> requires std::is_base_of_v<io::InputEvent, IE>
         inline void sendScreenInput(int x, int y) {
             Vector2 position = screenToWorld(x, y);
             IE input_event{ position };
             toolBox.captureInput(input_event);
         }
 
-        template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
+        template <typename IE> requires std::is_base_of_v<io::InputEvent, IE>
         inline void sendScreenInput(int x, int y, int direction) {
             Vector2 position = screenToWorld(x, y);
             IE input_event{ position, direction };
             toolBox.captureInput(input_event);
         }
 
+		template <typename KIE> requires std::is_base_of_v<io::KeyInputEvent, KIE>
+        inline void sendScreenInput(int x, int y, int key, int mods) {
+            Vector2 position = screenToWorld(x, y);
+            KIE input_event{ position, key, mods };
+            toolBox.captureInput(input_event);
+        }
+
         /* Propagates user input to a Canvas Item on the canvas. */
-        template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
+        template <typename IE> requires std::is_base_of_v<io::InputEvent, IE>
         inline void sendInput(IE input_event) {
             // TODO -> Check if input is inside item area before sending event.
         }
@@ -125,19 +132,6 @@ namespace cg {
             return _screenToWorld.transform(x, y);
         }
 
-        // Changes screen coordinates to Normalized Display Coordinates system.
-        inline Vector2 screenToNdc(Vector2 point) {
-            return _screenToNdc.transform(point);
-        }
-        inline Vector2 screenToNdc(int x, int y) {
-            return _screenToNdc.transform(x, y);
-        }
-
-        // Changes Normalized Display Coordinates to Screen Coordinates system.
-        inline Vector2 ndcToScreen(Vector2 point) {
-            return _ndcToScreen.transform(point);
-        }
-
         inline size_t getTypeCount(CanvasItem::TypeInfo of_type) {
 			return typeCount[(int)of_type];
         }
@@ -147,6 +141,12 @@ namespace cg {
             for (int i = 0; i < 3; ++i) // reset typeCount
 				typeCount[i] = 0;
         }
+
+        inline const ArrayList<std::unique_ptr<CanvasItem>>& getItens() const {
+            return itens;
+        }
+
+        CanvasItem *hitTest(float mx, float my);
     private:
         Vector2 windowSize; // aspect ratio: 10:7
 		Transform2D _screenToWorld; // Screen coordinates to World coordinates
@@ -156,10 +156,6 @@ namespace cg {
         ArrayList<std::unique_ptr<CanvasItem>> itens;
         size_t typeCount[3];
     public:
-
-        inline const ArrayList<std::unique_ptr<CanvasItem>>& getItens() const {
-            return itens;
-        }
         
         ToolBox toolBox;
     };

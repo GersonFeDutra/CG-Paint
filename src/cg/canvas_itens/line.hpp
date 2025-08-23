@@ -20,6 +20,9 @@ namespace cg
 
         void _render() override;
 
+        // Verifica se a linha foi selecionada pelo mouse
+        bool isSelected(Vector2 mousePos) const override;
+
         inline void append(Vector2 vertice) {
             vertices.push_back(vertice);
         }

@@ -40,6 +40,7 @@ namespace cg {
         virtual void _input(io::MouseWheelV mouse_event) {}
         /* Process mouse wheel horizontal input from user. */
         virtual void _input(io::MouseWheelH mouse_event) {}
+		virtual void _input(io::KeyInputEvent key_event) {}
 
         /** Process data between variations of delta time △t.
          * @param delta : time stamp between previous frame
@@ -47,6 +48,9 @@ namespace cg {
         virtual void _process(DeltaTime delta) {}
         /* Draw data onto screen with open GL calls. */
         virtual void _render() {}
+
+        // verificar se mouse está dentro do item
+        virtual bool isSelected(Vector2 mousePos) const { return false; }
 
         inline void setPosition(Vector2 pos) {
             position = pos;
@@ -65,7 +69,8 @@ namespace cg {
         friend std::ifstream& operator>>(std::ifstream& ifs, CanvasItem& item);
         virtual std::ofstream& _serialize(std::ofstream& ofs) const = 0;
 		virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
-
+    public:
+        inline static const float SELECTION_THRESHOLD = 5.0f; // pixels
     private:
         ID id = 0; // It's id location at the canvas.
         TypeInfo typeInfo = TypeInfo::OTHER; // Type info for later serialization

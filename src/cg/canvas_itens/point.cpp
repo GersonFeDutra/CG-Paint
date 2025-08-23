@@ -12,6 +12,14 @@ namespace cg
         RESET_CLI();
     }
 
+    // Seleção de ponto
+    // Verifica se a posição do mouse está próxima de um ponto.
+    // Retorna true se a distância entre mousePos e point for menor ou igual ao threshold.
+    bool Point::isSelected(Vector2 mousePos) const
+    {
+        return (mousePos - position).length() <= size + CanvasItem::SELECTION_THRESHOLD;
+    }
+
     void Point::_render()
     {
         GLdebug{

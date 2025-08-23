@@ -15,4 +15,9 @@ namespace cg {
 			_onRender();
 	}
 
+	void Selector::pick(const std::vector<CanvasItem*>& items, Vector2 mousePos)
+	{
+		selectedItem = toolBox.canvas->hitTest(mousePos.x, mousePos.y);
+	}
+
 }

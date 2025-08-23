@@ -71,6 +71,10 @@ public:
         Gui::instance()._saveFileDialog(key, title, filters, std::move(callback));
     }
 
+    inline static void closeDialog() {
+		Gui::instance()._closeDialog();
+    }
+
 private:
     // Inicialização (Criação de contexto ImGui, binding OpenGL3/GLUT etc)
     inline void _initialize() {
@@ -173,6 +177,12 @@ private:
 	}
 
     inline void _process() {
+        if (close) {
+            if (ImGuiFileDialog::Instance()->IsOpened())
+                ImGuiFileDialog::Instance()->Close();
+			close = false;
+        }
+
         // Processa o diálogo se estiver aberto
         if (dialogOpen != nullptr && ImGuiFileDialog::Instance()->Display(dialogOpen)) {
             // Verifica se o usuário selecionou um arquivo
@@ -200,7 +210,6 @@ private:
             }
             // Fecha o diálogo
             ImGuiFileDialog::Instance()->Close();
-
         }
         else if (dialogSave != nullptr && ImGuiFileDialog::Instance()->Display(dialogSave)) {
             // Verifica se o usuário selecionou um arquivo
@@ -256,7 +265,12 @@ private:
         saveFileCallback = std::move(callback);
     }
 
+    inline void _closeDialog() {
+		close = true;
+    }
+
 private:
+    bool close = false;
     const char* dialogOpen = nullptr;
     const char* dialogSave = nullptr;
     std::function<void(std::ifstream&)> openFileCallback = nullptr;

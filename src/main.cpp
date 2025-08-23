@@ -163,28 +163,54 @@ static void onSpecialKeyPressed(int key, int x, int y)
 {
     ImGui_ImplGLUT_SpecialFunc(key, x, y);
 
-    // TODO -> Delegar implementação para ToolBox
-    switch (key) {
-    case GLUT_KEY_F1:
-        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::POINT;
-        break;
-    case GLUT_KEY_F2:
-        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::LINE;
-        break;
-    case GLUT_KEY_F3:
-        canvas.toolBox.currentPrimitive = cg::ToolBox::Primitives::POLYGON;
-        break;
-    default: // ignore
-        if (canvas.toolBox.isInsideGui = Gui::isUsingMouseInput())
-            return;
-        break;
-    }
+	canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, key, glutGetModifiers());
 }
 
 
-void onKeyboardKeyPressed(unsigned char key, int x, int y)
+static void onKeyboardKeyPressed(unsigned char key, int x, int y)
 {
     ImGui_ImplGLUT_KeyboardFunc(key, x, y);
+
+    int mods = glutGetModifiers();
+    unsigned char normalizedKey = key;
+
+    if (mods & GLUT_ACTIVE_CTRL) {
+        // Caso Linux/X11 tenha convertido em código de controle (< 32)
+        if (key < 32) {
+            // Reconstrói letra minúscula: Ctrl+A (0x01) → 'a'
+            normalizedKey = static_cast<unsigned char>(key - 1 + 'a');
+
+            // (key + '@') → Ctrl+A = 0x01 + '@' = 'A'
+            //normalizedKey = static_cast<unsigned char>(key + '@');
+        }
+    }
+
+    // Só deixa maiúsculo se o shift está ativo
+    if ((mods & GLUT_ACTIVE_SHIFT) && normalizedKey >= 'a' && normalizedKey <= 'z') {
+        normalizedKey = static_cast<unsigned char>(normalizedKey - 'a' + 'A');
+    }
+
+	unsigned char ESC = 27;
+
+    std::cout << "[Key]: ";
+    if (mods & GLUT_ACTIVE_CTRL)
+		std::cout << "Ctrl + ";
+	if(mods & GLUT_ACTIVE_SHIFT)
+		std::cout << "Shift + ";
+    if (mods & GLUT_ACTIVE_ALT)
+        std::cout << "Alt + ";
+
+    if (normalizedKey == ESC)
+		std::cout << "ESC\n";
+    else
+        std::cout << normalizedKey << "\n";
+
+    if (Gui::isUsingKeyboardInput()) {
+        if (normalizedKey == ESC) // Fecha diálogos com ESC
+			Gui::closeDialog();
+    }
+    else
+        canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
 }
 
 

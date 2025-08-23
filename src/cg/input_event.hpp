@@ -5,11 +5,14 @@ namespace cg {
     namespace io {
         class Canvas;
 
-        struct MouseInputEvent {
+        struct InputEvent {
             Vector2 position; // mouse position on screen
-
             // Transforms mouse Screen Coordinates to Normalized Device Coordinates before creating the event.
-            MouseInputEvent(Vector2 position) : position{ position } {}
+            InputEvent(Vector2 position) : position{ position } {}
+		};
+
+        struct MouseInputEvent : InputEvent {
+            MouseInputEvent(Vector2 position) : InputEvent{ position } {}
         };
         using MouseMove = MouseInputEvent;
         struct MouseDrag : public MouseInputEvent {
@@ -37,6 +40,20 @@ namespace cg {
 
             MouseWheelH(Vector2 position, int direction) : MouseInputEvent{ position }, direction{ direction } {}
         };
+
+        struct KeyInputEvent : InputEvent {
+			int key; // key code (ASCII if keyboard, or GLUT Enum if special)
+            int mods; // bit field describing which modifier keys were held down
+            KeyInputEvent(Vector2 position, int key, int mods) : InputEvent{ position }, key{ key }, mods{ mods } {}
+		};
+
+        struct KeyboardInputEvent : KeyInputEvent {
+            KeyboardInputEvent(Vector2 position, int key, int mods) : KeyInputEvent{ position, key, mods } {}
+        };
+
+        struct SpecialKeyInputEvent : KeyInputEvent {
+            SpecialKeyInputEvent(Vector2 position, int code, int mods) : KeyInputEvent{ position, code, mods } {}
+		};
 
     } // namespace io
 

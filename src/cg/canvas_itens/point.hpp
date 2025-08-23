@@ -18,6 +18,8 @@ namespace cg
 
         //void _process(DeltaTime delta) override;
 
+        bool isSelected(Vector2 mousePos) const override;
+
         void _render() override;
         void _input(io::MouseDrag mouse_event) override;
 
@@ -42,7 +44,6 @@ namespace cg
     private:
         Color color; // TODO -> alpha blending
 		unsigned size = SIZE; // TODO -> smooth point
-
     };
 
     class Points : public CanvasItem

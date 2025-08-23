@@ -23,4 +23,13 @@ namespace cg {
 		toolBox._render();
 	}
 
+	CanvasItem* Canvas::hitTest(float mx, float my)
+	{
+		for (auto& item : itens)
+			if (item->isSelected({ mx, my }))
+				return item.get();
+
+		return nullptr;
+	}
+
 }

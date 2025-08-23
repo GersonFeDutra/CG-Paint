@@ -32,7 +32,14 @@ namespace cg {
 		bool isDrawing = false; // _render only if isDrawing
 	};
 
-	// TODO
-	class Selector : public Tool {};
+	class Selector : public Tool {
+		CanvasItem* selectedItem = nullptr;
+
+		void pick(const std::vector<CanvasItem*>& items, Vector2 mousePos);
+
+		bool hasSelection() const {
+			return selectedItem != nullptr;
+		}
+	};
 
 }

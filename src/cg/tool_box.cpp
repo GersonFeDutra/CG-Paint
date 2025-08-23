@@ -30,6 +30,9 @@ namespace cg {
         tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
     }
 
+    static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
+    static unsigned last_cursor = GLUT_CURSOR_INHERIT;
+
     void ToolBox::_render()
     {
         enum { NONE, SAVE, LOAD } clicked = NONE;
@@ -46,19 +49,26 @@ namespace cg {
             // toolBox.showCheckBox(&check, "Active
 
             // glut cursor
-            static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
-            static unsigned last_cursor = GLUT_CURSOR_INHERIT;
             unsigned current_cursor = GLUT_CURSOR_INHERIT;
 
-            if (toolBox.showRadioButton(&currentPrimitive, cg::ToolBox::Primitives::POINT, "Point")) {
-                tool_cursor = current_cursor;
+            int _currentTool = currentTool;
+            if (toolBox.showRadioButton(&_currentTool, Tools::POINT, "Point [F1]")) {
+				std::cout << "Point tool selected\n";
+                tool_cursor = GLUT_CURSOR_NONE;
             } // use point
-            if (toolBox.showRadioButton(&currentPrimitive, cg::ToolBox::Primitives::LINE, "Line")) {
+            if (toolBox.showRadioButton(&_currentTool, Tools::LINE, "Line [F2]")) {
                 tool_cursor = GLUT_CURSOR_CROSSHAIR;
             } // use line
-            if (toolBox.showRadioButton(&currentPrimitive, cg::ToolBox::Primitives::POLYGON, "Polygon")) {
+            if (toolBox.showRadioButton(&_currentTool, Tools::POLYGON, "Polygon [F3]")) {
                 tool_cursor = GLUT_CURSOR_CROSSHAIR;
             } // use polygon
+            if (toolBox.showRadioButton(&_currentTool, Tools::SELECT, "Select [F4]")) {
+                tool_cursor = GLUT_CURSOR_INHERIT;
+			} // selection tool
+            if (_currentTool != currentTool) {
+                currentTool = _currentTool;
+				// Do something on tool change
+			}
 
             if (!isInsideGui)
                 current_cursor = tool_cursor;
@@ -69,7 +79,7 @@ namespace cg {
             }
 
             // TODO [Extra] -> Polígono regular
-            // switch (canvas.toolBox.currentPrimitive) {
+            // switch (canvas.toolBox._currentTool) {
             // case cg::ToolBox::Primitives::REGULAR_POLYGON: {
             //     toolBox.sameLine();
             //     toolBox.showSliderInt(&canvas.toolBox.polygonEdges, 1, 255, "Edges");
@@ -96,83 +106,100 @@ namespace cg {
         }
 
         switch (clicked) {
-        case SAVE:
+        case SAVE: {
             save();
-            break;
-        case LOAD:
+        } break;
+        case LOAD: {
             load();
-            break;
+        } break;
         default:
             break;
         }
-
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        tools[currentPrimitive]->_render();
+        tools[currentTool]->_render();
     }
 
     void ToolBox::captureInput(io::MouseMove input_event)
     {
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        if (currentTool != currentPrimitive) {
-            // TODO -> update using tool
-            currentTool = currentPrimitive;
-        }
 
-        tools[currentPrimitive]->_input(input_event);
+        tools[currentTool]->_input(input_event);
     }
 
     void ToolBox::captureInput(io::MouseDrag input_event)
     {
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        if (currentTool != currentPrimitive) {
-            // TODO -> update using tool
-            currentTool = currentPrimitive;
-        }
 
-        tools[currentPrimitive]->_input(input_event);
+        tools[currentTool]->_input(input_event);
     }
 
     void ToolBox::captureInput(io::MouseLeftButtonPressed input_event)
     {
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        if (currentTool != currentPrimitive) {
-            // TODO -> update using tool
-            currentTool = currentPrimitive;
-        }
-        // std::cout << "Using left button" << std::endl;
 
-        tools[currentPrimitive]->_input(input_event);
+        tools[currentTool]->_input(input_event);
     }
 
     void ToolBox::captureInput(io::MouseLeftButtonReleased input_event)
     {
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        if (currentTool != currentPrimitive) {
-            // TODO -> update using tool
-            currentTool = currentPrimitive;
-        }
 
-        tools[currentPrimitive]->_input(input_event);
+        tools[currentTool]->_input(input_event);
     }
 
     void ToolBox::captureInput(io::MouseRightButtonPressed input_event)
     {
-        // std::cout << N_PRIMITIVES << ", " << currentTool << ", " << currentPrimitive << std::endl;
-        if (currentPrimitive >= N_PRIMITIVES)
+        if (currentTool >= N_PRIMITIVES)
             return;
-        if (currentTool != currentPrimitive) {
-            // TODO -> update using tool
-            currentTool = currentPrimitive;
-        }
 
-        if (currentTool != POINT) {
-            // std::cout << "Using right button" << std::endl;
-            tools[currentPrimitive]->_input(input_event);
+        if (currentTool != POINT)
+            tools[currentTool]->_input(input_event);
+    }
+
+    void ToolBox::captureInput(io::SpecialKeyInputEvent input_event)
+    {
+        switch (input_event.key) {
+        case GLUT_KEY_F1: {
+            tool_cursor = GLUT_CURSOR_NONE;
+            currentTool = Tools::POINT;
+        } break;
+        case GLUT_KEY_F2: {
+            tool_cursor = GLUT_CURSOR_CROSSHAIR;
+            currentTool = Tools::LINE;
+        } break;
+        case GLUT_KEY_F3: {
+            tool_cursor = GLUT_CURSOR_CROSSHAIR;
+            currentTool = Tools::POLYGON;
+        } break;
+        case GLUT_KEY_F4: {
+			tool_cursor = GLUT_CURSOR_INHERIT;
+			currentTool = Tools::SELECT;
+        } break;
+        default: // ignore
+            break;
+        }
+    }
+
+    void ToolBox::captureInput(io::KeyboardInputEvent input_event)
+    {
+        const unsigned char ESC = 27;
+
+        if (input_event.mods & GLUT_ACTIVE_CTRL) {
+            switch (input_event.key) {
+            case 's':
+                save();
+                break;
+            case 'o':
+                load();
+                break;
+            default: // ignore
+                break;
+			}
         }
     }
 
