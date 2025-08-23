@@ -221,4 +221,11 @@ namespace cg {
         return ifs;
     }
 
+    bool Flag::_isSelected(Vector2 cursor_local_position) const
+    {
+        // WATCH
+        return cursor_local_position.x >= 0.0f && cursor_local_position.x <= SIZE.x &&
+            cursor_local_position.y >= 0.0f && cursor_local_position.y <= SIZE.y;
+    }
+
 }

@@ -31,5 +31,8 @@ namespace cg {
         std::ostream& _print(std::ostream& os) const override;
         std::ofstream& _serialize(std::ofstream& ofs) const override;
         std::ifstream& _deserialize(std::ifstream& ifs) override;
+
+        // Inherited via CanvasItem
+        bool _isSelected(Vector2 cursor_local_position) const override;
     };
 }

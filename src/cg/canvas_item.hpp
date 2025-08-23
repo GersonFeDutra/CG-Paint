@@ -22,7 +22,7 @@ namespace cg {
 		CanvasItem() = default;
         CanvasItem(TypeInfo type_info) : typeInfo{type_info} {}
         virtual ~CanvasItem() = default;
-        CanvasItem(TypeInfo type_info, Vector2 position) : typeInfo{ type_info }, position{ position } {}
+        CanvasItem(TypeInfo type_info, Vector2 position) : typeInfo{ type_info }, model(position) {}
 
         /* Process mouse input from user. [Move] */
         virtual void _input(io::MouseMove mouse_event) {}
@@ -50,14 +50,26 @@ namespace cg {
         virtual void _render() {}
 
         // verificar se mouse está dentro do item
-        virtual bool isSelected(Vector2 mousePos) const { return false; }
+        inline bool isSelected(Vector2 mouse_position) const { return _isSelected(toLocal(mouse_position)); }
 
-        inline void setPosition(Vector2 pos) {
-            position = pos;
-        }
+        virtual bool _isSelected(Vector2 cursor_local_position) const = 0;
+
+        inline void translate(Vector2 by) {
+            model.translate(by);
+		}
+
+        inline void translateTo(Vector2 to) {
+            model.translateTo(to);
+		}
         
         inline TypeInfo getTypeInfo() const {
             return typeInfo;
+        }
+
+		// Converts position from Global Coordinate System to the Local Coordinate System (model) of the item
+        inline Vector2 toLocal(Vector2 global_position) const {
+            // Applies the inverse of the model transformation to the global position
+            return model.inverse() * global_position;
         }
 
         friend std::ostream& operator<<(std::ostream& os, const CanvasItem& item);
@@ -69,12 +81,13 @@ namespace cg {
         friend std::ifstream& operator>>(std::ifstream& ifs, CanvasItem& item);
         virtual std::ofstream& _serialize(std::ofstream& ofs) const = 0;
 		virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
+
     public:
-        inline static const float SELECTION_THRESHOLD = 5.0f; // pixels
+        inline static const float SELECTION_THRESHOLD = 4.0f; // pixels
     private:
         ID id = 0; // It's id location at the canvas.
         TypeInfo typeInfo = TypeInfo::OTHER; // Type info for later serialization
-    public:
-        Vector2 position{}; // TODO -> Remove + use model transform matrix
+    protected:
+		Transform2D model{}; // Model transformation matrix
     };
 }

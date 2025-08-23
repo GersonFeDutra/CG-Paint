@@ -15,7 +15,6 @@
 #include <random>
 #include <numbers>
 #include <type_traits>
-#include <iostream>
 #include <fstream>
 #include <concepts>
 
@@ -142,7 +141,7 @@ inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
 }
 template <typename T>
 inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
-    ofs << '(' << v.x << ", " << v.y << ')'; // Save in the format (x, y)
+    ofs << '(' << v.x << ' ' << v.y << ')'; // Save in the format (x y)
     return ofs;
 }
 template <typename T>
@@ -155,34 +154,20 @@ inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
             return ifs;
 		}
 
-        Vec2<T> parsed;
         // Load in the format (x, y)
         if (ifs.peek() == '(')
 		    ifs.ignore(); // Ignore '('
         else
             ifs.setstate(std::ios::failbit);
 
-        if (!(ifs >> parsed.x)) {
+        Vec2<T> parsed;
+        std::string dummy;
+        // Read x y)
+        if (!(ifs >> parsed.x) || !(ifs >> parsed.y) || !(ifs >> dummy) || dummy != ")") {
             ifs.setstate(std::ios::failbit); // marca falha no stream
             return ifs;
         }
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == ',')
-            ifs.ignore(); // Ignore ','
-        else
-            ifs.setstate(std::ios::failbit);
 
-        if (!(ifs >> parsed.y)) {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
-		}
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-			ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == ')')
-            ifs.ignore(); // Ignore ')'
-        else
-			ifs.setstate(std::ios::failbit);
 		v = parsed; // Assign the parsed value to the Vec2
     }
     catch (...) {
@@ -303,7 +288,7 @@ inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
 }
 template <typename T>
 inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
-    ofs << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // Save in the format (x, y, z)
+    ofs << "(" << v.x << " " << v.y << " " << v.z << ")"; // Save in the format (x y z)
     return ofs;
 }
 template <typename T>
@@ -312,50 +297,19 @@ inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
         while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
             ifs.ignore(); // Ignore leading whitespace
 
-        Vec3<T> parsed;
-        // Load in the format (x, y)
+        // Load in the format (x y z)
         if (ifs.peek() == '(')
             ifs.ignore(); // Ignore '('
         else
             ifs.setstate(std::ios::failbit);
 
-		// Read x
-        if (!(ifs >> parsed.x)) {
+        Vec3<T> parsed;
+		std::string dummy;
+		// Read x y z)
+        if (!(ifs >> parsed.x) || !(ifs >> parsed.y) || !(ifs >> parsed.z) || !(ifs >> dummy) || dummy != ")") {
             ifs.setstate(std::ios::failbit); // marca falha no stream
             return ifs;
         }
-
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == ',')
-            ifs.ignore(); // Ignore ','
-        else
-            ifs.setstate(std::ios::failbit);
-
-		// Read y
-        if (!(ifs >> parsed.y)) {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
-        }
-
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == ',')
-            ifs.ignore(); // Ignore ','
-        else
-            ifs.setstate(std::ios::failbit);
-
-		// Read z
-        if (!(ifs >> parsed.z)) {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
-        }
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == ')')
-            ifs.ignore(); // Ignore ')'
-        else
-            ifs.setstate(std::ios::failbit);
 
 		v = parsed; // Assign parsed values to v
     }
@@ -374,15 +328,16 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
 {
     Vec2<T>columns[3];
 
-    constexpr Transf2x3() = default;
-    constexpr Transf2x3(Vec2<T> translation) : columns{ {1, 0}, {0, 1}, translation } {}
+    constexpr Transf2x3() : columns{ Vec2<T>(1, 0), Vec2<T>(0, 1), Vec2<T>() } {}
+    constexpr ~Transf2x3() = default;
+    constexpr Transf2x3(Vec2<T> translation) : columns{ Vec2<T>(1, 0), Vec2<T>(0, 1), translation } {}
     constexpr Transf2x3(Vec2<T> v1_xaxis, Vec2<T> v2_yaxis, Vec2<T> v3_translation = {}) : columns{v1_xaxis, v2_yaxis, v3_translation} {}
     constexpr Transf2x3(T xaxis_x, T xaxis_y, T yaxis_x, T yaxis_y, T translation_x = 0, T translation_y = 0) : columns{
         { xaxis_x, xaxis_y },
         { yaxis_x, yaxis_y },
         { translation_x, translation_y }
     } {}
-    constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{Vec2<T>{ translation_x, translation_y }} {}
+    constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{ Vec2<T>{ translation_x, translation_y } } {}
 
     constexpr Transf2x3& operator*=(Transf2x3<T> m) {
         columns[0] = m * columns[0];
@@ -414,6 +369,42 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         return (*this) * Vec2<LargerType<T, U>>( x, y );
     }
 
+    constexpr inline float determinant() const {
+        return columns[0].x * columns[1].y - columns[0].y * columns[1].x;
+	}
+
+    constexpr inline auto inverse() const {
+        // Inverso de uma matriz de transformação afim 2D
+        T det = determinant();
+        assert_err(det != 0, "Matrix is not invertible.");
+        T invDet = 1 / det;
+        Vec2<T> invX{
+            columns[1].y * invDet,
+            -columns[0].y * invDet
+        };
+        Vec2<T> invY{
+            -columns[1].x * invDet,
+            columns[0].x * invDet
+        };
+        Vec2<T> invT{
+            -(invX.x * columns[2].x + invY.x * columns[2].y),
+            -(invX.y * columns[2].x + invY.y * columns[2].y)
+        };
+        return Transf2x3<T>{invX, invY, invT};
+	}
+
+	// Move para a posição absoluta (ignorando a rotação).
+	// Equivalente a definir a coluna de translação diretamente.
+    constexpr inline void moveTo(Vec2<T> position) {
+        columns[2] = position;
+	}
+
+	// Faz uma translação asbsoluta em relação à origem.
+    constexpr inline void translateTo(Vec2<T> position) {
+		moveTo(Vec2<T>{0, 0});
+        columns[2] += position;
+    }
+
     constexpr inline const T get(std::size_t col, std::size_t row) const {
         assert_err(col < 3 && row < 3, "Index out of range.");
         if (row == 2)
@@ -430,8 +421,66 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         assert_err(col < 3 && row < 2, "Inaccessible index or out of bounds.");
         return columns[col][row] = value;
     }
+
+	template<typename U>
+    friend std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m);
+    template<typename U>
+    friend std::istream& operator>>(std::istream& is, Transf2x3<U>& m);
+    template<typename U>
+    friend std::ofstream& operator<<(std::ofstream& ofs, const Transf2x3<U>& m);
+    template<typename U>
+	friend std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m);
 };
 
+template<typename U>
+std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m)
+{
+	return os << "[x: " << m.columns[0]
+             << "; y: " << m.columns[1]
+             << "; t: " << m.columns[2] << ']';
+}
+template<typename U>
+std::istream& operator>>(std::istream& is, Transf2x3<U>& m)
+{
+    try {
+        char c;
+        // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
+        if (!(is >> c >> c >> m.columns[0] >> c >> c >> m.columns[1] >> c >> c >> m.columns[2] >> c))
+            is.setstate(std::ios::failbit); // marca falha no stream
+    }
+    catch (...) {
+        is.setstate(std::ios::failbit);
+	}
+    return is;
+}
+
+template<typename U>
+std::ofstream& operator<<(std::ofstream& ofs, const Transf2x3<U>& m)
+{
+    ofs << "[x: " << m.columns[0] << "; y: " << m.columns[1] << "; t: " << m.columns[2] << ']';
+    return ofs;
+}
+
+template<typename U>
+std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m)
+{
+    try {
+        std::string dummy;
+        Vector2 parsed[3];
+        // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
+        if (!(ifs >> dummy >> parsed[0]) || dummy != "[x:" ||
+            !(ifs >> parsed[1] >> dummy) || dummy != ";y:" ||
+            !(ifs >> parsed[2] >> dummy) || dummy != ";t:")
+        {
+            ifs.setstate(std::ios::failbit); // marca falha no stream
+            return ifs;
+        }
+    }
+    catch (...) {
+        ifs.setstate(std::ios::failbit);
+    }
+    return ifs;
+}
 
 // Point transformation.
 template<typename T, std::convertible_to<T> U>

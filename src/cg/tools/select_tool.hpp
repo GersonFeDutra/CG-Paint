@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../tools.hpp"
 #include "../canvas.hpp"
@@ -23,7 +23,7 @@ namespace cg {
         void _input(io::MouseDrag mouse_event) override {
             if (selectedItem) {
                 // Exemplo simples: mover o item inteiro
-                selectedItem->setPosition(mouse_event.position);
+                selectedItem->translateTo(mouse_event.position);
             }
         }
 

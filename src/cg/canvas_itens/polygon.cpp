@@ -33,7 +33,7 @@ namespace cg {
 
     // Seleção de polígono (ray casting)
     // Determina se a posição do mouse está dentro de um polígono usando o algoritmo de "ray casting".
-    bool Polygon::isSelected(Vector2 mousePos) const
+    bool Polygon::_isSelected(Vector2 mousePos) const
     {
         bool inside = false;
         size_t n = vertices.size();
@@ -74,22 +74,40 @@ namespace cg {
         GLdebug{
             glColor3f(innerColor.r, innerColor.g, innerColor.b);
         }
+		ArrayList<Vector2> vertices;
+		vertices.reserve(this->vertices.size());
+
+		// Transforma os vértices do Sistema de Coordenadas Local para global usando a matriz de modelo
+        for (const auto& vertice : this->vertices)
+			vertices.push_back(model * vertice);
 
         switch (vertices.size()) {
-            case 0: { // point
-                glPointSize(1.0f); // TODO -> Add line width
-
-                glBegin(GL_POINTS);
-                    glVertex2f(position.x, position.y);
-                glEnd();
+            case 0: {
+                assert_err("Cannot draw a polygon with no vertices");
+            }; break;
+            case 1: { // point
+                GLdebug{
+                    glPointSize(width);
+                }
+                GLdebug{
+                    glBegin(GL_POINTS);
+                        glVertex2f(vertices[0].x, vertices[0].y);
+                    glEnd();
+                }
             } break;
-            case 1: { // line
-                glBegin(GL_LINES);
-                    glVertex2f(position.x, position.y);
-                    glVertex2f(vertices[0].x, vertices[0].y);
-                glEnd();
+            case 2: { // line
+                GLdebug{
+				    glLineWidth(width);
+                }
+                GLdebug {
+                    glBegin(GL_LINES);
+                        glVertex2f(vertices[0].x, vertices[0].y);
+                        glVertex2f(vertices[1].x, vertices[1].y);
+                    glEnd();
+                }
             } break;
             default: {
+				// TODO -> Implementar contorno
 				// TODO -> Usar cache para evitar tesselar a cada frame
 
                 // container "dono" que guarda todas as alocações estáveis
@@ -123,11 +141,7 @@ namespace cg {
                     gluTessVertex(tess, (GLdouble*)raw, raw);
                 };
 
-                {
-                    // Position como vértice inicial
-				    push_vertex(position.x, position.y);
-                }
-                for (auto vertice : vertices)
+                for (const auto& vertice : vertices)
 					push_vertex(vertice.x, vertice.y);
 
                 // finaliza a tesselagem
@@ -141,9 +155,10 @@ namespace cg {
             }
         }
     }
+
     std::ostream& Polygon::_print(std::ostream& os) const
     {
-        os << "Polygon: " << position << ", width: " << width << ", colors: [inner: " << innerColor << ", countour: " << countourColor << "], vertices[";
+        os << "Polygon: " << model << ", width: " << width << ", colors: [inner: " << innerColor << ", countour: " << countourColor << "], vertices[";
 
         auto vertice = vertices.begin();
         if (vertice < vertices.end()) {
@@ -156,7 +171,7 @@ namespace cg {
 
     std::ofstream& Polygon::_serialize(std::ofstream& ofs) const
     {
-        ofs << position << " width: " << width << " colors: [inner: " << innerColor << " countour: " << countourColor << "] vertices[";
+        ofs << model << " width: " << width << " colors: [inner: " << innerColor << " countour: " << countourColor << "] vertices[";
 
         auto vertice = vertices.begin();
         if (vertice < vertices.end()) {
@@ -174,11 +189,20 @@ namespace cg {
     {
         try {
             std::string dummy;
-            if (!(ifs >> position >> dummy >> width >> dummy >> dummy >> innerColor >> dummy >> countourColor >> dummy >> dummy))
+			Transform2D newModel;
+			float newWidth;
+            Color colors[2];
+			ArrayList<Vector2> newVertices;
+
+			// Lê o cabeçalho
+            if (!(ifs >> newModel >> dummy >> newWidth) || dummy != "width:" ||
+                !(ifs >> dummy) || dummy != "colors:" ||
+                !(ifs >> dummy) || dummy != "[inner:" ||
+                !(ifs >> colors[0] >> dummy) || dummy != "countour:" ||
+                !(ifs >> colors[1] >> dummy) || dummy != "]" ||
+                !(ifs >> dummy) || dummy != "vertices[")
                 ifs.setstate(std::ios::failbit); // marca falha no stream
 
-            vertices.clear();
-            // Lê os vértices
 
             while (std::isspace(ifs.peek()))
                 ifs.ignore();
@@ -186,6 +210,7 @@ namespace cg {
                 ifs.ignore();
                 return ifs; // não há vértices
             }
+
 
             Vector2 vertice;
             while (ifs >> vertice) {
@@ -197,6 +222,13 @@ namespace cg {
                 else if (ifs.peek() == ']')
                     break; // fim da lista de vértices
             }
+
+			// Substitui os dados apenas se tudo foi lido corretamente
+			model = newModel;
+			width = newWidth;
+			innerColor = colors[0];
+			countourColor = colors[1];
+            vertices = newVertices;
         }
         catch (...) {
             ifs.setstate(std::ios::failbit);

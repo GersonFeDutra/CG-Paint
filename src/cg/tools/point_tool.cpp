@@ -15,13 +15,14 @@ namespace cg {
         if (toolBox.isInsideGui || isDrawing)
             return;
 
+        auto [x, y] = model * Vector2{};
         GLdebug{
             glPointSize(Point::SIZE + 1.0f);
             glColor3ub(255, 255, 255);
         }
         GLdebug {
         glBegin(GL_POINTS);
-            glVertex2f(position.x, position.y);
+            glVertex2f(x, y);
         glEnd();
         }
         GLdebug{
@@ -30,21 +31,21 @@ namespace cg {
         }
         GLdebug{
         glBegin(GL_POINTS);
-            glVertex2f(position.x, position.y);
+            glVertex2f(x, y);
         glEnd();
         }
     }
 
     void PointTool::_input(io::MouseMove mouse_event)
     {
-        position = mouse_event.position;
+		setPosition(mouse_event.position);
     }
 
     void PointTool::_input(io::MouseDrag mouse_event)
     {
         if (isDrawing) {
             assert_err(point != nullptr, "Drawing a not intanced primitive.");
-            point->position = mouse_event.position;
+            setPosition(mouse_event.position);
         }
     }
 
@@ -60,7 +61,7 @@ namespace cg {
 
     void cg::PointTool::_input(io::MouseLeftButtonReleased mouse_event)
     {
-        position = mouse_event.position;
+        setPosition(mouse_event.position);
         isDrawing = false; // Não mova mais o último ponto.
     }
 }

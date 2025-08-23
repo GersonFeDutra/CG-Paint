@@ -13,9 +13,9 @@ namespace cg {
 
     PolygonTool::PolygonTool(ToolBox& tool_box)
         : Painter{ tool_box },
-        lines{
-            GhostLine{ &position, &position, toolBox.canvas },
-            GhostLine{ &position, &position, toolBox.canvas } }
+		lines{ // Inicializa as linhas com `from` e `to` apontando para a posição atual
+            GhostLine{ &getPosition(), &getPosition(), toolBox.canvas },
+            GhostLine{ &getPosition(), &getPosition(), toolBox.canvas } }
     {
         lines[0].color.r = 1.0f - lines[0].color.r;
     }
@@ -28,20 +28,20 @@ namespace cg {
     void PolygonTool::_input(io::MouseMove mouse_event)
     {
         if (isDrawing)
-            position = mouse_event.position;
+            setPosition(mouse_event.position);
     }
 
     void PolygonTool::_input(io::MouseDrag mouse_event)
     {
         if (isDrawing)
-            position = mouse_event.position;
+            setPosition(mouse_event.position);
     }
 
 
     void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
         if (isDrawing) {
-            polygon->append(position);
+            polygon->append(getPosition());
             lines[1].from = &polygon->lastVertice();
         }
         else {
@@ -52,7 +52,7 @@ namespace cg {
             toolBox.bindColorPtr(&polygon->getColor());
             isDrawing = true;
             
-            position = mouse_event.position; // update position to the first vertice
+            setPosition(mouse_event.position); // update position to the first vertice
             for (auto& line : lines)
                 line.from = &polygon->lastVertice();
 
@@ -66,7 +66,7 @@ namespace cg {
         polygon = nullptr;
 
         for (auto& line : lines)
-            line.from = &position;
+            line.from = &getPosition();
 
         toolBox.unbindColorPtr();
     }

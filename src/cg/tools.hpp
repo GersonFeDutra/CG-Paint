@@ -13,7 +13,24 @@ namespace cg {
 	protected:
 		ToolBox& toolBox;
 
+		// Define a posição absoluta do "scanner" da ferramenta no canvas.
+		// Pode ser usado para desenhar o cursor da ferramenta e posicionar novos itens.
+		void setPosition(const Vector2& position) {
+			model.moveTo(position); // Dado que a matriz é identidade, move para a posição absoluta.
+		}
+
+		// Retorna a posição absoluta do "scanner" da ferramenta no canvas.
+		Vector2& getPosition() {
+			return model.columns[2];
+		}
+		Vector2 getPosition() const {
+			return model.columns[2];
+		}
+
 		// Inherited via CanvasItem
+
+		bool _isSelected(Vector2 cursor_local_position) const override { return false; }
+
 		std::ostream& _print(std::ostream& os) const override { return os; }
 		std::ofstream& _serialize(std::ofstream& ofs) const override { return ofs; }
 		std::ifstream& _deserialize(std::ifstream& ifs) override { return ifs; }

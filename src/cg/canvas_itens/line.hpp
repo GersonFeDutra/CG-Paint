@@ -13,18 +13,28 @@ namespace cg
     class Line : public CanvasItem
     {
     public:
-        Line() : CanvasItem(TypeInfo::LINE) {}
-        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, position }, color{ color } {}
+        Line() : CanvasItem{ TypeInfo::LINE } {
+            vertices.reserve(2);
+		}
+
+        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE }, color{ color } {
+            vertices.reserve(2);
+			vertices.emplace_back(position);
+        }
 
         //void _process(DeltaTime delta) override;
 
         void _render() override;
 
         // Verifica se a linha foi selecionada pelo mouse
-        bool isSelected(Vector2 mousePos) const override;
+        bool _isSelected(Vector2 cursor_local_position) const override;
 
         inline void append(Vector2 vertice) {
             vertices.push_back(vertice);
+        }
+
+        inline void emplace_back(Vector2&& vertice) {
+            vertices.emplace_back(std::move(vertice));
         }
 
         // Tamanho da corda, desconsiderando vértice de origem.
@@ -33,13 +43,15 @@ namespace cg
         }
 
         inline Vector2& lastVertice() {
-            return (size() == 0) ? position : vertices.back();
+			assert_err(size() > 0, "No vertices in line");
+            return vertices.back();
         }
 
         inline Vector2 lastVertice() const {
-            return (size() == 0) ? position : vertices.back();
+            return vertices.back();
         }
 
+		// FIXME: essa função pode ser perigosa, pois permite modificar os vertices diretamente
         // Guido: adicionei essa função pra ver se um ngc funciona no polygon_tool
         inline std::vector<Vector2> getVertices() {
             return vertices;
@@ -68,7 +80,7 @@ namespace cg
         std::ifstream& _deserialize(std::ifstream& ifs) override;
     private:
         std::vector<Vector2> vertices;
-        Color color; // TODO -> alpha blending
+        Color color{}; // TODO -> alpha blending
 		float width = 1.0f; // TODO -> anti-alias
     };
 
