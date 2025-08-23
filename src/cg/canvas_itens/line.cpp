@@ -5,7 +5,7 @@ namespace cg {
 	void Line::_render()
 	{
 		if (vertices.empty())
-			return; // A linha deve ter pelo menos 2 vértices (a posição do item conta como 1 vértice)
+			return; // A linha deve ter pelo menos 2 vï¿½rtices (a posiï¿½ï¿½o do item conta como 1 vï¿½rtice)
 		GLdebug{
 			glBegin(GL_LINE_STRIP);
 				glColor3f(color.r, color.g, color.b);
@@ -16,9 +16,9 @@ namespace cg {
 		}
 	}
 
-	// Seleção de linha
-	// Verifica se a posição do mouse está próxima de um segmento de reta definido por p1 e p2.
-	// A proximidade é definida pelo threshold.
+	// Seleï¿½ï¿½o de linha
+	// Verifica se a posiï¿½ï¿½o do mouse estï¿½ prï¿½xima de um segmento de reta definido por p1 e p2.
+	// A proximidade ï¿½ definida pelo threshold.
 	static inline bool lineSelected(Vector2 mousePos, Vector2 p1, Vector2 p2, float threshold = CanvasItem::SELECTION_THRESHOLD) {
 		Vector2 line = p2 - p1;
 		Vector2 toMouse = mousePos - p1;
@@ -27,7 +27,7 @@ namespace cg {
 		//Se linha for muito pequena, ignora o seguimento
 		if (lineLength < 1e-5f) return false;
 
-		// Projeção do mouse na linha normalizada em relação ao segmento
+		// Projeï¿½ï¿½o do mouse na linha normalizada em relaï¿½ï¿½o ao segmento
 		// O Clamp entre 0 e 1 garante que o ponto projetado esteja dentro do segmento
 		float t = std::max(0.0f, std::min(1.0f, toMouse.dot(line) / (lineLength * lineLength)));
 		Vector2 closest = p1 + line * t;
@@ -35,13 +35,13 @@ namespace cg {
 		return (mousePos - closest).length() <= threshold;
 	}
 
-	// Seleção de linha
-	// Verifica se a posição do mouse está próxima de um segmento de reta definido por p1 e p2.
-	// A proximidade é definida pelo threshold.
+	// Seleï¿½ï¿½o de linha
+	// Verifica se a posiï¿½ï¿½o do mouse estï¿½ prï¿½xima de um segmento de reta definido por p1 e p2.
+	// A proximidade ï¿½ definida pelo threshold.
 	bool Line::isSelected(Vector2 mousePos) const
 	{
 		if (vertices.empty())
-			return false; // A linha deve ter pelo menos 2 vértices (a posição do item conta como 1 vértice)
+			return false; // A linha deve ter pelo menos 2 vï¿½rtices (a posiï¿½ï¿½o do item conta como 1 vï¿½rtice)
 
 		Vector2 lastVertice = position;
 		for (auto vertice : vertices) {
@@ -75,7 +75,7 @@ namespace cg {
 				ofs << ", " << *vertice;
 		}
 		else
-			ofs << ' '; // se não houver vértices, imprime separador vazio
+			ofs << ' '; // se nï¿½o houver vï¿½rtices, imprime separador vazio
 		ofs << ']';
 		return ofs;
 	}
@@ -88,24 +88,24 @@ namespace cg {
 				ifs.setstate(std::ios::failbit); // marca falha no stream
 
 			vertices.clear();
-			// Lê os vértices
+			// Lï¿½ os vï¿½rtices
 
 			while (std::isspace(ifs.peek()))
 				ifs.ignore();
 			if (ifs.peek() == ']') {
 				ifs.ignore();
-				return ifs; // não há vértices
+				return ifs; // nï¿½o hï¿½ vï¿½rtices
 			}
 
 			Vector2 vertice;
 			while (ifs >> vertice) {
 				vertices.push_back(vertice);
 				while (std::isspace(ifs.peek()))
-					ifs.ignore(); // ignora espaços em branco
+					ifs.ignore(); // ignora espaï¿½os em branco
 				if (ifs.peek() == ',')
-					ifs.ignore(); // ignora vírgula
+					ifs.ignore(); // ignora vï¿½rgula
 				else if (ifs.peek() == ']')
-					break; // fim da lista de vértices
+					break; // fim da lista de vï¿½rtices
 			}
 		}
 		catch (...) {

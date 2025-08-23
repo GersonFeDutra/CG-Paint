@@ -25,7 +25,7 @@ namespace cg
 				vertices.push_back(vert); // Store relative to position
         }
 
-        // Verifica se o polígono foi selecionado pelo mouse
+        // Verifica se o polï¿½gono foi selecionado pelo mouse
         bool isSelected(Vector2 mousePos) const override;
 
         void _render() override;

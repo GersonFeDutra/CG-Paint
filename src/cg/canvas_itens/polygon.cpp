@@ -38,17 +38,36 @@ namespace cg {
         bool inside = false;
         size_t n = vertices.size();
 
-        // Percorre cada aresta do polígono 
         for (size_t i = 0, j = n - 1; i < n; j = i++) {
-            // Verifica se a linha horizontal passando pelo mouse cruza a aresta (vertices[j], vertices[i])
-            if (((vertices[i].y > mousePos.y) != (vertices[j].y > mousePos.y)) &&
-                (mousePos.x < (vertices[j].x - vertices[i].x) *
-                    (mousePos.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x)) {
-                inside = !inside;
+            const Vector2& vi = vertices[i];
+            const Vector2& vj = vertices[j];
+
+            if (vi.y == vj.y && vi.y == mousePos.y) {
+                // Ignora arestas horizontais na altura do clique
+                continue;
+            }
+
+            // Verifica se o raio horizontal cruza a aresta
+            if (((vi.y > mousePos.y) != (vj.y > mousePos.y))) {
+                // Calcula a posição da interseção da aresta com o raio horizontal
+                float intersectX = vj.x + (mousePos.y - vj.y) * (vi.x - vj.x) / (vi.y - vj.y);
+
+                if (intersectX == mousePos.x) {
+                    // Interseção exatamente em um vértice
+                    bool otherUp = (vj.y > mousePos.y) != (vi.y > mousePos.y);
+                    if (otherUp) {
+                        inside = !inside; // Conta interseção apenas quando o outro vértice está para cima
+                    }
+                }
+                else if (intersectX > mousePos.x) {
+                    // Interseção à direita do ponto do clique
+                    inside = !inside;
+                }
             }
         }
         return inside;
     }
+
 
     void Polygon::_render() {
 

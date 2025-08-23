@@ -9,13 +9,14 @@
 #include "tools/point_tool.hpp"
 #include "tools/line_tool.hpp"
 #include "tools/polygon_tool.hpp"
+#include "tools/select_tool.hpp" 
 
 #include <facade/gui.hpp>
 
 
 namespace cg {
 
-    ToolBox::ToolBox() : tools{nullptr, nullptr, nullptr} {}
+    ToolBox::ToolBox() : tools{nullptr, nullptr, nullptr, nullptr} {}
 
     void ToolBox::addCanvas(Canvas* canvas_ptr) {
         assert_err(canvas == nullptr, "Canvas already added.");
@@ -25,9 +26,11 @@ namespace cg {
         static PointTool pointTool{ *this };
         static LineTool lineTool{ *this };
         static PolygonTool polygonTool{ *this };
-
+        static SelectTool selectTool{ *this };
+        
         // Passe as ferramentas para o array (lembre-se de alterar o tamanho dele em N_PRIMITIVES).
-        tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool };
+        tools = { (Painter*)&pointTool, (Painter*)&lineTool, (Painter*)&polygonTool, (Painter*)&selectTool };
+        
     }
 
     static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
