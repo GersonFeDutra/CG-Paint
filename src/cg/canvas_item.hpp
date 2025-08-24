@@ -59,6 +59,10 @@ namespace cg {
             model.translate(by);
 		}
 
+        inline void rotate(float angle) {
+            model.rotate(angle);
+        }
+
         inline void translateTo(Vector2 to) {
             model.translateTo(to);
 		}

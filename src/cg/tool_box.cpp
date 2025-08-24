@@ -99,21 +99,43 @@ namespace cg {
             //toolBox.showText("counter = %d", counter);
 
 
-            Vector2 translation = tools[Tools::SELECT]->getPosition();
 
             // Update translation
-            toolBox.showSliderVector2(&translation, canvas->getUpperLeft(), canvas->getBottomRight(), "X", "Y");
+            {
+                Vector2 translation = tools[Tools::SELECT]->getPosition();
+                toolBox.showSliderVector2(&translation, canvas->getUpperLeft(), canvas->getBottomRight(), "X", "Y");
 
-            if (translation != tools[Tools::SELECT]->getPosition())
-				tools[Tools::SELECT]->setPosition(translation);
+                if (translation != tools[Tools::SELECT]->getPosition())
+				    tools[Tools::SELECT]->setPosition(translation);
+            }
+            // Update rotation
+            {
+			    float rotation_deg = rad_to_deg(tools[Tools::SELECT]->getRotation()); // degrees
+			    toolBox.showSliderFloat(&rotation_deg, -360.0f, 360.0f, "Rotation");
 
-            if (toolBox.showButton("Save to file"))
-                clicked = SAVE;
-			toolBox.sameLine();
-            if (toolBox.showButton("Load from file"))
-                clicked = LOAD;
+			    float rotation_rad = deg_to_rad(rotation_deg); // radians
+                if (fabsf(rotation_rad - tools[Tools::SELECT]->getRotation()) > ZERO_PRECISION_ERROR)
+                    tools[Tools::SELECT]->setRotation(rotation_rad);
+            }
+            // Update scale
+            {
+                // TODO
+            }
+            // Cisalhamento
+            {
+                // TODO
+			}
 
-            toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
+			// Save / Load
+            {
+                if (toolBox.showButton("Save to file"))
+                    clicked = SAVE;
+			    toolBox.sameLine();
+                if (toolBox.showButton("Load from file"))
+                    clicked = LOAD;
+
+                toolBox.showText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Gui::getFps(), Gui::getFps());
+            }
         }
 
         switch (clicked) {

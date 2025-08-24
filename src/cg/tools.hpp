@@ -12,25 +12,30 @@ namespace cg {
 	public:
 		Tool(ToolBox& tool_box) : toolBox{ tool_box } {}
 	
-	// setters e getters
 	public:
+	// setters e getters
+	
 		// Define a posição absoluta do "scanner" da ferramenta no canvas.
 		// Pode ser usado para desenhar o cursor da ferramenta e posicionar novos itens.
 		virtual void setPosition(const Vector2& position) {
-			model.moveTo(position); // Dado que a matriz é identidade, move para a posição absoluta.
+			model.setOrigin(position);
 		}
 
-		Vector2 getPosition() const {
-			return model.columns[2];
+		virtual void setRotation(float angle) {
+			model.rotateTo(angle);
 		}
-	protected:
+
 		// Retorna a posição absoluta do "scanner" da ferramenta no canvas.
-		Vector2& _getPositionRef() {
-			return model.columns[2];
+		inline Vector2 getPosition() const {
+			return model.getOrigin();
 		}
 
-		// Inherited via CanvasItem
+		inline float getRotation() const {
+			return model.getRotation();
+		}
 
+	protected:
+	// Inherited via CanvasItem
 		bool _isSelected(Vector2 cursor_local_position) const override { return false; }
 
 	// operadores virtuais

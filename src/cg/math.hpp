@@ -32,6 +32,21 @@ constexpr T TAU = std::numbers::pi_v<T> * static_cast<T>(2);
 template <typename T>
 constexpr T PI = std::numbers::pi_v<T>;
 
+constexpr float EPSILON_ERROR = 1e-6f; // approx. zero
+inline constexpr float ZERO_PRECISION_ERROR = EPSILON_ERROR; // alias for EPSILON_ERROR
+
+// Radians to degrees
+template <typename T>
+inline constexpr T rad_to_deg(T rad) {
+    return rad * (double)(180) / PI<T>;
+}
+
+// Degrees to radians
+template <typename T>
+inline constexpr T deg_to_rad(T deg) {
+    return deg * PI<T> / (double)(180);
+}
+
 using Angle = float; // Angle in radians.
 
 template <typename T>
@@ -57,7 +72,7 @@ struct Vec2 {
     }
 
 	constexpr Vec2& operator+() const { return *this; }
-	constexpr Vec2& operator-() const { return *this = { -x, -y }; }
+	constexpr Vec2& operator-() { return *this = Vec2<T>{ -x, -y }; }
     Vec2& operator+=(Vec2 v) {
         x += v.x;
         y += v.y;
@@ -345,15 +360,16 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     } {}
     constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{ Vec2<T>{ translation_x, translation_y } } {}
 
-    constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns(
-        { cosf(theta), sinf(theta) },
-        { -sinf(theta), cosf(theta) },
+    constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns{
+        Vec2<T>{ cos(theta), sin(theta) },
+        Vec2<T>{ -sin(theta), cos(theta) },
         translation
-    ) {}
+    } {}
 
     constexpr inline Transf2x3& translate(Vec2<T> direction) {
         return *this *= Transf2x3<T>{ direction };
     }
+
     constexpr inline Transf2x3& rotate(float angle) {
         return *this *= Transf2x3<T>{ angle };
     }
@@ -392,19 +408,145 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         return Transf2x3<T>{invX, invY, invT};
 	}
 
-	// Move para a posição absoluta (ignorando a rotação).
-	// Equivalente a definir a coluna de translação diretamente.
-    constexpr inline void moveTo(Vec2<T> position) {
-        columns[2] = position;
-	}
-
-	// Faz uma translação asbsoluta em relação à origem.
+	// Faz uma translação absoluta - em relação à origem.
     constexpr inline void translateTo(Vec2<T> position) {
-		moveTo(Vec2<T>{0, 0});
-        columns[2] += position;
+		//*this = Transf2x3<T>{ position } * *this * Transf2x3<T>{-getOrigin()};
+        // Equivalente, mas melhor
+		*this *= Transf2x3<T>{ position - getOrigin() };
     }
 
-    constexpr inline const T get(std::size_t col, std::size_t row) const {
+	// Faz uma rotação abosoluta - em relação à origem, considerando que a matriz é uniforme.
+    constexpr inline void uniformRotateTo(float angle) {
+		assert_err(isUniform(), "Matrix is not uniform.");
+
+        // ângulo atual a partir da coluna 0
+        float current = std::atan2(columns[0].y, columns[0].x);
+        float delta = angle - current;
+        // normalize delta se quiser ficar no intervalo [-pi,pi]
+        // delta = fmod(delta + M_PI, 2*M_PI) - M_PI;
+        rotate(delta);
+    }
+
+    constexpr bool isUniform(float eps = EPSILON_ERROR) const {
+        Vector2 u = columns[0]; // (a, b)
+        Vector2 v = columns[1]; // (c, d)
+
+        float dot = u.x * v.x + u.y * v.y;
+        float lenU = std::sqrt(u.x * u.x + u.y * u.y);
+        float lenV = std::sqrt(v.x * v.x + v.y * v.y);
+
+        // shear ≈ 0
+        if (std::fabs(dot) > eps * lenU * lenV)
+            return false;
+
+        // escalas iguais
+        if (std::fabs(lenU - lenV) > eps * std::max(lenU, lenV))
+            return false;
+
+        return true;
+    }
+
+	// Faz uma rotação absoluta - em relação à origem
+	// Prefira uniformeRotateTo se a matriz for uniforme
+    constexpr inline void rotateTo(Angle angle) {
+        // L = [ a c ]
+        // [ b d ]
+        float a = columns[0].x;
+        float b = columns[0].y;
+        float c = columns[1].x;
+        float d = columns[1].y;
+
+        // Form S = L^T * L (symmetric 2x2)
+        float s11 = a * a + b * b;
+        float s12 = a * c + b * d;
+        float s22 = c * c + d * d;
+
+        // trace & det
+        float tr = s11 + s22;
+        float det = s11 * s22 - s12 * s12;
+        float discr = tr * tr - 4.0f * det;
+
+        // degenerate guard
+        if (discr <= 0.0f) {
+            // fallback simples
+            float current = std::atan2(b, a);
+            rotate(angle - current);
+            return;
+        }
+
+        float sqrt_discr = std::sqrt(discr);
+        float lambda1 = 0.5f * (tr + sqrt_discr);
+        float lambda2 = 0.5f * (tr - sqrt_discr);
+
+        // assegura valores positivos (S deve ser p.d.)
+        if (lambda1 <= EPSILON_ERROR || lambda2 <= EPSILON_ERROR) {
+            float current = std::atan2(b, a);
+            rotate(angle - current);
+            return;
+        }
+
+        // calculamos autovetores de S para montar Q (ortogonal)
+        // S = [s11 s12; s12 s22]
+        auto make_eigvec = [&](float lambda, float& vx, float& vy) {
+            if (std::fabs(s12) > EPSILON_ERROR) {
+                vx = s12;
+                vy = lambda - s11;
+            }
+            else {
+                // S é quase diagonal
+                if (s11 >= s22) { vx = 1.0f; vy = 0.0f; }
+                else { vx = 0.0f; vy = 1.0f; }
+            }
+            // normalize
+            float norm = std::sqrt(vx * vx + vy * vy);
+            if (norm > EPSILON_ERROR) { vx /= norm; vy /= norm; }
+            else { vx = 1.0f; vy = 0.0f; }
+            };
+
+        float q1x, q1y, q2x, q2y;
+        make_eigvec(lambda1, q1x, q1y);
+        // q2 = perpendicular to q1 to form orthonormal basis
+        q2x = -q1y; q2y = q1x;
+
+        // inv_sqrt_diag = diag(1/sqrt(lambda1), 1/sqrt(lambda2))
+        float i_sqrt1 = 1.0f / std::sqrt(lambda1);
+        float i_sqrt2 = 1.0f / std::sqrt(lambda2);
+
+        // invSqrt = Q * diag(...) * Q^T, compute entries explicitly:
+        // invSqrt = q1 q1^T * i_sqrt1 + q2 q2^T * i_sqrt2
+        float inv00 = q1x * q1x * i_sqrt1 + q2x * q2x * i_sqrt2;
+        float inv01 = q1x * q1y * i_sqrt1 + q2x * q2y * i_sqrt2;
+        float inv10 = inv01;
+        float inv11 = q1y * q1y * i_sqrt1 + q2y * q2y * i_sqrt2;
+
+        // R = L * invSqrt  (2x2 multiplication)
+        float R00 = a * inv00 + c * inv10;
+        float R01 = a * inv01 + c * inv11;
+        float R10 = b * inv00 + d * inv10;
+        float R11 = b * inv01 + d * inv11;
+
+        // angle from R (R should be a rotation matrix)
+        float current = std::atan2(R10, R00);
+        float delta = angle - current;
+        rotate(delta);
+	}
+
+    constexpr inline Angle getRotation() const {
+        return atan2f(columns[0].y, columns[0].x); // or -atan2f(-columns[1].x, columns[1].y);
+	}
+
+    // Move a origem do sistema de coordenadas local para a posição absoluta (ignorando a rotação).
+    // Equivalente a definir a coluna de translação diretamente.
+    constexpr inline void setOrigin(Vec2<T> position) {
+        columns[2] = position;
+    }
+
+	// Retorna a coluna de translação (origem do sistema de coordenadas local) em posição absoluta.
+    constexpr inline Vec2<T> getOrigin() const {
+        return columns[2];
+	}
+
+    constexpr inline T get(std::size_t col, std::size_t row) const {
         assert_err(col < 3 && row < 3, "Index out of range.");
         if (row == 2)
             return (T)(col == 2); // Homogeneous coordinates.

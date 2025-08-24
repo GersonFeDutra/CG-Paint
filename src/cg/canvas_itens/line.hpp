@@ -49,12 +49,12 @@ namespace cg
 
             // se não houver vértices, só movemos o modelo e retornamos
             if (vertices.empty()) {
-                model.moveTo(global_position);
+                model.setOrigin(global_position);
                 return;
             }
 
             // move o pivô (mantendo rotação) — altera apenas a coluna de translação.
-            model.moveTo(global_position);
+            model.setOrigin(global_position);
 
             // calcula inverso do novo modelo para converter posições globais -> novo sistema local
             Transform2D invNewModel = model.inverse();

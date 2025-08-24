@@ -36,24 +36,34 @@ namespace cg {
             }
         }
 
-        inline void translateSelected(const Vector2& delta) {
-            if (selectedItem)
-                selectedItem->translate(delta);
-		}
-
-    // setters e getters
-        void setPosition(const Vector2& position) override {
-			translateSelected(position - _getPositionRef()); // delta △translation
-			Tool::setPosition(position);
-        }
-
         inline void select(CanvasItem* item) {
 			selectedItem = item;
             model = Transform2D(item->model * Vector2{});
         }
 
+        inline void translateSelected(const Vector2& delta) {
+            if (selectedItem)
+                selectedItem->translate(delta);
+		}
+
+        inline void rotateSelected(float angle) {
+            if (selectedItem)
+                selectedItem->rotate(angle);
+		}
+
+    // setters e getters
         inline bool hasSelection() const {
             return selectedItem != nullptr;
+        }
+
+        void setPosition(const Vector2& position) override {
+			translateSelected(position - getPosition()); // delta △translation
+			Tool::setPosition(position);
+        }
+
+        void setRotation(float angle) override {
+			rotateSelected(angle - getRotation()); // delta △rotation
+			Tool::setRotation(angle);
         }
 
     private:

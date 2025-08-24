@@ -347,7 +347,7 @@ public:
     // }
 
     inline void showSliderFloat(float *f, float min, float max, const char *label = "") const {
-        ImGui::SliderFloat(label, f, 0.0f, 1.0f);
+        ImGui::SliderFloat(label, f, min, max);
     }
     inline void showSliderFloat(float *f, float max = 1.0f, const char* label = "") const {
         showSliderFloat(f, 0.0f, max, label);
