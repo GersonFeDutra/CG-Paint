@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <functional>
 #include <cg/math.hpp>
 #include <cg/geometry.hpp>
 
@@ -8,13 +9,14 @@ namespace cg {
 	class Canvas; // forward definition
 
 	struct GhostLine {
-		Vector2 *from = nullptr, *to = nullptr;
-		Transform2D* model = nullptr; // modelo de transformação para converter coords globais -> locais
+		std::function<Vector2()> getFrom;
+		std::function<Vector2()> getTo;
+
 		Color color = DEFAULT_COLOR;
 
 		GhostLine(Canvas* canvas);
-		GhostLine(Vector2* from, Vector2* to, Canvas* canvas);
-		GhostLine(Vector2* from, Vector2* to, Color color, Canvas* canvas);
+		GhostLine(std::function<Vector2()> getFrom, std::function<Vector2()> getTo, Canvas* canvas);
+		GhostLine(std::function<Vector2()> getFrom, std::function<Vector2()> getTo, Color color, Canvas* canvas);
 
 		void _render();
 

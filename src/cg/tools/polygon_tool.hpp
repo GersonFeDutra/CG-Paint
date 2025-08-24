@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 
@@ -22,8 +22,13 @@ namespace cg {
 		void _input(io::MouseDrag mouse_event) override;
 		void _input(io::MouseLeftButtonPressed mouse_event) override;
         void _input(io::MouseRightButtonPressed mouse_event) override;
+
+		Vector2 getFirstGhostLineStart() const;
+		Vector2 getLastGhostLineStart() const;
+
+		Vector2 getGhostLineEnd() const;
 	private:
-		Polygon* polygon; // dummie
+		Polygon* polygon = nullptr; // current polygon being drawn
 		GhostLine lines[2];
         Vector2 initialCoords;
 	};

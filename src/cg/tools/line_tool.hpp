@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cg/tools.hpp>
 
@@ -21,6 +21,9 @@ namespace cg {
 		void _input(io::MouseDrag mouse_event) override;
 		void _input(io::MouseLeftButtonPressed mouse_event) override;
 		void _input(io::MouseRightButtonPressed mouse_event) override;
+
+		Vector2 getGhostLineStart() const;
+		Vector2 getGhostLineEnd() const;
 	private:
 		GhostLine ghostLine;
 		Line* line = nullptr;

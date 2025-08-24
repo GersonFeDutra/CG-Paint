@@ -12,11 +12,15 @@
 namespace cg {
 
     PolygonTool::PolygonTool(ToolBox& tool_box)
-        : Painter{ tool_box },
-		lines{ // Inicializa as linhas com `from` e `to` apontando para a posição atual
-            GhostLine{ &_getPositionRef(), &_getPositionRef(), toolBox.canvas },
-            GhostLine{ &_getPositionRef(), &_getPositionRef(), toolBox.canvas } }
+        : Painter{ tool_box }, lines{ GhostLine{ toolBox.canvas }, GhostLine{ toolBox.canvas } }
     {
+        // Inicializa as linhas com `from` e `to` apontando para a posição atual
+        lines[0].getFrom = [this]() { return getFirstGhostLineStart(); };
+        lines[1].getFrom = [this]() { return getLastGhostLineStart(); };
+
+        for (auto i : { 0, 1 })
+		    lines[i].getTo = [this]() { return getGhostLineEnd(); };
+
         lines[0].color.r = 1.0f - lines[0].color.r;
     }
 
@@ -41,8 +45,7 @@ namespace cg {
     void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
         if (isDrawing) {
-            polygon->append(_getPositionRef());
-            lines[1].from = &polygon->lastVertice();
+            polygon->append(getPosition());
         }
         else {
             // new Polygon primitive
@@ -50,11 +53,8 @@ namespace cg {
             appendToCanvas(polygon); // add to canvas even if just one vertice (shown as a point)
 
             toolBox.bindColorPtr(&polygon->getColor());
-            isDrawing = true;
-            
+
             setPosition(mouse_event.position); // update position to the first vertice
-            for (auto& line : lines)
-                line.from = &polygon->lastVertice();
 
             isDrawing = true;
         }
@@ -65,10 +65,25 @@ namespace cg {
         isDrawing = false;
         polygon = nullptr;
 
-        for (auto& line : lines)
-            line.from = &_getPositionRef();
-
         toolBox.unbindColorPtr();
     }
+
+    Vector2 PolygonTool::getFirstGhostLineStart() const
+    {
+        assert_err(polygon != nullptr, "No polygon");
+        return polygon->firstVertice();
+    }
+
+    Vector2 PolygonTool::getLastGhostLineStart() const
+    {
+        assert_err(polygon != nullptr, "No polygon");
+        return polygon->lastVertice();
+    }
+
+    Vector2 PolygonTool::getGhostLineEnd() const
+    {
+		return getPosition();
+    }
+
 
 }

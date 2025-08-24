@@ -12,7 +12,8 @@
 
 namespace cg {
 	LineTool::LineTool(ToolBox& tool_box) : Painter{ tool_box }, ghostLine{ toolBox.canvas } {
-		ghostLine.from = ghostLine.to = &_getPositionRef(); // Start both `from` and `to` point as the current position
+		ghostLine.getFrom = [this]() { return getGhostLineStart(); };
+		ghostLine.getTo = [this]() { return getGhostLineEnd(); };
 	}
 
 	void LineTool::_onRender() {
@@ -39,7 +40,6 @@ namespace cg {
 
 		if (isDrawing) {
 			line->append(mouse_event.position);
-			ghostLine.from = &(line->lastVertice());
 		}
 		else {
 			// New line primitive
@@ -48,8 +48,6 @@ namespace cg {
 
 			toolBox.bindColorPtr(&line->getColor());
 			toolBox.getSelectorTool().select(line); // auto select the new line
-
-			ghostLine.from = &line->lastVertice();
 			isDrawing = true;
 		}
 	}
@@ -62,10 +60,19 @@ namespace cg {
 		// TODO -> fallback to point if only one vertice
 		if (line != nullptr && line->size() < 2)
 			delete line; // we do not make a line with single vertice
-
 		line = nullptr;
-		ghostLine.from = &_getPositionRef(); // reset ghost line `from` to the current position
 		toolBox.unbindColorPtr();
+	}
+
+	Vector2 LineTool::getGhostLineStart() const
+	{
+		assert_err(line != nullptr, "No line");
+		return line->lastVertice();
+	}
+
+	Vector2 LineTool::getGhostLineEnd() const
+	{
+		return getPosition();
 	}
 
 }

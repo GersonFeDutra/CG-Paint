@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 
@@ -32,6 +32,11 @@ namespace cg
 		// Number of vertices
         inline size_t size() {
             return vertices.size();
+        }
+
+        inline Vector2& firstVertice() {
+            assert_err(!vertices.empty(), "No vertices in polygon.");
+            return vertices.front();
         }
 
         inline Vector2& lastVertice() {

@@ -71,13 +71,9 @@ namespace cg
             return vertices.size();
         }
 
-        inline Vector2& lastVertice() {
-			assert_err(size() > 0, "No vertices in line");
-            return vertices.back();
-        }
-
         inline Vector2 lastVertice() const {
-            return vertices.back();
+			assert_err(size() > 0, "No vertices in line");
+            return model * vertices.back();
         }
 
 		// FIXME: essa função pode ser perigosa, pois permite modificar os vertices diretamente
