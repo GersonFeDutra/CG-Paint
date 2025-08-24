@@ -1,4 +1,4 @@
-#include "tool_box.hpp"
+﻿#include "tool_box.hpp"
 
 #include "canvas.hpp"
 
@@ -48,7 +48,6 @@ namespace cg {
             Window toolBox("Controls");
             // TODO -> Use Icon buttons for each tool
 
-            // toolBox.showSliderFloat(&f, "float");
             // toolBox.showCheckBox(&check, "Active
 
             // glut cursor
@@ -99,9 +98,18 @@ namespace cg {
             //toolBox.sameLine();
             //toolBox.showText("counter = %d", counter);
 
+
+            Vector2 translation = tools[Tools::SELECT]->getPosition();
+
+            // Update translation
+            toolBox.showSliderVector2(&translation, canvas->getUpperLeft(), canvas->getBottomRight(), "X", "Y");
+
+            if (translation != tools[Tools::SELECT]->getPosition())
+				tools[Tools::SELECT]->setPosition(translation);
+
             if (toolBox.showButton("Save to file"))
                 clicked = SAVE;
-
+			toolBox.sameLine();
             if (toolBox.showButton("Load from file"))
                 clicked = LOAD;
 

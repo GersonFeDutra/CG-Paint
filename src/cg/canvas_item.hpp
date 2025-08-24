@@ -11,6 +11,7 @@ namespace cg {
 
     class CanvasItem {
         friend class Canvas;
+		friend class SelectTool;
     public:
         enum class TypeInfo {
             POINT = 0,

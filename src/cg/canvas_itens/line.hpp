@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 
@@ -17,9 +17,9 @@ namespace cg
             vertices.reserve(2);
 		}
 
-        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE }, color{ color } {
+        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, position }, color{ color } {
             vertices.reserve(2);
-			vertices.emplace_back(position);
+			vertices.emplace_back(Vector2{}); // O ponto inicial é a origem local
         }
 
         //void _process(DeltaTime delta) override;
@@ -30,11 +30,40 @@ namespace cg
         bool _isSelected(Vector2 cursor_local_position) const override;
 
         inline void append(Vector2 vertice) {
-            vertices.push_back(vertice);
+            // Armazena o ponto relativo ao sistema de coordenadas local do modelo
+            vertices.push_back(toLocal(vertice));
+			setPivotToMiddle(); // Atualiza o sistema de coordenadas local
         }
 
-        inline void emplace_back(Vector2&& vertice) {
-            vertices.emplace_back(std::move(vertice));
+		// Define o pivô como o ponto médio entre todos os vértices
+        void setPivotToMiddle() {
+            Vector2 middle{};
+            for (const auto& vertice : vertices)
+                middle += model * vertice;
+            setPivot(middle / vertices.size());
+        }
+
+        inline void setPivot(Vector2 global_position) {
+            // guarda o modelo atual (com rotação + translação antiga)
+            Transform2D oldModel = model;
+
+            // se não houver vértices, só movemos o modelo e retornamos
+            if (vertices.empty()) {
+                model.moveTo(global_position);
+                return;
+            }
+
+            // move o pivô (mantendo rotação) — altera apenas a coluna de translação.
+            model.moveTo(global_position);
+
+            // calcula inverso do novo modelo para converter posições globais -> novo sistema local
+            Transform2D invNewModel = model.inverse();
+
+            // para cada vértice: pega posição global (usando oldModel) e converte para a nova
+            for (auto& v : vertices) {
+                Vector2 worldPos = oldModel * v; // posição global do vértice antes da mudança
+                v = invNewModel * worldPos;      // nova coordenada local (no sistema com novo pivô)
+            }
         }
 
         // Tamanho da corda, desconsiderando vértice de origem.

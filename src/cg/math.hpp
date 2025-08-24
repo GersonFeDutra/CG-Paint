@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <util.hpp>
 
@@ -56,6 +56,8 @@ struct Vec2 {
         return *this;
     }
 
+	constexpr Vec2& operator+() const { return *this; }
+	constexpr Vec2& operator-() const { return *this = { -x, -y }; }
     Vec2& operator+=(Vec2 v) {
         x += v.x;
         y += v.y;
@@ -226,8 +228,12 @@ struct Vec3 {
     template <typename S>
     constexpr Vec3 operator*(S f) const { return {x * f, y * f, z * f}; }
 
+    constexpr Vec3& operator+() const { return *this; }
+	constexpr Vec3& operator-() const { return *this = { -x, -y, -z }; }
+
     constexpr Vec3 operator+(Vec3 v) const { return {x + v.x, y + v.y, z + v.z}; }
     constexpr Vec3 operator-(Vec3 v) const { return {x - v.x, y - v.y, z - v.z}; }
+
     Vec3& operator+=(const Vec3 &v) {
         x += v.x;
         y += v.y;
@@ -339,13 +345,6 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     } {}
     constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{ Vec2<T>{ translation_x, translation_y } } {}
 
-    constexpr Transf2x3& operator*=(Transf2x3<T> m) {
-        columns[0] = m * columns[0];
-        columns[1] = m * columns[1];
-        columns[2] = m * columns[2];
-        return *this;
-    }
-
     constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns(
         { cosf(theta), sinf(theta) },
         { -sinf(theta), cosf(theta) },
@@ -353,10 +352,10 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     ) {}
 
     constexpr inline Transf2x3& translate(Vec2<T> direction) {
-        return *this *= Transf2x3<T>{direction};
+        return *this *= Transf2x3<T>{ direction };
     }
     constexpr inline Transf2x3& rotate(float angle) {
-        return *this *= Transf2x3{angle};
+        return *this *= Transf2x3<T>{ angle };
     }
 
     template <std::convertible_to<T> U>
@@ -501,15 +500,23 @@ inline Vec2<LargerType<T, U>> operator*(const Transf2x3<T>& m, const Vec2<U>& v)
 
 template <typename T, std::convertible_to<T> U>
 inline Transf2x3<LargerType<T, U>> operator*(const Transf2x3<T>& a, const Transf2x3<U>& b) {
+    // transformação considerando coordenadas homogêneas [h = (0, 0)]
+    auto transform_axis_vector = [&](Vec2<T> v) {
+        return Vec2<LargerType<T, U>>{
+            a.columns[0].x * v.x + a.columns[1].x * v.y,
+            a.columns[0].y * v.x + a.columns[1].y * v.y };
+    };
+
     return {
-        a * b.columns[0],
-        a * b.columns[1],
-        a * b.columns[2]
+        transform_axis_vector(b.columns[0]),
+        transform_axis_vector(b.columns[1]),
+        a * b.columns[2] // transformação completa no vetor de translação [h = 1]
     };
 }
 
+
 template <typename T, std::convertible_to<T> U>
-inline Transf2x3<LargerType<T, U>> operator*=(Transf2x3<T>& a, const Transf2x3<U>& b) {
+inline Transf2x3<LargerType<T, U>>& operator*=(Transf2x3<T>& a, const Transf2x3<U>& b) {
     return a = a * b;
 }
 

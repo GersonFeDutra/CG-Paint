@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // Fachada para a biblioteca de Interface Gráfica do Usuário.
 // Declara um anova classe singleton Gui.
 // Implementa o Dear Im Gui com GLUT e OpenGL3.
@@ -355,6 +355,18 @@ public:
     inline void showSliderFloat(float* f, const char* label) const {
         showSliderFloat(f, 0.0f, 1.0f, label);
     }
+
+    inline void showSliderVector2(cg::Vector2* vec, cg::Vector2 min, cg::Vector2 max, const char* labelX = "", const char* labelY = "") const {
+		auto width = ImGui::GetContentRegionAvail().x;
+        // divide o espaço disponível para dois sliders
+		width = (width - ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize(labelX).x - ImGui::CalcTextSize(labelY).x) / 2.0f;
+
+        ImGui::PushItemWidth(width);
+        ImGui::SliderFloat(labelX, &(vec->x), min.x, max.x);
+        ImGui::SameLine();
+        ImGui::SliderFloat(labelY, &(vec->y), min.y, max.y);
+		ImGui::PopItemWidth();
+	}
 
     inline void showSliderInt(int* value, int min, int max, const char* label = "", const char* format = "") {
         ImGui::SliderInt(label, value, min, max, format);

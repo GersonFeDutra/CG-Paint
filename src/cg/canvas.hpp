@@ -94,8 +94,20 @@ namespace cg {
             return refs;
         }
 
-        inline Vector2 getWindowSize() {
+        inline Vector2 getWindowSize() const {
             return windowSize;
+        }
+
+        inline float getAspectRatio() const {
+            return windowSize.x / windowSize.y;
+		}
+
+        inline Vector2 getUpperLeft() const {
+            return screenToWorld(0, 0);
+		}
+
+        inline Vector2 getBottomRight() const {
+            return screenToWorld((int)windowSize.x, (int)windowSize.y);
         }
 
         // Update coordinate system
@@ -106,8 +118,7 @@ namespace cg {
                 { 0.0f, -1.0f },
                 { -windowSize.x / 2.0f, windowSize.y / 2.0f },
 			};
-            // TODO -> Remove
-            _screenToNdc = {
+            /*_screenToNdc = {
                 { 2.0f / windowSize.x, 0.0f },
                 { 0.0f, -2.0f / windowSize.y },
                 { -1.0f, 1.0f },
@@ -116,7 +127,7 @@ namespace cg {
                 { windowSize.x / 2.0f, 0.0f },
                 { 0.0f, windowSize.y / -2.0f },
                 { windowSize.x / 2.0f, windowSize.y / 2.0f },
-            };
+            };*/
         }
 
         template <std::convertible_to<float> T>
@@ -125,10 +136,10 @@ namespace cg {
         }
 
         // Changes screen coordinates to World Coordinates system.
-        inline Vector2 screenToWorld(Vector2 point) {
+        inline Vector2 screenToWorld(Vector2 point) const {
 			return _screenToWorld.transform(point);
         }
-        inline Vector2 screenToWorld(int x, int y) {
+        inline Vector2 screenToWorld(int x, int y) const {
             return _screenToWorld.transform(x, y);
         }
 
@@ -150,8 +161,8 @@ namespace cg {
     private:
         Vector2 windowSize; // aspect ratio: 10:7
 		Transform2D _screenToWorld; // Screen coordinates to World coordinates
-        Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
-        Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen Coordinates
+        //Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
+        //Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen Coordinates
 
         ArrayList<std::unique_ptr<CanvasItem>> itens;
         size_t typeCount[3];

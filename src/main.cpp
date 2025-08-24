@@ -1,4 +1,4 @@
-#include "util.hpp" // Importações do Open GL, FreeGLUT e métodos auxiliares para debug
+﻿#include "util.hpp" // Importações do Open GL, FreeGLUT e métodos auxiliares para debug
 
 #include <cstdlib> // Inclui algumas convenções do C
 #include <cstring> // Manipulação de cadeias de caracteres

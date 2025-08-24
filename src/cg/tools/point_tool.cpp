@@ -1,7 +1,8 @@
-#include <memory>
+ï»¿#include <memory>
 
 #include "point_tool.hpp"
 
+#include "select_tool.hpp"
 #include <cg/canvas_itens/point.hpp>
 
 
@@ -11,7 +12,7 @@ namespace cg {
 
     void PointTool::_render()
     {
-        // TODO -> Verificar se está desenhando acima do ponto
+        // TODO -> Verificar se estÃ¡ desenhando acima do ponto
         if (toolBox.isInsideGui || isDrawing)
             return;
 
@@ -56,12 +57,14 @@ namespace cg {
         toolBox.bindColorPtr(&point->getColor());
         appendToCanvas(point);
 
+		toolBox.getSelectorTool().select(point);
+
         isDrawing = true;
     }
 
     void cg::PointTool::_input(io::MouseLeftButtonReleased mouse_event)
     {
         setPosition(mouse_event.position);
-        isDrawing = false; // Não mova mais o último ponto.
+        isDrawing = false; // NÃ£o mova mais o Ãºltimo ponto.
     }
 }

@@ -1,4 +1,4 @@
-#include "tools.hpp"
+﻿#include "tools.hpp"
 
 #include "canvas.hpp"
 
@@ -13,11 +13,6 @@ namespace cg {
 	{
 		if (isDrawing && !toolBox.isInsideGui)
 			_onRender();
-	}
-
-	void Selector::pick(const std::vector<CanvasItem*>& items, Vector2 mousePos)
-	{
-		selectedItem = toolBox.canvas->hitTest(mousePos.x, mousePos.y);
 	}
 
 }

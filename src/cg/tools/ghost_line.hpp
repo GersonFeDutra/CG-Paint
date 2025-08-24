@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cg/math.hpp>
 #include <cg/geometry.hpp>
@@ -9,6 +9,7 @@ namespace cg {
 
 	struct GhostLine {
 		Vector2 *from = nullptr, *to = nullptr;
+		Transform2D* model = nullptr; // modelo de transformação para converter coords globais -> locais
 		Color color = DEFAULT_COLOR;
 
 		GhostLine(Canvas* canvas);
@@ -21,7 +22,7 @@ namespace cg {
 		Canvas* canvas;
 		static constexpr Color DEFAULT_COLOR = { 0.15f, 0.35f, .75f, 0.66f }; // Azul claro semi-transparente
 		static constexpr float DASH_LENGTH = 2.5f; // Comprimento do tracejado em pixels
-		static constexpr float GAP_LENGTH = 1.0f;  // Comprimento do espa�amento em pixels
+		static constexpr float GAP_LENGTH = 1.0f;  // Comprimento do espaçamento em pixels
 	};
 
 }

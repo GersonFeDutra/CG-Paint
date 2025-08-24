@@ -1,4 +1,4 @@
-#include "line.hpp"
+﻿#include "line.hpp"
 
 namespace cg {
 
@@ -7,6 +7,10 @@ namespace cg {
 		if (vertices.empty())
 			return; // A linha deve ter pelo menos 2 vértices (a posição do item conta como 1 vértice)
 
+		// Faremos manualmente!
+		// aplica transformação do modelo com open gl
+		//glMatrixMode(GL_MODELVIEW);
+
 		GLdebug{
 			glLineWidth(width);
 		}
@@ -14,11 +18,13 @@ namespace cg {
 			glBegin(GL_LINE_STRIP);
 				glColor3f(color.r, color.g, color.b);
 				for (const auto& vertice : vertices) {
-					auto [x, y] = model * vertice;
+					auto [x, y] = model * vertice; // aplica a transformação do modelo em cada vértice
 					glVertex2f(x, y);
 				}
 			glEnd();
 		}
+
+		//glLoadIdentity(); // Restaura a matriz de modelo
 	}
 
 	// Seleção de linha

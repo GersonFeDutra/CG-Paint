@@ -1,4 +1,4 @@
-#include <memory>
+ï»¿#include <memory>
 
 #include <util.hpp>
 #include <math.h>
@@ -13,9 +13,9 @@ namespace cg {
 
     PolygonTool::PolygonTool(ToolBox& tool_box)
         : Painter{ tool_box },
-		lines{ // Inicializa as linhas com `from` e `to` apontando para a posição atual
-            GhostLine{ &getPosition(), &getPosition(), toolBox.canvas },
-            GhostLine{ &getPosition(), &getPosition(), toolBox.canvas } }
+		lines{ // Inicializa as linhas com `from` e `to` apontando para a posiÃ§Ã£o atual
+            GhostLine{ &_getPositionRef(), &_getPositionRef(), toolBox.canvas },
+            GhostLine{ &_getPositionRef(), &_getPositionRef(), toolBox.canvas } }
     {
         lines[0].color.r = 1.0f - lines[0].color.r;
     }
@@ -41,7 +41,7 @@ namespace cg {
     void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
         if (isDrawing) {
-            polygon->append(getPosition());
+            polygon->append(_getPositionRef());
             lines[1].from = &polygon->lastVertice();
         }
         else {
@@ -66,7 +66,7 @@ namespace cg {
         polygon = nullptr;
 
         for (auto& line : lines)
-            line.from = &getPosition();
+            line.from = &_getPositionRef();
 
         toolBox.unbindColorPtr();
     }

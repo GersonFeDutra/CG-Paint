@@ -5,13 +5,14 @@
 
 #include "line_tool.hpp"
 
+#include "select_tool.hpp"
 #include <cg/tool_box.hpp>
 #include <cg/canvas_itens/line.hpp>
 
 
 namespace cg {
 	LineTool::LineTool(ToolBox& tool_box) : Painter{ tool_box }, ghostLine{ toolBox.canvas } {
-		ghostLine.from = ghostLine.to = &getPosition(); // Start both `from` and `to` point as the current position
+		ghostLine.from = ghostLine.to = &_getPositionRef(); // Start both `from` and `to` point as the current position
 	}
 
 	void LineTool::_onRender() {
@@ -30,7 +31,6 @@ namespace cg {
 			setPosition(mouse_event.position);
 	}
 
-
 	void LineTool::_input(io::MouseLeftButtonPressed mouse_event)
 	{
 		// ghost line `from` aways points to `position`
@@ -45,7 +45,9 @@ namespace cg {
 			// New line primitive
 			line = new Line(mouse_event.position, toolBox.getColor());
 			appendToCanvas(line);
+
 			toolBox.bindColorPtr(&line->getColor());
+			toolBox.getSelectorTool().select(line); // auto select the new line
 
 			ghostLine.from = &line->lastVertice();
 			isDrawing = true;
@@ -62,7 +64,7 @@ namespace cg {
 			delete line; // we do not make a line with single vertice
 
 		line = nullptr;
-		ghostLine.from = &getPosition(); // reset ghost line `from` to the current position
+		ghostLine.from = &_getPositionRef(); // reset ghost line `from` to the current position
 		toolBox.unbindColorPtr();
 	}
 

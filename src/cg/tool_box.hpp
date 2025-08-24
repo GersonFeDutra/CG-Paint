@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <array>
 
@@ -12,6 +12,7 @@ namespace cg {
 	class Painter;
 	class PointTool;
 	class LineTool;
+	class SelectTool;
 
 	/** Gerencia as ferramentas atuais usadas no Canvas.
 	 * Simplesmente delega os eventos de entrada para a ferramenta atual.
@@ -56,6 +57,11 @@ namespace cg {
 			currentColor = *colorPtr;
 			colorPtr = &currentColor;
 		}
+
+		inline SelectTool& getSelectorTool() {
+			return *(SelectTool *)tools[Tools::SELECT];
+		}
+
 	public:
 		// TODO -> Cor secundária [alternada com x key]
 		Canvas* canvas = nullptr;
