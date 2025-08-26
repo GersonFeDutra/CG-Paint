@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <util.hpp>
-#include <cmath> // Adicionado para as funções cosf e sinf
 
 // Windows Macros may override later std::min / std::max uses
 #ifdef min
@@ -10,6 +9,7 @@
 #ifdef max
 #undef max
 #endif
+
 
 // Inclui algumas funções matemáticas básicas
 #include <random>
@@ -71,8 +71,8 @@ struct Vec2 {
         return *this;
     }
 
-    constexpr Vec2& operator+() const { return *this; }
-    constexpr Vec2& operator-() { return *this = Vec2<T>{ -x, -y }; }
+	constexpr Vec2& operator+() const { return *this; }
+	constexpr Vec2& operator-() { return *this = Vec2<T>{ -x, -y }; }
     Vec2& operator+=(Vec2 v) {
         x += v.x;
         y += v.y;
@@ -165,15 +165,15 @@ template <typename T>
 inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
     try {
         while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
+			ifs.ignore(); // Ignore leading whitespace
         if (ifs.peek() == EOF) {
             ifs.setstate(std::ios::failbit);
             return ifs;
-        }
+		}
 
         // Load in the format (x, y)
         if (ifs.peek() == '(')
-            ifs.ignore(); // Ignore '('
+		    ifs.ignore(); // Ignore '('
         else
             ifs.setstate(std::ios::failbit);
 
@@ -185,7 +185,7 @@ inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
             return ifs;
         }
 
-        v = parsed; // Assign the parsed value to the Vec2
+		v = parsed; // Assign the parsed value to the Vec2
     }
     catch (...) {
         ifs.setstate(std::ios::failbit);
@@ -233,7 +233,6 @@ struct Vec3 {
     Vec3& operator=(Vec3<U> const& v) {
         x = v.x;
         y = v.y;
-        z = v.z;
         return *this;
     }
 
@@ -245,7 +244,7 @@ struct Vec3 {
     constexpr Vec3 operator*(S f) const { return {x * f, y * f, z * f}; }
 
     constexpr Vec3& operator+() const { return *this; }
-    constexpr Vec3& operator-() const { return *this = { -x, -y, -z }; }
+	constexpr Vec3& operator-() const { return *this = { -x, -y, -z }; }
 
     constexpr Vec3 operator+(Vec3 v) const { return {x + v.x, y + v.y, z + v.z}; }
     constexpr Vec3 operator-(Vec3 v) const { return {x - v.x, y - v.y, z - v.z}; }
@@ -326,14 +325,14 @@ inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
             ifs.setstate(std::ios::failbit);
 
         Vec3<T> parsed;
-        std::string dummy;
-        // Read x y z)
+		std::string dummy;
+		// Read x y z)
         if (!(ifs >> parsed.x) || !(ifs >> parsed.y) || !(ifs >> parsed.z) || !(ifs >> dummy) || dummy != ")") {
             ifs.setstate(std::ios::failbit); // marca falha no stream
             return ifs;
         }
 
-        v = parsed; // Assign parsed values to v
+		v = parsed; // Assign parsed values to v
     }
     catch (...) {
         ifs.setstate(std::ios::failbit);
@@ -362,8 +361,8 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{ Vec2<T>{ translation_x, translation_y } } {}
 
     constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns{
-        Vec2<T>{ cosf(theta), sinf(theta) },
-        Vec2<T>{ -sinf(theta), cosf(theta) },
+        Vec2<T>{ cos(theta), sin(theta) },
+        Vec2<T>{ -sin(theta), cos(theta) },
         translation
     } {}
 
@@ -387,7 +386,7 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
 
     constexpr inline float determinant() const {
         return columns[0].x * columns[1].y - columns[0].y * columns[1].x;
-    }
+	}
 
     constexpr inline auto inverse() const {
         // Inverso de uma matriz de transformação afim 2D
@@ -407,18 +406,18 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
             -(invX.y * columns[2].x + invY.y * columns[2].y)
         };
         return Transf2x3<T>{invX, invY, invT};
-    }
+	}
 
-    // Faz uma translação absoluta - em relação à origem.
+	// Faz uma translação absoluta - em relação à origem.
     constexpr inline void translateTo(Vec2<T> position) {
-        //*this = Transf2x3<T>{ position } * *this * Transf2x3<T>{-getOrigin()};
+		//*this = Transf2x3<T>{ position } * *this * Transf2x3<T>{-getOrigin()};
         // Equivalente, mas melhor
-        *this *= Transf2x3<T>{ position - getOrigin() };
+		*this *= Transf2x3<T>{ position - getOrigin() };
     }
 
-    // Faz uma rotação abosoluta - em relação à origem, considerando que a matriz é uniforme.
+	// Faz uma rotação abosoluta - em relação à origem, considerando que a matriz é uniforme.
     constexpr inline void uniformRotateTo(float angle) {
-        assert_err(isUniform(), "Matrix is not uniform.");
+		assert_err(isUniform(), "Matrix is not uniform.");
 
         // ângulo atual a partir da coluna 0
         float current = std::atan2(columns[0].y, columns[0].x);
@@ -447,8 +446,8 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         return true;
     }
 
-    // Faz uma rotação absoluta - em relação à origem
-    // Prefira uniformeRotateTo se a matriz for uniforme
+	// Faz uma rotação absoluta - em relação à origem
+	// Prefira uniformeRotateTo se a matriz for uniforme
     constexpr inline void rotateTo(Angle angle) {
         // L = [ a c ]
         // [ b d ]
@@ -530,11 +529,11 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         float current = std::atan2(R10, R00);
         float delta = angle - current;
         rotate(delta);
-    }
+	}
 
     constexpr inline Angle getRotation() const {
         return atan2f(columns[0].y, columns[0].x); // or -atan2f(-columns[1].x, columns[1].y);
-    }
+	}
 
     // Move a origem do sistema de coordenadas local para a posição absoluta (ignorando a rotação).
     // Equivalente a definir a coluna de translação diretamente.
@@ -542,10 +541,10 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         columns[2] = position;
     }
 
-    // Retorna a coluna de translação (origem do sistema de coordenadas local) em posição absoluta.
+	// Retorna a coluna de translação (origem do sistema de coordenadas local) em posição absoluta.
     constexpr inline Vec2<T> getOrigin() const {
         return columns[2];
-    }
+	}
 
     constexpr inline T get(std::size_t col, std::size_t row) const {
         assert_err(col < 3 && row < 3, "Index out of range.");
@@ -564,20 +563,20 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         return columns[col][row] = value;
     }
 
-    template<typename U>
+	template<typename U>
     friend std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m);
     template<typename U>
     friend std::istream& operator>>(std::istream& is, Transf2x3<U>& m);
     template<typename U>
     friend std::ofstream& operator<<(std::ofstream& ofs, const Transf2x3<U>& m);
     template<typename U>
-    friend std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m);
+	friend std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m);
 };
 
 template<typename U>
 std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m)
 {
-    return os << "[x: " << m.columns[0]
+	return os << "[x: " << m.columns[0]
              << "; y: " << m.columns[1]
              << "; t: " << m.columns[2] << ']';
 }
@@ -592,7 +591,7 @@ std::istream& operator>>(std::istream& is, Transf2x3<U>& m)
     }
     catch (...) {
         is.setstate(std::ios::failbit);
-    }
+	}
     return is;
 }
 
@@ -689,7 +688,7 @@ struct Color {
     constexpr Color(ColorRgb color, float alpha = 1.0f) : r{(float)color.r}, g{(float)color.g}, b{(float)color.b}, a{(float)alpha} {}
     constexpr Color(Vector3 v, float alpha = 1.0f) : r(v.x), g(v.y), b(v.z), a(alpha) {}
 
-    constexpr operator ColorRgb() const {
+    constexpr operator ColorRgb() {
         return {
             (unsigned char)(r * 255),
             (unsigned char)(g * 255),

@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "math.hpp"
+
 #include "input_event.hpp"
+
 
 namespace cg {
     using ID = std::size_t;
@@ -9,7 +11,7 @@ namespace cg {
 
     class CanvasItem {
         friend class Canvas;
-        friend class SelectTool;
+		friend class SelectTool;
     public:
         enum class TypeInfo {
             POINT = 0,
@@ -18,16 +20,10 @@ namespace cg {
             OTHER,
         };
     public:
-        CanvasItem() = default;
-        CanvasItem(TypeInfo type_info) : typeInfo{ type_info } {}
+		CanvasItem() = default;
+        CanvasItem(TypeInfo type_info) : typeInfo{type_info} {}
         virtual ~CanvasItem() = default;
         CanvasItem(TypeInfo type_info, Vector2 position) : typeInfo{ type_info }, model(position) {}
-
-        // Make rotate virtual but not pure. Add a default implementation.
-        // This avoids errors in classes that don't need a specific rotation logic.
-        virtual void rotate(float angle) {
-            model.rotate(angle);
-        }
 
         /* Process mouse input from user. [Move] */
         virtual void _input(io::MouseMove mouse_event) {}
@@ -45,57 +41,58 @@ namespace cg {
         virtual void _input(io::MouseWheelV mouse_event) {}
         /* Process mouse wheel horizontal input from user. */
         virtual void _input(io::MouseWheelH mouse_event) {}
-        virtual void _input(io::KeyInputEvent key_event) {}
-        
+		virtual void _input(io::KeyInputEvent key_event) {}
+
         /** Process data between variations of delta time △t.
-        * @param delta : time stamp between previous frame
-        */
+         * @param delta : time stamp between previous frame
+         */
         virtual void _process(DeltaTime delta) {}
         /* Draw data onto screen with open GL calls. */
         virtual void _render() {}
-        
-        // Métodos para cores virtuais. Revertidos para ColorRgb para consistência.
-        virtual void setColor(const ColorRgb& color) = 0;
-        virtual ColorRgb& getColor() const = 0;
 
+        // verificar se mouse está dentro do item
         inline bool isSelected(Vector2 mouse_position) const { return _isSelected(toLocal(mouse_position)); }
 
         virtual bool _isSelected(Vector2 cursor_local_position) const = 0;
 
-        inline Vector2 toLocal(Vector2 global_position) const { return model.inverse() * global_position; }
-        
         inline void translate(Vector2 by) {
             model.translate(by);
+		}
+
+        inline void rotate(float angle) {
+            model.rotate(angle);
         }
 
         inline void translateTo(Vector2 to) {
             model.translateTo(to);
-        }
+		}
         
         inline TypeInfo getTypeInfo() const {
             return typeInfo;
         }
 
+		// Converts position from Global Coordinate System to the Local Coordinate System (model) of the item
+        inline Vector2 toLocal(Vector2 global_position) const {
+            // Applies the inverse of the model transformation to the global position
+            return model.inverse() * global_position;
+        }
+
         friend std::ostream& operator<<(std::ostream& os, const CanvasItem& item);
         friend std::istream& operator>>(std::istream& is, CanvasItem& item);
         virtual std::ostream& _print(std::ostream& os) const = 0;
-
-        // No need for a separate read method, the operator overload can handle it.
-        // It's also not declared as pure virtual, so it would need an implementation.
-        // Let's remove this for simplicity unless it's strictly needed.
         virtual std::istream& _read(std::istream& is);
 
         friend std::ofstream& operator<<(std::ofstream& ofs, const CanvasItem& item);
         friend std::ifstream& operator>>(std::ifstream& ifs, CanvasItem& item);
         virtual std::ofstream& _serialize(std::ofstream& ofs) const = 0;
-        virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
+		virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
 
     public:
         inline static const float SELECTION_THRESHOLD = 4.0f; // pixels
     private:
         ID id = 0; // It's id location at the canvas.
+        TypeInfo typeInfo = TypeInfo::OTHER; // Type info for later serialization
     protected:
-        Transform2D model{}; // Model transformation matrix
-        TypeInfo typeInfo = TypeInfo::OTHER; // Retained as a single declaration
+		Transform2D model{}; // Model transformation matrix
     };
 }
