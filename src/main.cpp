@@ -39,7 +39,7 @@ void display()
 {
     Gui::newFrame();
 
-    GLdebug{
+    GLdebug() {
         glClear(GL_COLOR_BUFFER_BIT); // Limpa o quadro do buffer de cor
     }
 
@@ -60,7 +60,7 @@ void display()
 /* Chamada sempre que a janela for redimensionada */
 static void reshape(int w, int h) {
     // 1. Atualiza o viewport
-    GLdebug {
+    GLdebug() {
         glViewport(0, 0, w, h);
     }
 
@@ -163,7 +163,8 @@ static void onSpecialKeyPressed(int key, int x, int y)
 {
     ImGui_ImplGLUT_SpecialFunc(key, x, y);
 
-	canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, key, glutGetModifiers());
+    if (!Gui::isUsingKeyboardInput())
+	    canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, key, glutGetModifiers());
 }
 
 

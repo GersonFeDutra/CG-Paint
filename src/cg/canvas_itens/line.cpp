@@ -11,10 +11,10 @@ namespace cg {
 		// aplica transformação do modelo com open gl
 		//glMatrixMode(GL_MODELVIEW);
 
-		GLdebug{
+		GLdebug() {
 			glLineWidth(width);
 		}
-		GLdebug{
+		GLdebug() {
 			glBegin(GL_LINE_STRIP);
 				glColor3f(color.r, color.g, color.b);
 				for (const auto& vertice : vertices) {

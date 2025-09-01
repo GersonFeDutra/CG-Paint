@@ -12,14 +12,26 @@ namespace cg
 {
     class Line : public CanvasItem
     {
+        friend class Gizmo;
     public:
         Line() : CanvasItem{ TypeInfo::LINE } {
             vertices.reserve(2);
 		}
 
+        Line(Color color) : CanvasItem{ TypeInfo::LINE }, color{ color } {
+            vertices.reserve(2);
+        }
+
         Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, position }, color{ color } {
             vertices.reserve(2);
 			vertices.emplace_back(Vector2{}); // O ponto inicial é a origem local
+        }
+
+        Line(Vector2 from, Vector2 to, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, from }, color{ color } {
+            vertices.reserve(2);
+            vertices.emplace_back(Vector2{});
+            vertices.emplace_back(toLocal(to)); // Os pontos da linha são relativos às coordenadas locais
+            setPivotToMiddle();
         }
 
         //void _process(DeltaTime delta) override;
@@ -103,7 +115,7 @@ namespace cg
         std::ostream& _print(std::ostream& os) const override;
         std::ofstream& _serialize(std::ofstream& ofs) const override;
         std::ifstream& _deserialize(std::ifstream& ifs) override;
-    private:
+    protected:
         std::vector<Vector2> vertices;
         Color color{}; // TODO -> alpha blending
 		float width = 1.0f; // TODO -> anti-alias

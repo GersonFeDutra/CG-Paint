@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../canvas.hpp"
 
@@ -36,11 +36,11 @@ namespace cg
         }
 
         inline Vector2 getPosition() const {
-            return model * Vector2{};
+            return model * localPosition;
         }
 
         inline void setPosition(Vector2 to) {
-            model = Transform2D(to);
+            localPosition = model.inverse() * to;
 		}
 
         //void _input(io::MouseMove input_event) override;
@@ -50,6 +50,7 @@ namespace cg
         std::ofstream& _serialize(std::ofstream& ofs) const override;
         std::ifstream& _deserialize(std::ifstream& ifs) override;
     private:
+        Vector2 localPosition{};
         Color color{}; // TODO -> alpha blending
 		float size = SIZE; // TODO -> smooth point
     };

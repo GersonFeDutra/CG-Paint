@@ -2,6 +2,7 @@
 
 #include "../tools.hpp"
 #include "../canvas.hpp"
+#include "gizmo.hpp"
 
 
 namespace cg {
@@ -38,18 +39,27 @@ namespace cg {
 
         inline void select(CanvasItem* item) {
 			selectedItem = item;
-            model = Transform2D(item->model * Vector2{});
+            // A transformação do item selecionado é uma cópia da seleção.
+            // Usamos isso para fazer transformações absolutas na ferramenta de seleção,
+            // e relativas no ítem selecionado com deltas.
+            model = item->model;
         }
 
-        inline void translateSelected(const Vector2& delta) {
+        inline void translateSelected(const Vec2Offset& delta) {
             if (selectedItem)
                 selectedItem->translate(delta);
 		}
 
-        inline void rotateSelected(float angle) {
+        inline void rotateSelected(DeltaAngle angle) {
             if (selectedItem)
                 selectedItem->rotate(angle);
 		}
+
+        // Scale by delta △scale
+        inline void scaleSelected(Vector2 by) {
+            if (selectedItem)
+                selectedItem->scale(by);
+        }
 
     // setters e getters
         inline bool hasSelection() const {
@@ -62,8 +72,31 @@ namespace cg {
         }
 
         void setRotation(float angle) override {
-			rotateSelected(angle - getRotation()); // delta △rotation
+            if (selectedItem)
+                selectedItem->rotateTo(angle);
+
 			Tool::setRotation(angle);
+        }
+
+        inline void scale(Vector2 by) override {
+            scaleSelected(by);
+            Tool::scale(by);
+        }
+
+        inline void rotate(float by) override {
+            rotateSelected(by); // delta △rotation
+            Tool::rotate(by);
+        }
+
+        inline void translate(Vec2Offset by) override {
+            translateSelected(by);
+            Tool::translate(by);
+        }
+
+        void setScale(const Vector2& scale) override {
+            auto [x, y] = getScale();
+            scaleSelected({ scale.x / x, scale.y / y });
+			Tool::setScale(scale);
         }
 
     private:

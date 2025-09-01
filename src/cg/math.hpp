@@ -38,13 +38,13 @@ inline constexpr float ZERO_PRECISION_ERROR = EPSILON_ERROR; // alias for EPSILO
 // Radians to degrees
 template <typename T>
 inline constexpr T rad_to_deg(T rad) {
-    return rad * (double)(180) / PI<T>;
+    return rad * 180.0 / PI<T>;
 }
 
 // Degrees to radians
 template <typename T>
 inline constexpr T deg_to_rad(T deg) {
-    return deg * PI<T> / (double)(180);
+    return deg * PI<T> / 180.0;
 }
 
 using Angle = float; // Angle in radians.
@@ -59,6 +59,7 @@ struct Vec2 {
     // Construtores
     constexpr Vec2() = default;
     constexpr Vec2(T x, T y) : x(x), y(y) {}
+    constexpr Vec2(T xy) : Vec2{ xy, xy } {}
 
     // Construtor de conversão (somente quando U→T é válido):
     template<std::convertible_to<T> U>
@@ -71,8 +72,12 @@ struct Vec2 {
         return *this;
     }
 
-	constexpr Vec2& operator+() const { return *this; }
-	constexpr Vec2& operator-() { return *this = Vec2<T>{ -x, -y }; }
+    constexpr operator bool() {
+        return *this != Vec2<T>{0, 0};
+    }
+
+	constexpr Vec2 operator+() const { return *this; }
+	constexpr Vec2 operator-() const { return Vec2<T>{ -x, -y }; }
     Vec2& operator+=(Vec2 v) {
         x += v.x;
         y += v.y;
@@ -119,6 +124,15 @@ struct Vec2 {
         return norm();
     }
 
+    constexpr inline Vec2<T> abs() const {
+        if constexpr (std::is_same_v<T, float>) {
+            return { std::fabsf(x), std::fabsf(y) };
+        }
+        else {
+            return { std::abs(x), std::abs(y) };
+        }
+    }
+
     /* Get linear interpolation next step. */
     inline Vec2 lerp(Vec2 to, float by) const {
         return { x + (to.x - x) * by, y + (to.y - y) * by };
@@ -137,6 +151,13 @@ struct Vec2 {
     friend std::ofstream& operator<<(std::ofstream& ofs, const Vec2<U>& v);
     template <typename U>
     friend std::ifstream& operator>>(std::ifstream& ifs, Vec2<U>& v);
+
+    static inline constexpr Vec2<T> zero()  noexcept { return {}; }
+    static inline constexpr Vec2<T> one()  noexcept { return { 1, 1 }; }
+    static inline constexpr Vec2<T> left()  noexcept { return { -1, 0 }; }
+    static inline constexpr Vec2<T> right() noexcept { return { 1, 0 }; }
+    static inline constexpr Vec2<T> up()    noexcept { return { 0,  1 }; }
+    static inline constexpr Vec2<T> down()  noexcept { return { 0, -1 }; }
 };
 
 // Friends
@@ -211,6 +232,18 @@ constexpr bool operator==(Vec2<T> u, Vec2<U> v) { return u.x == v.x && u.y == v.
 
 template <typename T, std::convertible_to<T> U>
 constexpr bool operator!=(Vec2<T> u, Vec2<U> v) { return !(u == v); }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator<(Vec2<T> u, Vec2<U> v) { return u.x < v.x || u.y < v.y; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator<=(Vec2<T> u, Vec2<U> v) { return u.x <= v.x || u.y <= v.y; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator>(Vec2<T> u, Vec2<U> v) { return u.x > v.x || u.y > v.y; }
+
+template <typename T, std::convertible_to<T> U>
+constexpr bool operator>=(Vec2<T> u, Vec2<U> v) { return u.x >= v.x || u.y >= v.y; }
 
 using Vector2 = Vec2<float>;
 using Vector2i = Vec2<int>;
@@ -374,6 +407,10 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         return *this *= Transf2x3<T>{ angle };
     }
 
+    constexpr inline Transf2x3& scale(Vec2<T> by) {
+        return *this *= Transf2x3<T>{ Vec2<T>(by.x, 0), Vec2<T>(0, by.y) };
+    }
+
     template <std::convertible_to<T> U>
     constexpr inline auto transform(Vec2<U> v) const {
         return (*this) * v;
@@ -531,9 +568,72 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         rotate(delta);
 	}
 
-    constexpr inline Angle getRotation() const {
+    // Faz uma escala absoluta em relação à uma matriz não uniforme.
+    constexpr inline void scaleTo(Vector2 to) {
+        // escala atual
+        float sx = columns[0].norm();
+        float sy = columns[1].norm();
+
+        // evitar divisão por zero
+        if (sx < ZERO_PRECISION_ERROR) sx = 1.0f;
+        if (sy < ZERO_PRECISION_ERROR) sy = 1.0f;
+
+        // fatores relativos
+        float delta_x = to.x / sx;
+        float delta_y = to.y / sy;
+
+        // aplica escala relativa
+        *this *= Transf2x3<T>{ delta_x, 0.0f, 0.0f, delta_y };
+    }
+
+	// Faz uma escala absoluta uniforme
+	// Assume que a matriz é uniforme
+    constexpr inline void uniformScaleTo(float to) {
+        // escala atual
+        float sx = columns[0].norm();
+
+        if (sx < ZERO_PRECISION_ERROR) sx = 1.0f;
+
+        float delta = to / sx;
+
+        // aplica escala relativa uniforme
+        *this *= Transf2x3<T>{ delta, 0.0f, 0.0f, delta };
+    }
+
+    // Retorna a rotação uniforme
+    // Assume que a matriz é uniforme
+    constexpr inline Angle getUniformRotation() const {
         return atan2f(columns[0].y, columns[0].x); // or -atan2f(-columns[1].x, columns[1].y);
 	}
+
+    // Retorna a rotação da matriz não uniforme.
+    // Prefira `getUniformRotation` se a matriz não for uniforme.
+    constexpr inline Angle getRotation() const {
+        // Decomposição polar simplificada
+        float det = columns[0].x * columns[1].y - columns[0].y * columns[1].x;
+        float sign = det > 0 ? 1.0f : -1.0f;
+
+        // Extrai rotação ignorando escala
+        float norm_x = columns[0].norm();
+        float norm_y = columns[1].norm();
+
+        if (norm_x < ZERO_PRECISION_ERROR || norm_y < ZERO_PRECISION_ERROR)
+            return 0.0f;
+
+        Vec2<T> rotated_x = columns[0] / norm_x;
+        Vec2<T> rotated_y = columns[1] / norm_y;
+
+        // Usa a média dos ângulos dos dois eixos para maior precisão
+        float angle1 = atan2f(rotated_x.y, rotated_x.x);
+        float angle2 = atan2f(rotated_y.y, rotated_y.x) - sign * PI<float> / 2.0f;
+
+        return (angle1 + angle2) / 2.0f;
+    }
+
+    // Obtém a escala não uniforme de cada eixo.
+    constexpr inline Vec2<T> getScale() const {
+		return { columns[0].norm(), columns[1].norm() }; // usa a norma (length) dos vetores para escala não uniforme
+    }
 
     // Move a origem do sistema de coordenadas local para a posição absoluta (ignorando a rotação).
     // Equivalente a definir a coluna de translação diretamente.
@@ -787,5 +887,12 @@ template <std::convertible_to<T> U>
 inline Vec2Interpolator<LargerType<T, U>> Vec2<T>::lerpIterator(Vec2<U> to, float by) const {
     return { *this, to, by };
 }
+
+// deltas
+
+using DeltaTime = float; // △t s
+using DeltaAngle = Angle; // △θ rad
+using Vec2Offset = Vector2; // (△x, △y)
+using Velocity = Vec2Offset; // △v = (△x, △y)
 
 } // namespace cg

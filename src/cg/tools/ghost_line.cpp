@@ -25,7 +25,7 @@ namespace cg {
         if (from == to)
             return;
 
-        GLdebug{
+        GLdebug() {
             const float SEGMENT_LENGTH = DASH_LENGTH + GAP_LENGTH;
 
             float screenDistance = from.distance(to);

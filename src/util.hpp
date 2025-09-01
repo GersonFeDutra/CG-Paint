@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* Utilites header */
 // TODO -> Log to file.
 
@@ -76,9 +76,11 @@ constexpr void print_success(const char* message, Args...args) {
 
 
 #ifdef _MSC_VER
-	#define my_assert(E) if (!(E)) __debugbreak();
+	#define my_assert(E) if (!(E)) __debugbreak()
+#elif defined(__GNUC__) || defined(__clang__)
+	#include <signal.h>
+	#define my_assert(E) if (!(E)) raise(SIGTRAP)
 #else
-	#include <cassert>
 	#define my_assert(E) assert(E)
 #endif
 
@@ -144,17 +146,21 @@ inline bool GLLogCall(const std::source_location location = std::source_location
 	};
 
 	/* Macro de Debug para chamadas OpenGL */
-	#define GLdebug if (GLDebugScope _gl_debug_scope = GLDebugScope())
+	#define GLdebug() if (GLDebugScope _gl_debug_scope = GLDebugScope())
 	// Usa o escopo tempor�rio para realizar as chamadas no construtor/destrutor com RAII
 
 	// Prefira a vers�o escopada acima
 	//#define GLCall(GL) GLClearError(); GL; GLLogCall()
+
+	#define print_var(VAR, ...) std::cerr << #VAR ##__VA_ARGS__ ": " << (VAR) << '\n'
 #else
 	constexpr bool IS_DEBUG = false; // Is debugger availlable?
 
 	// Macro de Debug para chamadas OpenGL
-	#define GLdebug
+	#define GLdebug() do {} while(false)
 	//#define GLCall(GL) GL
+
+	#define print_var(VAR, ...) std::cerr << #VAR ##__VA_ARGS__ ": " << (VAR) << '\n'
 #endif // _DEBUG
 
 
@@ -258,8 +264,9 @@ void suc(bool condition, const char* message, Args... args,
 
 // Asserts the condition.
 template<typename... Args>
-constexpr void assert_err(bool condition, const char* message = nullptr, Args ...args,
-	const std::source_location location = std::source_location::current()
+inline constexpr void _assert_err(bool condition,
+	const std::source_location location = std::source_location::current(),
+	const char* message = nullptr, Args ...args
 ) {
 	if constexpr (IS_DEBUG) {
 		if (!condition) {
@@ -280,3 +287,11 @@ constexpr void assert_err(bool condition, const char* message = nullptr, Args ..
 		}
 	}
 }
+
+#define assert_err(cond, ...) \
+    do { \
+        if (!(cond)) { \
+            _assert_err((false), std::source_location::current(), ##__VA_ARGS__); \
+            my_assert(false); /* <- para exatamente na linha da chamada */ \
+        } \
+    } while (0)

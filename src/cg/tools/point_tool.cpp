@@ -17,20 +17,20 @@ namespace cg {
             return;
 
         auto [x, y] = model * Vector2{};
-        GLdebug{
+        GLdebug() {
             glPointSize(Point::SIZE + 1.0f);
             glColor3ub(255, 255, 255);
         }
-        GLdebug {
+        GLdebug() {
         glBegin(GL_POINTS);
             glVertex2f(x, y);
         glEnd();
         }
-        GLdebug{
+        GLdebug() {
             glPointSize(Point::SIZE);
             glColor3ub(0, 0, 0);
         }
-        GLdebug{
+        GLdebug() {
         glBegin(GL_POINTS);
             glVertex2f(x, y);
         glEnd();

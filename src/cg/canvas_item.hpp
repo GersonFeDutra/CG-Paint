@@ -7,7 +7,6 @@
 
 namespace cg {
     using ID = std::size_t;
-    using DeltaTime = float;
 
     class CanvasItem {
         friend class Canvas;
@@ -50,22 +49,33 @@ namespace cg {
         /* Draw data onto screen with open GL calls. */
         virtual void _render() {}
 
+        /* Reshape/ resize window event. Use canvas.getWindowSize to update the geometry. */
+        virtual void _reshape(Canvas& canvas) {}
+
         // verificar se mouse está dentro do item
         inline bool isSelected(Vector2 mouse_position) const { return _isSelected(toLocal(mouse_position)); }
 
         virtual bool _isSelected(Vector2 cursor_local_position) const = 0;
 
-        inline void translate(Vector2 by) {
+        virtual inline void translate(Vec2Offset by) {
             model.translate(by);
 		}
 
-        inline void rotate(float angle) {
-            model.rotate(angle);
+        virtual inline void rotate(Angle by) {
+            model.rotate(by);
+        }
+
+        virtual inline void scale(Vector2 by) {
+            model.scale(by);
         }
 
         inline void translateTo(Vector2 to) {
             model.translateTo(to);
 		}
+
+        inline void rotateTo(float angle) {
+            model.rotateTo(angle);
+        }
         
         inline TypeInfo getTypeInfo() const {
             return typeInfo;
@@ -93,6 +103,10 @@ namespace cg {
         ID id = 0; // It's id location at the canvas.
         TypeInfo typeInfo = TypeInfo::OTHER; // Type info for later serialization
     protected:
+        // Use this to avoid serializing data. Useful when you inherits basic primitives, e.g. tools, like guidelines.
+        inline void noSerialize() {
+            typeInfo = TypeInfo::OTHER;
+        }
 		Transform2D model{}; // Model transformation matrix
     };
 }

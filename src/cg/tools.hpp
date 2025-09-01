@@ -25,13 +25,23 @@ namespace cg {
 			model.rotateTo(angle);
 		}
 
+		virtual void setScale(const Vector2& scale) {
+			model.scaleTo(scale);
+		}
+
 		// Retorna a posição absoluta do "scanner" da ferramenta no canvas.
 		inline Vector2 getPosition() const {
 			return model.getOrigin();
 		}
 
+		// Retorna a rotação da ferramenta no canvas.
 		inline float getRotation() const {
 			return model.getRotation();
+		}
+
+		// Retorna a escala da ferramenta no canvas.
+		inline Vector2 getScale() const {
+			return model.getScale();
 		}
 
 	protected:

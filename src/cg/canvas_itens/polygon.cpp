@@ -1,4 +1,4 @@
-#include <util.hpp>
+﻿#include <util.hpp>
 
 #include "polygon.hpp"
 
@@ -71,7 +71,7 @@ namespace cg {
 
     void Polygon::_render() {
 
-        GLdebug{
+        GLdebug() {
             glColor3f(innerColor.r, innerColor.g, innerColor.b);
         }
 		ArrayList<Vector2> vertices;
@@ -83,23 +83,23 @@ namespace cg {
 
         switch (vertices.size()) {
             case 0: {
-                assert_err("Cannot draw a polygon with no vertices");
+                assert_err(false, "Cannot draw a polygon with no vertices");
             }; break;
             case 1: { // point
-                GLdebug{
+                GLdebug() {
                     glPointSize(width);
                 }
-                GLdebug{
+                GLdebug() {
                     glBegin(GL_POINTS);
                         glVertex2f(vertices[0].x, vertices[0].y);
                     glEnd();
                 }
             } break;
             case 2: { // line
-                GLdebug{
+                GLdebug() {
 				    glLineWidth(width);
                 }
-                GLdebug {
+                GLdebug() {
                     glBegin(GL_LINES);
                         glVertex2f(vertices[0].x, vertices[0].y);
                         glVertex2f(vertices[1].x, vertices[1].y);

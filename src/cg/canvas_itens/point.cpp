@@ -1,4 +1,4 @@
-#include "point.hpp"
+﻿#include "point.hpp"
 #include <cstdlib>
 
 #include <util.hpp>
@@ -6,7 +6,7 @@
 
 namespace cg
 {
-    Point::Point(Vector2 position, Color color) : CanvasItem{ TypeInfo::POINT, position }, color{ color } {}
+    Point::Point(Vector2 position, Color color) : CanvasItem{ TypeInfo::POINT }, color{ color }, localPosition{ position } {}
 
     // Seleção de ponto
     // Verifica se a posição do mouse está próxima de um ponto.
@@ -22,10 +22,10 @@ namespace cg
 
     void Point::_render()
     {
-        GLdebug{
+        GLdebug() {
             glPointSize(size);
         }
-        GLdebug{
+        GLdebug() {
             glBegin(GL_POINTS);
                 glColor3f(color.r, color.g, color.b);
 				auto [x, y] = getPosition();
@@ -36,17 +36,17 @@ namespace cg
 
     void Point::_input(io::MouseDrag mouse_event)
     {
-        model = Transform2D(mouse_event.position);
+        localPosition = mouse_event.position;
     }
 
     std::ostream& Point::_print(std::ostream& os) const
     {
-        return os << "Point: " << getPosition() << ", size: " << size << ", color: " << color;
+        return os << "Point: " << model << " at: " << getPosition() << ", size : " << size << ", color : " << color;
     }
 
     std::ofstream& Point::_serialize(std::ofstream& fs) const
     {
-        fs << getPosition() << " size: " << size << " color: " << color;
+        fs << model << " at: " << getPosition() << " size: " << size << " color: " << color;
         return fs;
     }
 
@@ -57,7 +57,10 @@ namespace cg
             Vector2 newPosition;
             Color newColor;
             float newSize;
-            if (!(fs >> newPosition >> dummy >> newSize) || dummy != "size:" || !(fs >> dummy >> newColor) || dummy != "color:") {
+            Transform2D newModel;
+            if (!(fs >> newModel >> dummy >> newPosition) ||
+                dummy != "at:" || !(fs >> dummy >> newSize) ||
+                dummy != "size:" || !(fs >> dummy >> newColor) || dummy != "color:") {
                 fs.setstate(std::ios::failbit); // marca falha no stream
 				return fs;
             }

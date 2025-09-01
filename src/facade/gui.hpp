@@ -9,6 +9,8 @@
 
 #include <memory>
 #include <filesystem>
+#include <string>
+#include <cstdint>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -323,7 +325,110 @@ public:
      * @param label Associated label text.
      */
     inline bool showButton(const char* label = "", cg::Vector2 size = {}) const {
-        return ImGui::Button(label, *(ImVec2 *)&size);
+        return ImGui::Button(label, *(ImVec2*)&size);
+    }
+
+    inline enum { DEC_PRESSED = -1, NONE = 0, INC_PRESSED = +1 }
+        showIncrementalFloatSlider(float* f, float min, float max, float by = 1.0f,
+            const char* label = "", const char* dec_label = "", const char* inc_label = "",
+            const char* dec_description = "", const char* inc_description = "")
+    {
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        const char* lbl_slider = label ? label : "";
+        const char* lbl_dec = dec_label ? dec_label : "";
+        const char* lbl_inc = inc_label ? inc_label : "";
+        const char* txt_dec = dec_description ? dec_description : "";
+        const char* txt_inc = inc_description ? inc_description : "";
+
+        // calcule larguras mínimas dos elementos que não devem expandir (inclui o label do slider, agora no fim)
+        ImVec2 sz_dec_btn = ImGui::CalcTextSize(lbl_dec);
+        float dec_btn_w = sz_dec_btn.x + style.FramePadding.x * 2.0f;
+        if (dec_btn_w <= 0.0f) dec_btn_w = 0.0f;
+
+        ImVec2 sz_inc_btn = ImGui::CalcTextSize(lbl_inc);
+        float inc_btn_w = sz_inc_btn.x + style.FramePadding.x * 2.0f;
+        if (inc_btn_w <= 0.0f) inc_btn_w = 0.0f;
+
+        ImVec2 sz_dec_txt = ImGui::CalcTextSize(txt_dec);
+        float dec_txt_w = sz_dec_txt.x;
+        if (dec_txt_w <= 0.0f) dec_txt_w = 0.0f;
+
+        ImVec2 sz_inc_txt = ImGui::CalcTextSize(txt_inc);
+        float inc_txt_w = sz_inc_txt.x;
+        if (inc_txt_w <= 0.0f) inc_txt_w = 0.0f;
+
+        ImVec2 sz_label = ImGui::CalcTextSize(lbl_slider);
+        float label_w = sz_label.x;
+        if (label_w <= 0.0f) label_w = 0.0f;
+
+        // Disponível total (em px) para todos os elementos nesta linha
+        float avail = ImGui::GetContentRegionAvail().x;
+
+        // elementos na linha (ordem): dec_btn, dec_txt, slider, inc_txt, inc_btn, label
+        const int gaps = 5; // gaps entre os 6 elementos
+        float total_gaps_w = style.ItemSpacing.x * gaps;
+
+        // largura mínima total que NÃO é do slider (inclui label no fim)
+        float min_fixed_w = dec_btn_w + dec_txt_w + inc_txt_w + inc_btn_w + label_w + total_gaps_w;
+
+        // largura que iremos dar ao slider
+        float slider_w = avail - min_fixed_w;
+        const float slider_min_w = 50.0f; // mínimo defensivo
+        if (slider_w < slider_min_w) {
+            slider_w = slider_min_w;
+        }
+
+        // --- layout e render ---
+        // dec button
+        bool dec_pressed = false;
+        if (dec_btn_w > 0.0f) {
+            dec_pressed = ImGui::Button(lbl_dec, ImVec2(dec_btn_w, 0.0f));
+        }
+
+        ImGui::SameLine();
+
+        // dec description (texto mínimo)
+        if (dec_txt_w > 0.0f) {
+            ImGui::TextUnformatted(txt_dec);
+        }
+
+        ImGui::SameLine();
+
+        // slider (ocupa slider_w). Usamos uma ID derivada do ponteiro para evitar colisões e não mostrar label aqui.
+        std::string slider_id = std::string("##slider_") + std::to_string(reinterpret_cast<std::uintptr_t>(f));
+        ImGui::PushItemWidth(slider_w);
+        bool changed = ImGui::SliderFloat(slider_id.c_str(), f, min, max);
+        ImGui::PopItemWidth();
+
+        ImGui::SameLine();
+
+        // inc description
+        if (inc_txt_w > 0.0f) {
+            ImGui::TextUnformatted(txt_inc);
+        }
+
+        ImGui::SameLine();
+
+        // inc button
+        bool inc_pressed = false;
+        if (inc_btn_w > 0.0f) {
+            inc_pressed = ImGui::Button(lbl_inc, ImVec2(inc_btn_w, 0.0f));
+        }
+
+        ImGui::SameLine();
+
+        // finalmente, o label do slider (exibe após o último botão de incremento)
+        if (label_w > 0.0f) {
+            ImGui::TextUnformatted(lbl_slider);
+        }
+
+        // retorno
+        if (dec_pressed)
+            return DEC_PRESSED;
+        if (inc_pressed)
+            return INC_PRESSED;
+        return NONE;
     }
 
     /** Displays a checkbox button inside the window
@@ -357,16 +462,122 @@ public:
     }
 
     inline void showSliderVector2(cg::Vector2* vec, cg::Vector2 min, cg::Vector2 max, const char* labelX = "", const char* labelY = "") const {
-		auto width = ImGui::GetContentRegionAvail().x;
+        auto width = ImGui::GetContentRegionAvail().x;
         // divide o espaço disponível para dois sliders
-		width = (width - ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize(labelX).x - ImGui::CalcTextSize(labelY).x) / 2.0f;
+        width = (width - ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize(labelX).x - ImGui::CalcTextSize(labelY).x) / 2.0f;
 
         ImGui::PushItemWidth(width);
         ImGui::SliderFloat(labelX, &(vec->x), min.x, max.x);
         ImGui::SameLine();
         ImGui::SliderFloat(labelY, &(vec->y), min.y, max.y);
-		ImGui::PopItemWidth();
-	}
+        ImGui::PopItemWidth();
+    }
+
+    inline cg::Vector2 showIncrementalSliderVector2(
+        cg::Vector2* vec, cg::Vector2 min, cg::Vector2 max, float by = 1.0f,
+        // X axis: slider label, dec button label, inc button label
+        const char* labelX = "X", const char* dec_labelX = "<", const char* inc_labelX = ">",
+        // Y axis
+        const char* labelY = "Y", const char* dec_labelY = "V", const char* inc_labelY = "^"
+    ) {
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        // normalize strings (evita null)
+        const char* lx = labelX ? labelX : "";
+        const char* dx = dec_labelX ? dec_labelX : "";
+        const char* ix = inc_labelX ? inc_labelX : "";
+        const char* ly = labelY ? labelY : "";
+        const char* dy = dec_labelY ? dec_labelY : "";
+        const char* iy = inc_labelY ? inc_labelY : "";
+
+        // calcula larguras mínimas (botões consideram FramePadding)
+        ImVec2 sz;
+        sz = ImGui::CalcTextSize(dx); float dec_btn_x_w = (dx[0] ? (sz.x + style.FramePadding.x * 2.0f) : 0.0f);
+        sz = ImGui::CalcTextSize(ix); float inc_btn_x_w = (ix[0] ? (sz.x + style.FramePadding.x * 2.0f) : 0.0f);
+        sz = ImGui::CalcTextSize(lx);    float label_x_w = (lx[0] ? sz.x : 0.0f);
+
+        sz = ImGui::CalcTextSize(dy); float dec_btn_y_w = (dy[0] ? (sz.x + style.FramePadding.x * 2.0f) : 0.0f);
+        sz = ImGui::CalcTextSize(iy); float inc_btn_y_w = (iy[0] ? (sz.x + style.FramePadding.x * 2.0f) : 0.0f);
+        sz = ImGui::CalcTextSize(ly);    float label_y_w = (ly[0] ? sz.x : 0.0f);
+
+        // espaço disponível
+        float avail = ImGui::GetContentRegionAvail().x;
+
+        // estimativa de gaps: cada cluster tem 3 gaps entre seus 4 itens (dec, slider, inc, label).
+        // Além disso, deixamos 1 gap extra entre os clusters.
+        const float gaps_count = 3.0f + 3.0f + 1.0f;
+        float total_gaps_w = style.ItemSpacing.x * gaps_count;
+
+        // largura mínima fixa (tudo exceto sliders)
+        float min_fixed = dec_btn_x_w + inc_btn_x_w + label_x_w
+            + dec_btn_y_w + inc_btn_y_w + label_y_w
+            + total_gaps_w;
+
+        // espaço restante para os 2 sliders (dividido igualmente)
+        float slider_total = avail - min_fixed;
+        const float slider_min_each = 50.0f;
+        float slider_w_each = slider_min_each;
+        if (slider_total > 2.0f * slider_min_each) slider_w_each = slider_total * 0.5f;
+
+        // rendering em uma só linha: cluster X então cluster Y
+        bool dec_x_pressed = false, inc_x_pressed = false;
+        bool dec_y_pressed = false, inc_y_pressed = false;
+
+        // --- X cluster ---
+        if (dec_btn_x_w > 0.0f) dec_x_pressed = ImGui::Button(dx, ImVec2(dec_btn_x_w, 0.0f));
+        ImGui::SameLine();
+
+        {
+            // slider X (ID único baseado no ponteiro)
+            std::string id_x = std::string("##slider_x_") + std::to_string(reinterpret_cast<std::uintptr_t>(vec));
+            ImGui::PushItemWidth(slider_w_each);
+            ImGui::SliderFloat(id_x.c_str(), &(vec->x), min.x, max.x);
+            ImGui::PopItemWidth();
+        }
+        ImGui::SameLine();
+
+        if (inc_btn_x_w > 0.0f) inc_x_pressed = ImGui::Button(ix, ImVec2(inc_btn_x_w, 0.0f));
+        ImGui::SameLine();
+
+        if (label_x_w > 0.0f) ImGui::TextUnformatted(lx);
+
+        // separador pequeno entre clusters
+        ImGui::SameLine();
+
+        // --- Y cluster ---
+        if (dec_btn_y_w > 0.0f) dec_y_pressed = ImGui::Button(dy, ImVec2(dec_btn_y_w, 0.0f));
+        ImGui::SameLine();
+
+        {
+            std::string id_y = std::string("##slider_y_") + std::to_string(reinterpret_cast<std::uintptr_t>(vec));
+            ImGui::PushItemWidth(slider_w_each);
+            ImGui::SliderFloat(id_y.c_str(), &(vec->y), min.y, max.y);
+            ImGui::PopItemWidth();
+        }
+        ImGui::SameLine();
+
+        if (inc_btn_y_w > 0.0f) inc_y_pressed = ImGui::Button(iy, ImVec2(inc_btn_y_w, 0.0f));
+        ImGui::SameLine();
+
+        if (label_y_w > 0.0f) ImGui::TextUnformatted(ly);
+
+        // monta o vetor de incremento já multiplicado por 'by'
+        cg::Vector2 increment{ 0.0f, 0.0f };
+        if (dec_x_pressed) increment.x = -by;
+        else if (inc_x_pressed) increment.x = +by;
+        if (dec_y_pressed) increment.y = -by;
+        else if (inc_y_pressed) increment.y = +by;
+
+        return increment;
+    }
+
+    inline void showSliderVector2(cg::Vector2* vec, float min, float max, const char* labelX = "", const char* labelY = "") const {
+        showSliderVector2(vec, { min, min }, { max, max }, labelX, labelY);
+    }
+
+    inline void showSliderVector2(cg::Vector2* vec, float max = 1.0f, const char* labelX = "", const char* labelY = "") const {
+        showSliderVector2(vec, {}, { max, max }, labelX, labelY);
+    }
 
     inline void showSliderInt(int* value, int min, int max, const char* label = "", const char* format = "") {
         ImGui::SliderInt(label, value, min, max, format);

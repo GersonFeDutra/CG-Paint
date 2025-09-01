@@ -14,10 +14,10 @@ namespace cg {
 	{
         auto [r, g, b] = colors.GREEN.normalized();
 
-        GLdebug{
+        GLdebug() {
             glClearColor(r, g, b, 1.0f); // cor de fundo
         }
-            GLdebug{
+            GLdebug() {
                 glMatrixMode(GL_PROJECTION);
         }
 
@@ -27,13 +27,13 @@ namespace cg {
             Vector2 center = SIZE / 2.0f;
             Vector2 halfSize = SIZE / 4.0f; // metade da metade → zoom 2x
 
-            GLdebug{
+            GLdebug() {
                 glMatrixMode(GL_PROJECTION);
             }
-            GLdebug{
+            GLdebug() {
                     glLoadIdentity(); // sempre limpe antes de aplicar nova projeção
             }
-            GLdebug{
+            GLdebug() {
                 gluOrtho2D(
                     center.x - halfSize.x,
                     center.x + halfSize.x,
@@ -43,7 +43,7 @@ namespace cg {
             }
         }
         else {
-            GLdebug{
+            GLdebug() {
                 gluOrtho2D(0.0, SIZE.x, 0.0, SIZE.y); // coordenadas limite do viewport normalizadas (em 2D)
             }
         }
@@ -55,13 +55,13 @@ namespace cg {
 
     void Flag::_render()
     {
-        GLdebug{
+        GLdebug() {
                 glColor3ub(colors.YELLOW.r, colors.YELLOW.g, colors.YELLOW.b);
         }
 
             // Desenha o diamante (losango) da bandeira do Brasil
         float diamondOffset = 1.7f;
-        GLdebug{
+        GLdebug() {
             glBegin(GL_POLYGON);
                 glVertex2f(SIZE.x / 2.0f, SIZE.y - diamondOffset);
                 glVertex2f(SIZE.x - diamondOffset, SIZE.y / 2.0f);
@@ -74,15 +74,15 @@ namespace cg {
         static constexpr Vector2 CENTER{ SIZE / 2.0f };
         static constexpr float RADIUS = 3.5f;
 
-        GLdebug{
+        GLdebug() {
             glColor3ub(colors.BLUE.r, colors.BLUE.g, colors.BLUE.b);
         }
-        GLdebug{
+        GLdebug() {
             genCircleAuto(CENTER, RADIUS, 10.0f);
         }
 
         // Desenha a faixa da bandeira, composta por arcos
-        GLdebug{
+        GLdebug() {
             glColor3ub(colors.WHITE.r, colors.WHITE.g, colors.WHITE.b);
         }
         const Vector2 arcCenter{ CENTER.x - 2.0f, 0.0f };
@@ -175,10 +175,10 @@ namespace cg {
         Star procyon(1, { -7.8f, 1.2f }); // Amazonas
 
         /* Texto da faixa */
-        GLdebug{
+        GLdebug() {
             glColor3ub(colors.GREEN.r, colors.GREEN.g, colors.GREEN.b);
         }
-        GLdebug{
+        GLdebug() {
             glPushMatrix();
         }
 
@@ -186,13 +186,13 @@ namespace cg {
         // Calcular ângulos do arco visível
         auto [startAngle, endAngle] = computeArcAngles(arcCenter, midRadius, CENTER, RADIUS);
 
-        GLdebug{
+        GLdebug() {
             glTranslatef(arcCenter.x, arcCenter.y, 0.0f); // Centralizar no centro do arco
         }
 
             // Desenhar texto na faixa
         drawArcText("ORDEM E PROGRESSO", midRadius - 0.22f, endAngle, startAngle, 0.004f);
-        GLdebug{
+        GLdebug() {
             glPopMatrix();
         }
 

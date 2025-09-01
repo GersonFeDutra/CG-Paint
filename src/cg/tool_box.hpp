@@ -22,10 +22,12 @@ namespace cg {
 		static constexpr std::size_t N_PRIMITIVES = 4; // Altere aqui o tamanho do array para adicionar mais ferramentas.
 	public:
 		ToolBox();
+		~ToolBox();
 
 		void addCanvas(Canvas* canvas_ptr);
 
 		void _render();
+		void _reshape(Canvas& canvas);
 
 		template <typename IE> requires std::is_base_of_v<io::MouseInputEvent, IE>
 		void captureInput(IE input_event) {}

@@ -128,6 +128,9 @@ namespace cg {
                 { 0.0f, windowSize.y / -2.0f },
                 { windowSize.x / 2.0f, windowSize.y / 2.0f },
             };*/
+            for (auto& item : itens)
+                item->_reshape(*this);
+            toolBox._reshape(*this);
         }
 
         template <std::convertible_to<float> T>
