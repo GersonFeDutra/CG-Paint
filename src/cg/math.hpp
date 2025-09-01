@@ -125,12 +125,7 @@ struct Vec2 {
     }
 
     constexpr inline Vec2<T> abs() const {
-        if constexpr (std::is_same_v<T, float>) {
-            return { std::fabsf(x), std::fabsf(y) };
-        }
-        else {
-            return { std::abs(x), std::abs(y) };
-        }
+        return { std::abs(x), std::abs(y) };
     }
 
     /* Get linear interpolation next step. */
@@ -394,8 +389,8 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     constexpr Transf2x3(T translation_x, T translation_y) : Transf2x3{ Vec2<T>{ translation_x, translation_y } } {}
 
     constexpr Transf2x3(Angle theta, Vec2<T> translation = {}) : columns{
-        Vec2<T>{ cos(theta), sin(theta) },
-        Vec2<T>{ -sin(theta), cos(theta) },
+        Vec2<T>{ std::cos(theta), std::sin(theta) },
+        Vec2<T>{ -std::sin(theta), std::cos(theta) },
         translation
     } {}
 

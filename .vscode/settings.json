@@ -70,6 +70,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "source_location": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "bitset": "cpp",
+        "set": "cpp",
+        "regex": "cpp"
     }
 }

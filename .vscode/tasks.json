@@ -14,7 +14,9 @@
         "reveal": "always",
         "panel": "shared",
         "close": false,
-        "showReuseMessage": true
+        "showReuseMessage": false,
+        "clear": false,
+        "focus": true
       },
       "icon": {
         "color": "terminal.ansiBlue",
@@ -41,8 +43,10 @@
       "presentation": {
         "reveal": "always",
         "panel": "shared",
-        "close": true,
-        "showReuseMessage": false
+        "close": false,
+        "showReuseMessage": false,
+        "clear": false,
+        "focus": true
       }
     },
     {
@@ -57,8 +61,8 @@
         "reveal": "always",
         "focus": true,
         "panel": "shared",
-        "clear": true,
-        "close": true,
+        "clear": false,
+        "close": false,
         "showReuseMessage": false
       },
       "icon": {

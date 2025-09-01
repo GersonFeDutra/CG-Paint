@@ -288,8 +288,7 @@ inline constexpr void _assert_err(bool condition,
 	}
 }
 
-#define assert_err(cond, ...) \
-    do { \
+#define assert_err(cond, ...) do { \
         if (!(cond)) { \
             _assert_err((false), std::source_location::current(), ##__VA_ARGS__); \
             my_assert(false); /* <- para exatamente na linha da chamada */ \

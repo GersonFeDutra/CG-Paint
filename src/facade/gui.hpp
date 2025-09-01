@@ -328,8 +328,9 @@ public:
         return ImGui::Button(label, *(ImVec2*)&size);
     }
 
-    inline enum { DEC_PRESSED = -1, NONE = 0, INC_PRESSED = +1 }
-        showIncrementalFloatSlider(float* f, float min, float max, float by = 1.0f,
+    enum Increment { DEC_PRESSED = -1, NONE = 0, INC_PRESSED = +1 };
+
+    inline Increment showIncrementalFloatSlider(float* f, float min, float max, float by = 1.0f,
             const char* label = "", const char* dec_label = "", const char* inc_label = "",
             const char* dec_description = "", const char* inc_description = "")
     {

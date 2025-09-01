@@ -7,6 +7,7 @@
 
 namespace cg {
     using ID = std::size_t;
+    class Canvas;
 
     class CanvasItem {
         friend class Canvas;
