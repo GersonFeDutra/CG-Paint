@@ -87,11 +87,19 @@ namespace cg {
             itens.pop_back(); // aqui o unique_ptr no fim do vetor é destruído e liberado do CanvasItem
         }
 
-        ArrayList<CanvasItem *> select() { // futuramente expôr um modo de selecionar itens externamente
-            ArrayList<CanvasItem *> refs{itens.size()}; // reserva
-            for (auto& item : itens)
-                refs.push_back(item.get());
-            return refs;
+        /** Retorna o primeiro ítem encontrado na posição passada.
+         * Se não for encontrado, retorna `nullptr`
+         */
+        CanvasItem* pick(Vector2 mouse_position) {
+            // Percorre na ordem reversa
+            for (auto it = itens.end() - 1; it >= itens.begin(); --it) {
+                const auto& item = *it;
+                if (item->isSelected(mouse_position)) {
+                    return item.get();
+                    break;
+                }
+            }
+            return nullptr;
         }
 
         inline Vector2 getWindowSize() const {

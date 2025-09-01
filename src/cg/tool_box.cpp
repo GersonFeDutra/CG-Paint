@@ -448,7 +448,7 @@ namespace cg {
 						while (ifs.peek() != ']') {
 							auto point = std::make_unique<cg::Point>();
 							try {
-								point->_deserialize(ifs);
+								ifs >> *point;
 							}
 							catch (const std::exception& e) {
 								print_error("Failed to deserialize point: %s", e.what());

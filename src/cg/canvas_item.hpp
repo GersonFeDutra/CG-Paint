@@ -56,8 +56,10 @@ namespace cg {
         // verificar se mouse está dentro do item
         inline bool isSelected(Vector2 mouse_position) const { return _isSelected(toLocal(mouse_position)); }
 
+    protected:
         virtual bool _isSelected(Vector2 cursor_local_position) const = 0;
 
+    public:
         virtual inline void translate(Vec2Offset by) {
             model.translate(by);
 		}

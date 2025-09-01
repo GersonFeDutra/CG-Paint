@@ -16,8 +16,11 @@ namespace cg {
             }
         }
 
+        void _input(io::MouseMove mouse_event) override;
+
         void _input(io::MouseLeftButtonPressed mouse_event) override {
-            pick(toolBox.canvas->getItens(), mouse_event.position);
+            if (CanvasItem* item = toolBox.canvas->pick(mouse_event.position))
+                select(item);
         }
 
         void _input(io::MouseDrag mouse_event) override {
@@ -27,23 +30,7 @@ namespace cg {
             }
         }
 
-        void pick(const std::vector<std::unique_ptr<CanvasItem>>& items, Vector2 mousePos) {
-            selectedItem = nullptr;
-            for (auto& item : items) {
-                if (item->isSelected(mousePos)) {
-                    selectedItem = item.get();
-                    break; // pega o primeiro encontrado
-                }
-            }
-        }
-
-        inline void select(CanvasItem* item) {
-			selectedItem = item;
-            // A transformação do item selecionado é uma cópia da seleção.
-            // Usamos isso para fazer transformações absolutas na ferramenta de seleção,
-            // e relativas no ítem selecionado com deltas.
-            model = item->model;
-        }
+        void select(CanvasItem* item);
 
         inline void translateSelected(const Vec2Offset& delta) {
             if (selectedItem)
