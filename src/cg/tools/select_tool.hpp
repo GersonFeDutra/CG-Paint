@@ -19,15 +19,15 @@ namespace cg {
         void _input(io::MouseMove mouse_event) override;
 
         void _input(io::MouseLeftButtonPressed mouse_event) override {
-            if (CanvasItem* item = toolBox.canvas->pick(mouse_event.position))
+            if (CanvasItem* item = toolBox.canvas->pick(mouse_event.position)) {
                 select(item);
+                item->_input(mouse_event);
+            }
         }
 
         void _input(io::MouseDrag mouse_event) override {
-            if (selectedItem) {
-                // Exemplo simples: mover o item inteiro
-                selectedItem->translateTo(mouse_event.position);
-            }
+            if (selectedItem)
+                selectedItem->_input(mouse_event); // Repassa o evento para o ítem selecionado
         }
 
         void select(CanvasItem* item);

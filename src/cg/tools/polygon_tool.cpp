@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "polygon_tool.hpp"
+#include "select_tool.hpp"
 
 #include <cg/tool_box.hpp>
 #include <cg/canvas_itens/polygon.hpp>
@@ -45,7 +46,7 @@ namespace cg {
     void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
         if (isDrawing) {
-            polygon->append(getPosition());
+            polygon->append(mouse_event.position);
         }
         else {
             // new Polygon primitive
@@ -55,6 +56,7 @@ namespace cg {
             toolBox.bindColorPtr(&polygon->getColor());
 
             setPosition(mouse_event.position); // update position to the first vertice
+            toolBox.getSelectorTool().select(polygon); // auto select the new polygon
 
             isDrawing = true;
         }
@@ -65,19 +67,19 @@ namespace cg {
         isDrawing = false;
         polygon = nullptr;
 
-        toolBox.unbindColorPtr();
+        //toolBox.unbindColorPtr();
     }
 
     Vector2 PolygonTool::getFirstGhostLineStart() const
     {
         assert_err(polygon != nullptr, "No polygon");
-        return polygon->firstVertice();
+        return polygon->toGlobal(polygon->firstVertice());
     }
 
     Vector2 PolygonTool::getLastGhostLineStart() const
     {
         assert_err(polygon != nullptr, "No polygon");
-        return polygon->lastVertice();
+        return polygon->toGlobal(polygon->lastVertice());
     }
 
     Vector2 PolygonTool::getGhostLineEnd() const

@@ -61,7 +61,7 @@ namespace cg {
 		if (line != nullptr && line->size() < 2)
 			delete line; // we do not make a line with single vertice
 		line = nullptr;
-		toolBox.unbindColorPtr();
+		//toolBox.unbindColorPtr(); // keep binded
 	}
 
 	Vector2 LineTool::getGhostLineStart() const

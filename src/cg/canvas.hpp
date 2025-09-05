@@ -91,13 +91,10 @@ namespace cg {
          * Se não for encontrado, retorna `nullptr`
          */
         CanvasItem* pick(Vector2 mouse_position) {
-            // Percorre na ordem reversa
-            for (auto it = itens.end() - 1; it >= itens.begin(); --it) {
+            for (auto it = itens.rbegin(); it != itens.rend(); ++it) {
                 const auto& item = *it;
-                if (item->isSelected(mouse_position)) {
+                if (item->isSelected(mouse_position))
                     return item.get();
-                    break;
-                }
             }
             return nullptr;
         }

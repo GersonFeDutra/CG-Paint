@@ -162,7 +162,8 @@ namespace cg {
 			{
 				float rotation_deg = rad_to_deg(tools[Tools::SELECT]->getRotation()); // degrees
 				int increment_unit = toolBox.showIncrementalFloatSlider(
-					&rotation_deg, -180.0f, 180.0f, 1.0f, "Rotation", "-1 deg", "+1 deg", "[", "]");
+					&rotation_deg, -180.0f, 180.0f, 1.0f,
+					"Rotation", "-1 deg", "+1 deg", "[", "]");
 				
 				if (increment_unit) // Aply negative / positive rotation
 					tools[Tools::SELECT]->rotate(deg_to_rad((float)increment_unit));
@@ -177,7 +178,7 @@ namespace cg {
 				// FIXME
 				Vector2 scale = tools[Tools::SELECT]->getScale();
 				Vector2 increment = toolBox.showIncrementalSliderVector2(&scale, 1e-3f, 16.0f, .1f,
-					"Sx", "*.9x", "*1.1x", "Sy", "*.9y", "*1.1y");
+					"Sx", "*.9x", "*1.1x", "Sy [Shift]", "*.9y", "*1.1y");
 				//toolBox.showSliderVector2(&scale, 1e-3f, 16.0f, "Sx", "Sy");
 
 				if (increment) {

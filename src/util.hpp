@@ -294,3 +294,14 @@ inline constexpr void _assert_err(bool condition,
             my_assert(false); /* <- para exatamente na linha da chamada */ \
         } \
     } while (0)
+
+template<typename... Args>
+inline constexpr void print() {
+	std::cout << '\n';
+}
+
+template<typename T, typename... Args>
+inline constexpr void print(T&& first, Args&&... args) {
+	std::cout << first << ' ';
+	print(std::forward<Args>(args)...);
+}

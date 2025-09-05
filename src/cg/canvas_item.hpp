@@ -90,6 +90,11 @@ namespace cg {
             return model.inverse() * global_position;
         }
 
+        inline Vector2 toGlobal(Vector2 local_position) const {
+            // Applies the model transformation to the local position obtainning a global coordinate.
+            return model * local_position;
+        }
+
         friend std::ostream& operator<<(std::ostream& os, const CanvasItem& item);
         friend std::istream& operator>>(std::istream& is, CanvasItem& item);
         virtual std::ostream& _print(std::ostream& os) const = 0;

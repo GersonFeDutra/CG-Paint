@@ -44,9 +44,10 @@ namespace cg {
 
     void PointTool::_input(io::MouseDrag mouse_event)
     {
+        setPosition(mouse_event.position);
         if (isDrawing) {
             assert_err(point != nullptr, "Drawing a not intanced primitive.");
-            setPosition(mouse_event.position);
+            point->setPosition(mouse_event.position);
         }
     }
 

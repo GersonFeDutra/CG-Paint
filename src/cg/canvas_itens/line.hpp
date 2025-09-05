@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "util.hpp"
 #include <vector>
 
 #include <cg/canvas.hpp>
@@ -13,6 +14,7 @@ namespace cg
     class Line : public CanvasItem
     {
         friend class Gizmo;
+        inline static Vector2 selectionOffset{};
     public:
         Line() : CanvasItem{ TypeInfo::LINE } {
             vertices.reserve(2);
@@ -37,6 +39,16 @@ namespace cg
         //void _process(DeltaTime delta) override;
 
         void _render() override;
+
+        void _input(io::MouseLeftButtonPressed mouse_event) {
+            // Calcula o offset em relação ao pivôt
+            Line::selectionOffset = mouse_event.position - model.getOrigin();
+        }
+
+        void _input(io::MouseDrag mouse_event) {
+            // Aplica a translação ajustada sobre o pivôt
+            translateTo(mouse_event.position - selectionOffset);
+        }
 
         // Verifica se a linha foi selecionada pelo mouse
         bool _isSelected(Vector2 cursor_local_position) const override;
@@ -85,7 +97,7 @@ namespace cg
 
         inline Vector2 lastVertice() const {
 			assert_err(size() > 0, "No vertices in line");
-            return model * vertices.back();
+            return toGlobal(vertices.back());
         }
 
 		// FIXME: essa função pode ser perigosa, pois permite modificar os vertices diretamente
@@ -101,7 +113,6 @@ namespace cg
         inline Color getColor() const {
             return color;
         }
-
         
         inline void setColor(ColorRgb lineColor) {
             color = lineColor;
