@@ -6,6 +6,8 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <string>
+#include <fstream>
 #include <source_location>
 
 #include "api.hpp" // Includes the Open GL API, so you can include just this utilities header.
@@ -36,7 +38,7 @@ using ArrayList = std::vector<T>; // alias the data structure by the name of wha
 
 
 template <typename... Args>
-constexpr void print_warning(const char* message, Args...args) {
+inline constexpr void print_warning(const char* message, Args...args) {
 	SET_CLI_YELLOW();
 	if constexpr (sizeof...(Args) > 0) {
 		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
@@ -49,7 +51,7 @@ constexpr void print_warning(const char* message, Args...args) {
 }
 
 template <typename... Args>
-constexpr void print_error(const char* message, Args...args) {
+inline constexpr void print_error(const char* message, Args...args) {
 	SET_CLI_RED();
 	if constexpr (sizeof...(Args) > 0) {
 		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
@@ -62,7 +64,7 @@ constexpr void print_error(const char* message, Args...args) {
 }
 
 template <typename... Args>
-constexpr void print_success(const char* message, Args...args) {
+inline constexpr void print_success(const char* message, Args...args) {
 	SET_CLI_GREEN();
 	if constexpr (sizeof...(Args) > 0) {
 		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
@@ -74,6 +76,19 @@ constexpr void print_success(const char* message, Args...args) {
 	RESET_CLI();
 }
 
+
+template <typename... Args>
+inline constexpr void print_info(const char* message, Args...args) {
+	SET_CLI_BLUE();
+	if constexpr (sizeof...(Args) > 0) {
+		std::fprintf(stderr, message, std::forward<Args>(args)...); // segura, tipada
+	}
+	else {
+		std::fprintf(stderr, "%s", message); // Mensagem formatada
+	}
+	fputc('\n', stderr);
+	RESET_CLI();
+}
 
 #ifdef _MSC_VER
 	#define my_assert(E) if (!(E)) __debugbreak()
@@ -147,14 +162,14 @@ inline bool GLLogCall(const std::source_location location = std::source_location
 
 	/* Macro de Debug para chamadas OpenGL */
 	#define GLdebug() if (GLDebugScope _gl_debug_scope = GLDebugScope())
-	// Usa o escopo tempor�rio para realizar as chamadas no construtor/destrutor com RAII
+	// Usa o escopo temporário para realizar as chamadas no construtor/destrutor com RAII
 
-	// Prefira a vers�o escopada acima
+	// Prefira a versão escopada acima
 	//#define GLCall(GL) GLClearError(); GL; GLLogCall()
 
 	#define print_var(VAR, ...) std::cerr << #VAR ##__VA_ARGS__ ": " << (VAR) << '\n'
 #else
-	constexpr bool IS_DEBUG = false; // Is debugger availlable?
+	constexpr bool IS_DEBUG = false; // Is debugger available?
 
 	// Macro de Debug para chamadas OpenGL
 	#define GLdebug() if (false); else
@@ -304,4 +319,14 @@ template<typename T, typename... Args>
 inline constexpr void print(T&& first, Args&&... args) {
 	std::cout << first << ' ';
 	print(std::forward<Args>(args)...);
+}
+
+
+inline static std::string peek_word(std::istream& is) {
+	std::streampos pos = is.tellg(); // salva posição
+	std::string word;
+	is >> word;                      // lê a palavra
+	is.clear();                      // limpa possíveis flags (EOF, etc.)
+	is.seekg(pos);                   // volta para a posição anterior
+	return word;
 }

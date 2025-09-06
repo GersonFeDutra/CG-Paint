@@ -137,9 +137,8 @@ namespace cg
         }
 
         // Inherited via CanvasItem
-        std::ostream& _print(std::ostream& os) const override;
-        std::ofstream& _serialize(std::ofstream& ofs) const override;
-        std::ifstream& _deserialize(std::ifstream& ifs) override;
+        std::ostream& _serialize(std::ostream& os) const override;
+        std::istream& _deserialize(std::istream& is) override;
     protected:
         std::vector<Vector2> vertices;
         Color color{}; // TODO -> alpha blending

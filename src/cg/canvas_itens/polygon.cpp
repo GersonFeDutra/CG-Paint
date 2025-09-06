@@ -156,36 +156,34 @@ namespace cg {
         }
     }
 
-    std::ostream& Polygon::_print(std::ostream& os) const
+//     std::ostream& Polygon::_print(std::ostream& os) const
+//     {
+//         os << "Polygon: " << model << ", width: " << width << ", colors: [inner: " << innerColor << ", contour: " << contourColor << "], vertices[";
+// 
+//         auto vertice = vertices.begin();
+//         if (vertice < vertices.end()) {
+//             os << *vertice;
+//             for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
+//                 os << ", " << *vertice;
+//         }
+//         return os << ']';
+//     }
+
+    std::ostream& Polygon::_serialize(std::ostream& os) const
     {
-        os << "Polygon: " << model << ", width: " << width << ", colors: [inner: " << innerColor << ", countour: " << countourColor << "], vertices[";
+        os << "Polygon " << model << " width: " << width << " colors: [inner: " << innerColor << " contour: " << contourColor << " ] vertices[ ";
 
         auto vertice = vertices.begin();
         if (vertice < vertices.end()) {
             os << *vertice;
             for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
-                os << ", " << *vertice;
+                os << ' ' << *vertice;
         }
-        return os << ']';
+        os << " ]";
+        return os;
     }
 
-    std::ofstream& Polygon::_serialize(std::ofstream& ofs) const
-    {
-        ofs << model << " width: " << width << " colors: [inner: " << innerColor << " countour: " << countourColor << "] vertices[";
-
-        auto vertice = vertices.begin();
-        if (vertice < vertices.end()) {
-            ofs << *vertice;
-            for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
-                ofs << ", " << *vertice;
-        }
-        else
-            ofs << ' '; // se não houver vértices, imprime separador vazio
-        ofs << ']';
-        return ofs;
-    }
-
-    std::ifstream& Polygon::_deserialize(std::ifstream& ifs)
+    std::istream& Polygon::_deserialize(std::istream& is)
     {
         try {
             std::string dummy;
@@ -194,45 +192,119 @@ namespace cg {
             Color colors[2];
 			ArrayList<Vector2> newVertices;
 
-			// Lê o cabeçalho
-            if (!(ifs >> newModel >> dummy >> newWidth) || dummy != "width:" ||
-                !(ifs >> dummy) || dummy != "colors:" ||
-                !(ifs >> dummy) || dummy != "[inner:" ||
-                !(ifs >> colors[0] >> dummy) || dummy != "countour:" ||
-                !(ifs >> colors[1] >> dummy) || dummy != "]" ||
-                !(ifs >> dummy) || dummy != "vertices[")
-                ifs.setstate(std::ios::failbit); // marca falha no stream
+            if constexpr (IS_DEBUG) {
+				// Lê o cabeçalho
 
+				if (!(is >> dummy >> newModel)) {
+					print_error("Falha ao ler 'Polygon <newModel>'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "Polygon") {
+					print_error("Esperado 'Polygon', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
 
-            while (std::isspace(ifs.peek()))
-                ifs.ignore();
-            if (ifs.peek() == ']') {
-                ifs.ignore();
-                return ifs; // não há vértices
+				if (!(is >> dummy >> newWidth)) {
+					print_error("Falha ao ler 'width: <valor>'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "width:") {
+					print_error("Esperado 'width:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				if (!(is >> dummy)) {
+					print_error("Falha ao ler 'colors:'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "colors:") {
+					print_error("Esperado 'colors:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				if (!(is >> dummy)) {
+					print_error("Falha ao ler '[inner:'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "[inner:") {
+					print_error("Esperado '[inner:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				if (!(is >> colors[0] >> dummy)) {
+					print_error("Falha ao ler 'inner <color> contour:'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "contour:") {
+					print_error("Esperado 'contour:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				if (!(is >> colors[1] >> dummy)) {
+					print_error("Falha ao ler 'contour <color> ]'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "]") {
+					print_error("Esperado ']', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				if (!(is >> dummy)) {
+					print_error("Falha ao ler 'vertices['");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "vertices[") {
+					print_error("Esperado 'vertices[', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+			}
+            else {
+
+                // Lê o cabeçalho
+                if (!(is >> dummy >> newModel) || dummy != "Polygon" || !(is >> dummy >> newWidth) ||
+                    dummy != "width:" || !(is >> dummy) || dummy != "colors:" || !(is >> dummy) ||
+                    dummy != "[inner:" || !(is >> colors[0] >> dummy) || dummy != "contour:" ||
+                    !(is >> colors[1] >> dummy) || dummy != "]" || !(is >> dummy) ||
+                    dummy != "vertices[")
+                    is.setstate(std::ios::failbit); // marca falha no stream
+
             }
-
-
             Vector2 vertice;
-            while (ifs >> vertice) {
-                vertices.push_back(vertice);
-                while (std::isspace(ifs.peek()))
-                    ifs.ignore(); // ignora espaços em branco
-                if (ifs.peek() == ',')
-                    ifs.ignore(); // ignora vírgula
-                else if (ifs.peek() == ']')
-                    break; // fim da lista de vértices
+            while (is_next_vec2<float>(is)) {
+                is >> vertice;
+                newVertices.push_back(vertice);
             }
+            if (!(is >> dummy) || dummy != "]") {
+                is.setstate(std::ios::failbit); // marca falha no stream
+                return is;
+            }
+            else
+                is.clear(); // limpa possíveis flags
 
 			// Substitui os dados apenas se tudo foi lido corretamente
 			model = newModel;
 			width = newWidth;
 			innerColor = colors[0];
-			countourColor = colors[1];
+			contourColor = colors[1];
             vertices = newVertices;
         }
         catch (...) {
-            ifs.setstate(std::ios::failbit);
+            is.setstate(std::ios::failbit);
         }
-        return ifs;
+        return is;
     }
 }

@@ -100,13 +100,10 @@ namespace cg {
 
         friend std::ostream& operator<<(std::ostream& os, const CanvasItem& item);
         friend std::istream& operator>>(std::istream& is, CanvasItem& item);
-        virtual std::ostream& _print(std::ostream& os) const = 0;
-        virtual std::istream& _read(std::istream& is);
-
-        friend std::ofstream& operator<<(std::ofstream& ofs, const CanvasItem& item);
-        friend std::ifstream& operator>>(std::ifstream& ifs, CanvasItem& item);
-        virtual std::ofstream& _serialize(std::ofstream& ofs) const = 0;
-		virtual std::ifstream& _deserialize(std::ifstream& ifs) = 0;
+        //virtual std::ostream& _print(std::ostream& os) const = 0;
+        virtual std::ostream& _serialize(std::ostream& os) const = 0;
+        //virtual std::istream& _read(std::istream& is);
+        virtual std::istream& _deserialize(std::istream& is) = 0;
 
     public:
         inline static const float SELECTION_THRESHOLD = 4.0f; // pixels

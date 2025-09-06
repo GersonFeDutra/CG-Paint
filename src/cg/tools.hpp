@@ -49,9 +49,9 @@ namespace cg {
 		bool _isSelected(Vector2 cursor_local_position) const override { return false; }
 
 	// operadores virtuais
-		std::ostream& _print(std::ostream& os) const override { return os; }
-		std::ofstream& _serialize(std::ofstream& ofs) const override { return ofs; }
-		std::ifstream& _deserialize(std::ifstream& ifs) override { return ifs; }
+		//std::ostream& _print(std::ostream& os) const override { return os; }
+		std::ostream& _serialize(std::ostream& os) const override { return os; }
+		std::istream& _deserialize(std::istream& is) override { return is; }
 
 	protected:
 		ToolBox& toolBox;

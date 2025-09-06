@@ -203,22 +203,16 @@ namespace cg {
         std::cout << input_event.position.x << ", " << input_event.position.y << '\n';
     }
 
-    std::ostream& Flag::_print(std::ostream& os) const
+    std::ostream& Flag::_serialize(std::ostream& os) const
     {
         // TODO
         return os;
     }
 
-    std::ofstream& Flag::_serialize(std::ofstream& ofs) const
+    std::istream& Flag::_deserialize(std::istream& is)
     {
         // TODO
-        return ofs;
-    }
-
-    std::ifstream& Flag::_deserialize(std::ifstream& ifs)
-    {
-        // TODO
-        return ifs;
+        return is;
     }
 
     bool Flag::_isSelected(Vector2 cursor_local_position) const

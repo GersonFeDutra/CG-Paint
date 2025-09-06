@@ -141,11 +141,6 @@ struct Vec2 {
     friend std::ostream& operator<<(std::ostream& os, const Vec2<U>& v);
     template <typename U>
     friend std::istream& operator>>(std::istream& is, Vec2<U>& v);
-    
-    template <typename U>
-    friend std::ofstream& operator<<(std::ofstream& ofs, const Vec2<U>& v);
-    template <typename U>
-    friend std::ifstream& operator>>(std::ifstream& ifs, Vec2<U>& v);
 
     static inline constexpr Vec2<T> zero()  noexcept { return {}; }
     static inline constexpr Vec2<T> one()  noexcept { return { 1, 1 }; }
@@ -156,57 +151,44 @@ struct Vec2 {
 };
 
 // Friends
+// template <typename T>
+// inline std::ostream& operator<<(std::ostream& os, const Vec2<T>& v) {
+//     return os << '(' << v.x << ", " << v.y << ')';
+// }
+// template <typename T>
+// inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
+//     try {
+//         char c;
+//         if (!(is >> c >> v.x >> c >> v.y >> c)) // Read in the format (x, y)
+//             is.setstate(std::ios::failbit); // marca falha no stream
+//     }
+//     catch (...) {
+//         is.setstate(std::ios::failbit);
+//     }
+//     return is;
+// }
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Vec2<T>& v) {
-    return os << '(' << v.x << ", " << v.y << ')';
+    os << "( " << v.x << ' ' << v.y << " )"; // Save in the format ( x y )
+    return os;
 }
 template <typename T>
 inline std::istream& operator>>(std::istream& is, Vec2<T>& v) {
     try {
-        char c;
-        if (!(is >> c >> v.x >> c >> v.y >> c)) // Read in the format (x, y)
-            is.setstate(std::ios::failbit); // marca falha no stream
-    }
-    catch (...) {
-        is.setstate(std::ios::failbit);
-    }
-    return is;
-}
-template <typename T>
-inline std::ofstream& operator<<(std::ofstream& ofs, const Vec2<T>& v) {
-    ofs << '(' << v.x << ' ' << v.y << ')'; // Save in the format (x y)
-    return ofs;
-}
-template <typename T>
-inline std::ifstream& operator>>(std::ifstream& ifs, Vec2<T>& v) {
-    try {
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-			ifs.ignore(); // Ignore leading whitespace
-        if (ifs.peek() == EOF) {
-            ifs.setstate(std::ios::failbit);
-            return ifs;
-		}
-
-        // Load in the format (x, y)
-        if (ifs.peek() == '(')
-		    ifs.ignore(); // Ignore '('
-        else
-            ifs.setstate(std::ios::failbit);
-
-        Vec2<T> parsed;
         std::string dummy;
-        // Read x y)
-        if (!(ifs >> parsed.x) || !(ifs >> parsed.y) || !(ifs >> dummy) || dummy != ")") {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
+        Vec2<T> parsed;
+        if (!(is >> dummy >> parsed.x >> parsed.y) || dummy != "(" ||
+            !(is >> dummy) || dummy != ")") {
+            is.setstate(std::ios::failbit); // marca falha no stream
+            return is;
         }
 
 		v = parsed; // Assign the parsed value to the Vec2
     }
     catch (...) {
-        ifs.setstate(std::ios::failbit);
+        is.setstate(std::ios::failbit);
     }
-    return ifs;
+    return is;
 }
 
 // Operadores aritméticos
@@ -240,9 +222,30 @@ constexpr bool operator>(Vec2<T> u, Vec2<U> v) { return u.x > v.x || u.y > v.y; 
 template <typename T, std::convertible_to<T> U>
 constexpr bool operator>=(Vec2<T> u, Vec2<U> v) { return u.x >= v.x || u.y >= v.y; }
 
+
+template <typename T>
+inline static Vec2<T> peek_vec2(std::istream& is) {
+	std::streampos pos = is.tellg(); // salva posição
+	Vec2<T> v;
+	is >> v;                         // lê o vetor
+	is.clear();                      // limpa possíveis flags (EOF, etc.)
+	is.seekg(pos);                   // volta para a posição anterior
+	return v;
+}
+
+template <typename T>
+inline static bool is_next_vec2(std::istream& is) {
+	std::streampos pos = is.tellg(); // salva posição
+	Vec2<T> v;
+	is >> v;                         // lê o vetor
+    bool ok = !is.fail();            // verifica se a leitura foi bem-sucedida
+	is.clear();                      // limpa possíveis flags (EOF, etc.)
+	is.seekg(pos);                   // volta para a posição anterior
+	return ok;
+}
+
 using Vector2 = Vec2<float>;
 using Vector2i = Vec2<int>;
-
 
 template <typename T>
 struct Vec3 {
@@ -311,61 +314,46 @@ struct Vec3 {
     friend std::ostream& operator<<(std::ostream& os, const Vec3<U>& v);
     template<typename U>
     friend std::istream& operator>>(std::istream& is, Vec3<U>& v);
-
-    template<typename U>
-    friend std::ofstream& operator<<(std::ofstream& ofs, const Vec3<U>& v);
-    template<typename U>
-    friend std::ifstream& operator>>(std::ifstream& ifs, Vec3<U>& v);
 };
 
 // Friends
+// template <typename T>
+// inline std::ostream& operator<<(std::ostream& os, const Vec3<T>& v) {
+//     return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+// }
+// template <typename T>
+// inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
+//     try {
+//         char c;
+//         if (!(is >> c >> v.x >> c >> v.y >> c >> v.z >> c)) // Read in the format (x, y, z)
+//             is.setstate(std::ios::failbit); // marca falha no stream
+//     }
+//     catch (...) {
+//         is.setstate(std::ios::failbit);
+//     }
+//     return is;
+// }
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Vec3<T>& v) {
-    return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+    os << "( " << v.x << " " << v.y << " " << v.z << " )"; // Save in the format ( x y z )
+    return os;
 }
 template <typename T>
 inline std::istream& operator>>(std::istream& is, Vec3<T>& v) {
     try {
-        char c;
-        if (!(is >> c >> v.x >> c >> v.y >> c >> v.z >> c)) // Read in the format (x, y, z)
-            is.setstate(std::ios::failbit); // marca falha no stream
+        std::string dummy;
+        Vec3<T> parsed;
+        if (!(is >> dummy >> parsed.x >> parsed.y >> parsed.z) || dummy != "(" ||
+            !(is >> dummy) || dummy != ")") {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+        v = parsed;
     }
     catch (...) {
         is.setstate(std::ios::failbit);
     }
     return is;
-}
-template <typename T>
-inline std::ofstream& operator<<(std::ofstream& ofs, const Vec3<T>& v) {
-    ofs << "(" << v.x << " " << v.y << " " << v.z << ")"; // Save in the format (x y z)
-    return ofs;
-}
-template <typename T>
-inline std::ifstream& operator>>(std::ifstream& ifs, Vec3<T>& v) {
-    try {
-        while (ifs.peek() == ' ' || ifs.peek() == '\n' || ifs.peek() == '\r')
-            ifs.ignore(); // Ignore leading whitespace
-
-        // Load in the format (x y z)
-        if (ifs.peek() == '(')
-            ifs.ignore(); // Ignore '('
-        else
-            ifs.setstate(std::ios::failbit);
-
-        Vec3<T> parsed;
-		std::string dummy;
-		// Read x y z)
-        if (!(ifs >> parsed.x) || !(ifs >> parsed.y) || !(ifs >> parsed.z) || !(ifs >> dummy) || dummy != ")") {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
-        }
-
-		v = parsed; // Assign parsed values to v
-    }
-    catch (...) {
-        ifs.setstate(std::ios::failbit);
-    }
-    return ifs;
 }
 
 using Vector3 = Vec3<float>;
@@ -379,6 +367,7 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
 
     constexpr Transf2x3() : columns{ Vec2<T>(1, 0), Vec2<T>(0, 1), Vec2<T>() } {}
     constexpr ~Transf2x3() = default;
+    constexpr Transf2x3(Vec2<T> arr[3]) : columns{ arr[0], arr[1], arr[2] } {}
     constexpr Transf2x3(Vec2<T> translation) : columns{ Vec2<T>(1, 0), Vec2<T>(0, 1), translation } {}
     constexpr Transf2x3(Vec2<T> v1_xaxis, Vec2<T> v2_yaxis, Vec2<T> v3_translation = {}) : columns{v1_xaxis, v2_yaxis, v3_translation} {}
     constexpr Transf2x3(T xaxis_x, T xaxis_y, T yaxis_x, T yaxis_y, T translation_x = 0, T translation_y = 0) : columns{
@@ -410,7 +399,7 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     constexpr inline auto transform(Vec2<U> v) const {
         return (*this) * v;
     }
-    
+
     template <std::convertible_to<T> U>
     constexpr inline auto transform(U x, U y) const {
         return (*this) * Vec2<LargerType<T, U>>( x, y );
@@ -447,7 +436,7 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
 		*this *= Transf2x3<T>{ position - getOrigin() };
     }
 
-	// Faz uma rotação abosoluta - em relação à origem, considerando que a matriz é uniforme.
+	// Faz uma rotação absoluta - em relação à origem, considerando que a matriz é uniforme.
     constexpr inline void uniformRotateTo(float angle) {
 		assert_err(isUniform(), "Matrix is not uniform.");
 
@@ -662,60 +651,112 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     friend std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m);
     template<typename U>
     friend std::istream& operator>>(std::istream& is, Transf2x3<U>& m);
-    template<typename U>
-    friend std::ofstream& operator<<(std::ofstream& ofs, const Transf2x3<U>& m);
-    template<typename U>
-	friend std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m);
 };
+
+// template<typename U>
+// std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m)
+// {
+// 	return os << "[x: " << m.columns[0]
+//              << "; y: " << m.columns[1]
+//              << "; t: " << m.columns[2] << ']';
+// }
+// template<typename U>
+// std::istream& operator>>(std::istream& is, Transf2x3<U>& m)
+// {
+//     try {
+//         char c;
+//         // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
+//         if (!(is >> c >> c >> m.columns[0] >> c >> c >> m.columns[1] >> c >> c >> m.columns[2] >> c))
+//             is.setstate(std::ios::failbit); // marca falha no stream
+//     }
+//     catch (...) {
+//         is.setstate(std::ios::failbit);
+// 	}
+//     return is;
+// }
 
 template<typename U>
 std::ostream& operator<<(std::ostream& os, const Transf2x3<U>& m)
 {
-	return os << "[x: " << m.columns[0]
-             << "; y: " << m.columns[1]
-             << "; t: " << m.columns[2] << ']';
+    os << "[ x: " << m.columns[0] << " y: " << m.columns[1] << " t: " << m.columns[2] << " ]";
+    return os;
 }
+
 template<typename U>
 std::istream& operator>>(std::istream& is, Transf2x3<U>& m)
 {
     try {
-        char c;
-        // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
-        if (!(is >> c >> c >> m.columns[0] >> c >> c >> m.columns[1] >> c >> c >> m.columns[2] >> c))
-            is.setstate(std::ios::failbit); // marca falha no stream
+        std::string dummy;
+        Vector2 parsed[3];
+        if constexpr(IS_DEBUG) {
+            if (!(is >> dummy) || dummy != "[") {
+                print_error("Esperado '[', mas veio '%s'", dummy.c_str());
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+
+            if (!(is >> dummy >> parsed[0])) {
+                print_error("Falha ao ler o primeiro ponto");
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+            if (dummy != "x:") {
+                print_error("Esperado '[x:', mas veio '%s'", dummy.c_str());
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+
+            if (!(is >> dummy >> parsed[1])) {
+                print_error("Falha ao ler o segundo ponto");
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+            if (dummy != "y:") {
+                print_error("Esperado 'y:', mas veio '%s'", dummy.c_str());
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+
+            if (!(is >> dummy >> parsed[2])) {
+                print_error("Falha ao ler o terceiro ponto");
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+            if (dummy != "t:") {
+                print_error("Esperado 't:', mas veio '%s'", dummy.c_str());
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+
+            if (!(is >> dummy)) {
+                print_error("Falha ao ler ']' no final");
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+            if (dummy != "]") {
+                print_error("Esperado ']', mas veio '%s'", dummy.c_str());
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+        }
+        else {
+            // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
+            if (!(is >> dummy) || dummy != "[" ||
+                !(is >> dummy >> parsed[0]) || dummy != "x:" ||
+                !(is >> dummy >> parsed[1]) || dummy != "y:" ||
+                !(is >> dummy >> parsed[2]) || dummy != "t:" ||
+                !(is >> dummy) || dummy != "]")
+            {
+                is.setstate(std::ios::failbit); // marca falha no stream
+                return is;
+            }
+        }
+        m = Transf2x3<U>(parsed);
     }
     catch (...) {
         is.setstate(std::ios::failbit);
-	}
+    }
     return is;
-}
-
-template<typename U>
-std::ofstream& operator<<(std::ofstream& ofs, const Transf2x3<U>& m)
-{
-    ofs << "[x: " << m.columns[0] << "; y: " << m.columns[1] << "; t: " << m.columns[2] << ']';
-    return ofs;
-}
-
-template<typename U>
-std::ifstream& operator>>(std::ifstream& ifs, Transf2x3<U>& m)
-{
-    try {
-        std::string dummy;
-        Vector2 parsed[3];
-        // Read in the format [x: (x.x, x.y); y: (y.x, y.y); t: (t.x, t.y)]
-        if (!(ifs >> dummy >> parsed[0]) || dummy != "[x:" ||
-            !(ifs >> parsed[1] >> dummy) || dummy != ";y:" ||
-            !(ifs >> parsed[2] >> dummy) || dummy != ";t:")
-        {
-            ifs.setstate(std::ios::failbit); // marca falha no stream
-            return ifs;
-        }
-    }
-    catch (...) {
-        ifs.setstate(std::ios::failbit);
-    }
-    return ifs;
 }
 
 // Point transformation.
@@ -793,10 +834,8 @@ struct Color {
 
     friend std::ostream& operator<<(std::ostream& os, Color c);
     friend std::istream& operator>>(std::istream& is, Color& c);
-
-    friend std::ofstream& operator<<(std::ofstream& ofs, Color c);
-    friend std::ifstream& operator>>(std::ifstream& ifs, Color& c);
 };
+
 
 namespace colors {
     constexpr Color NONE {};

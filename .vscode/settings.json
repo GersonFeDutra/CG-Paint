@@ -77,5 +77,14 @@
         "forward_list": "cpp",
         "unordered_set": "cpp",
         "stack": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "CHECKVERSION",
+        "fout",
+        "Framebuffer",
+        "Gamepad",
+        "glfw",
+        "localdata",
+        "tcgp"
+    ]
 }

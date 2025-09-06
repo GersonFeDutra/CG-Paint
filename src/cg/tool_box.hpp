@@ -46,6 +46,7 @@ namespace cg {
 
 		void save();
 		void load();
+		void clearScreen();
 
 		inline Color getColor() const {
 			return *colorPtr;

@@ -194,16 +194,16 @@ private:
             // Verifica se o usuário selecionou um arquivo
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::cout << "Arquivo selecionado: " << filePathName << std::endl;
+                print_info("Arquivo selecionado: %s", filePathName.c_str());
 
                 //std::ifstream file(filePathName, std::ios::binary); // TODO -> Versão binária
                 std::ifstream file(filePathName);
                 if (file.is_open()) {
 				    cacheLastPath(filePathName);
-                    print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
                     if (openFileCallback) {
                         openFileCallback(file);
                         openFileCallback = nullptr;
+                        print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
                     }
                     else {
                         print_error("Callback de abertura de arquivo não definida!");
@@ -221,16 +221,16 @@ private:
             // Verifica se o usuário selecionou um arquivo
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::cout << "Arquivo selecionado: " << filePathName << std::endl;
+                print_info("Arquivo selecionado: %s", filePathName.c_str());
 
                 //std::ofstream file(filePathName, std::ios::binary); // TODO -> Versão binária
                 std::ofstream file(filePathName);
                 if (file.is_open()) {
-                    print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
 					cacheLastPath(filePathName);
                     if (saveFileCallback) {
                         saveFileCallback(file);
                         saveFileCallback = nullptr;
+                        print_success("Arquivo aberto com sucesso: %s", filePathName.c_str());
                     }
                     else {
                         print_error("Callback de salvamento de arquivo não definida!");
@@ -249,7 +249,7 @@ private:
     // Limpa tudo ao encerrar
     inline void _shutdown() {
 #ifdef _DEBUG
-        assert_err(_initialized); // Tried to shutdown an already destroied GUI context!
+        assert_err(_initialized); // Tried to shutdown an already destroyed GUI context!
 #endif  
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGLUT_Shutdown();

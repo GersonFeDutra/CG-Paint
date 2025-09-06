@@ -28,9 +28,9 @@ namespace cg {
         void _input(io::MouseMove input_event) override;
 
         // Inherited via CanvasItem
-        std::ostream& _print(std::ostream& os) const override;
-        std::ofstream& _serialize(std::ofstream& ofs) const override;
-        std::ifstream& _deserialize(std::ifstream& ifs) override;
+        //std::ostream& _print(std::ostream& os) const override;
+        std::ostream& _serialize(std::ostream& os) const override;
+        std::istream& _deserialize(std::istream& is) override;
 
         // Inherited via CanvasItem
         bool _isSelected(Vector2 cursor_local_position) const override;

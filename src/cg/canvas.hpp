@@ -162,6 +162,7 @@ namespace cg {
         }
 
         inline void clear() {
+            // WARNING -> Cuidado, clear pode remover ferramentas internas além das primitivas!
             itens.clear();
             for (int i = 0; i < 3; ++i) // reset typeCount
 				typeCount[i] = 0;
@@ -181,7 +182,7 @@ namespace cg {
         ArrayList<std::unique_ptr<CanvasItem>> itens;
         size_t typeCount[3];
     public:
-        
+
         ToolBox toolBox;
     };
 

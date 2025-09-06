@@ -15,7 +15,7 @@ namespace cg
         inline static Vector2 selectionOffset{};
     public:
         Polygon() : CanvasItem(TypeInfo::POLYGON) {}
-        Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::POLYGON }, innerColor{ color }, countourColor{ color } {
+        Polygon(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::POLYGON }, innerColor{ color }, contourColor{ color } {
 			vertices.reserve(3); // reserva espaço para 3 vértices
             vertices.emplace_back(position);
         }
@@ -99,7 +99,7 @@ namespace cg
         inline std::vector<Vector2> getVertices() {
             return vertices;
         }
-            
+
         inline void setVertices(std::vector<Vector2> allVertices) {
             vertices = allVertices;
         }
@@ -117,13 +117,12 @@ namespace cg
         }
 
         // Inherited via CanvasItem
-        std::ostream& _print(std::ostream& os) const override;
-        std::ofstream& _serialize(std::ofstream& ofs) const override;
-        std::ifstream& _deserialize(std::ifstream& ifs) override;
+        std::ostream& _serialize(std::ostream& os) const override;
+        std::istream& _deserialize(std::istream& is) override;
     private:
         std::vector<Vector2> vertices;
         Color innerColor{};
-        Color countourColor{}; // TODO -> Implement contour color
+        Color contourColor{}; // TODO -> Implement contour color
 		float width = 1.0f; // TODO -> Implement line width
         // TODO -> anti-alias
 

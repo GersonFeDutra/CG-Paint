@@ -63,67 +63,122 @@ namespace cg {
 		return false;
 	}
 
-	std::ostream& Line::_print(std::ostream& os) const
+// 	std::ostream& Line::_print(std::ostream& os) const
+// 	{
+// 		os << "Line: " << model << ", width: " << width << ", color: " << color << ", vertices[";
+// 
+// 		auto vertice = vertices.begin();
+// 		if (vertice < vertices.end()) {
+// 			os << *vertice;
+// 			for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
+// 				os << ", " << *vertice;
+// 		}
+// 		return os << ']';
+// 	}
+
+	std::ostream& Line::_serialize(std::ostream& os) const
 	{
-		os << "Line: " << model << ", width: " << width << ", color: " << color << ", vertices[";
+		os << "Line " << model << " width: " << width << " color: " << color << " vertices[ ";
 
 		auto vertice = vertices.begin();
 		if (vertice < vertices.end()) {
 			os << *vertice;
 			for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
-				os << ", " << *vertice;
+				os << ' ' << *vertice;
 		}
-		return os << ']';
+		os << " ]";
+		return os;
 	}
 
-	std::ofstream& Line::_serialize(std::ofstream& ofs) const
-	{
-		ofs << model << " width: " << width << " color: " << color << " vertices[";
-
-		auto vertice = vertices.begin();
-		if (vertice < vertices.end()) {
-			ofs << *vertice;
-			for (vertice = ++vertice; vertice < vertices.end(); ++vertice)
-				ofs << ", " << *vertice;
-		}
-		else
-			ofs << ' '; // se não houver vértices, imprime separador vazio
-		ofs << ']';
-		return ofs;
-	}
-
-	std::ifstream& Line::_deserialize(std::ifstream& ifs)
+	std::istream& Line::_deserialize(std::istream& is)
 	{
 		try {
 			std::string dummy;
-			if (!(ifs >> model >> dummy >> width >> dummy >> color >> dummy))
-				ifs.setstate(std::ios::failbit); // marca falha no stream
+			float newWidth;
+			Color newColor;
+			Transform2D newModel;
+			ArrayList<Vector2> newVertices;
 
-			vertices.clear();
+			if constexpr (IS_DEBUG) {
+				std::string dummy;
+
+				// 1. Lê "Line" + model
+				if (!(is >> dummy >> newModel)) {
+					print_error("Falha ao ler 'Line <model>'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "Line") {
+					print_error("Esperado 'Line', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				// 2. Lê "width:" + width
+				if (!(is >> dummy >> newWidth)) {
+					print_error("Falha ao ler 'width: <valor>'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "width:") {
+					print_error("Esperado 'width:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				// 3. Lê "color:" + color
+				if (!(is >> dummy >> newColor)) {
+					print_error("Falha ao ler 'color: <valor>'");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "color:") {
+					print_error("Esperado 'color:', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+
+				// 4. Lê "vertices["
+				if (!(is >> dummy)) {
+					print_error("Falha ao ler 'vertices['");
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				if (dummy != "vertices[") {
+					print_error("Esperado 'vertices[', mas veio '%s'", dummy.c_str());
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+			}
+			else {
+				if (!(is >> dummy >> newModel) || dummy != "Line" ||
+					!(is >> dummy >> newWidth) || dummy != "width:" ||
+					!(is >> dummy >> newColor) || dummy != "color:" ||
+					!(is >> dummy) || dummy != "vertices[")
+				{
+					is.setstate(std::ios::failbit); // marca falha no stream
+				}
+			}
 			// Lê os vértices
-
-			while (std::isspace(ifs.peek()))
-				ifs.ignore();
-			if (ifs.peek() == ']') {
-				ifs.ignore();
-				return ifs; // não há vértices
-			}
-
 			Vector2 vertice;
-			while (ifs >> vertice) {
-				vertices.push_back(vertice);
-				while (std::isspace(ifs.peek()))
-					ifs.ignore(); // ignora espaços em branco
-				if (ifs.peek() == ',')
-					ifs.ignore(); // ignora vírgula
-				else if (ifs.peek() == ']')
-					break; // fim da lista de vértices
+			while (is_next_vec2<float>(is)) {
+				is >> vertice;
+				newVertices.push_back(vertice);
 			}
+			if (!(is >> dummy) || dummy != "]")
+				is.setstate(std::ios::failbit); // marca falha no stream
+			else
+				is.clear(); // limpa possíveis flags
+
+			model = newModel;
+			width = newWidth;
+			color = newColor;
+			vertices = newVertices;
 		}
 		catch (...) {
-			ifs.setstate(std::ios::failbit);
+			is.setstate(std::ios::failbit);
 		}
-		return ifs;
+		return is;
 	}
 
 }

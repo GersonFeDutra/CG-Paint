@@ -1,4 +1,5 @@
-﻿#include "point.hpp"
+﻿#include <string>
+#include "point.hpp"
 #include <cstdlib>
 
 #include <util.hpp>
@@ -20,7 +21,7 @@ namespace cg
 		return point_selected(cursor_local_position, getPosition(), size + CanvasItem::SELECTION_THRESHOLD);
     }
 
-    void Point::_render()
+	void Point::_render()
     {
         GLdebug() {
             //glEnable(GL_POINT_SMOOTH);
@@ -36,38 +37,88 @@ namespace cg
         }
     }
 
-    std::ostream& Point::_print(std::ostream& os) const
+    // std::ostream& Point::_print(std::ostream& os) const
+    // {
+    //     return os << "Point: " << model << " at: " << getPosition() << ", size : " << size << ", color : " << color;
+    // }
+
+	std::ostream &Point::_serialize(std::ostream &os) const
     {
-        return os << "Point: " << model << " at: " << getPosition() << ", size : " << size << ", color : " << color;
+        os << "Point " << model << " at: " << getPosition() << " size: " << size << " color: " << color;
+        return os;
     }
 
-    std::ofstream& Point::_serialize(std::ofstream& fs) const
-    {
-        fs << model << " at: " << getPosition() << " size: " << size << " color: " << color;
-        return fs;
-    }
-
-    std::ifstream& Point::_deserialize(std::ifstream& fs)
+    std::istream& Point::_deserialize(std::istream& is)
     {
         try {
             std::string dummy;
             Vector2 newPosition;
             Color newColor;
             float newSize;
-            Transform2D newModel;
-            if (!(fs >> newModel >> dummy >> newPosition) ||
-                dummy != "at:" || !(fs >> dummy >> newSize) ||
-                dummy != "size:" || !(fs >> dummy >> newColor) || dummy != "color:") {
-                fs.setstate(std::ios::failbit); // marca falha no stream
-				return fs;
+            Transf2x3<float> newModel;
+            if constexpr (IS_DEBUG) {
+                if (!(is >> dummy >> newModel)) {
+                    print_error("Erro ao ler 'Point <newModel>'");
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                if (dummy != "Point") {
+                    print_error("Esperado 'Point', mas veio: %s", dummy);
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+
+                if (!(is >> dummy >> newPosition)) {
+                    print_error("Erro ao ler 'at: <newPosition>'");
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                if (dummy != "at:") {
+                    print_error("Esperado 'at:', mas veio: %s", dummy);
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+
+                if (!(is >> dummy >> newSize)) {
+                    print_error("Erro ao ler 'size: <newSize>'");
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                if (dummy != "size:") {
+                    print_error("Esperado 'size:', mas veio: %s", dummy);
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+
+                if (!(is >> dummy >> newColor)) {
+                    print_error("Erro ao ler 'color: <newColor>'");
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                if (dummy != "color:") {
+                    print_error("Esperado 'color:', mas veio: %s", dummy);
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+            }
+            else {
+                if (!(is >> dummy >> newModel) || dummy != "Point" ||
+                    !(is >> dummy >> newPosition) || dummy != "at:" ||
+                    !(is >> dummy >> newSize) || dummy != "size:" ||
+                    !(is >> dummy >> newColor) || dummy != "color:") {
+                    is.setstate(std::ios::failbit); // marca falha no stream
+                    return is;
+                }
             }
 			color = newColor;
+            size = newSize;
 			setPosition(newPosition);
+            model = newModel;
         }
         catch (...) {
-            fs.setstate(std::ios::failbit);
+            is.setstate(std::ios::failbit);
         }
-        return fs;
+        return is;
     }
 
 
