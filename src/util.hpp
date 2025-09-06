@@ -157,7 +157,7 @@ inline bool GLLogCall(const std::source_location location = std::source_location
 	constexpr bool IS_DEBUG = false; // Is debugger availlable?
 
 	// Macro de Debug para chamadas OpenGL
-	#define GLdebug() do {} while(false)
+	#define GLdebug() if (false); else
 	//#define GLCall(GL) GL
 
 	#define print_var(VAR, ...) std::cerr << #VAR ##__VA_ARGS__ ": " << (VAR) << '\n'
