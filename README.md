@@ -41,12 +41,12 @@ exclusões:
 
 - [ ] Use a criatividade!
 
-### Definição das apresentações
+### Definição das [apresentações](https://docs.google.com/presentation/d/1XVjmBlJticL7nBKuWkazYf_grtQmo3ByLoaVnSsXd0U/edit?usp=sharing)
 
 - [ ] Cada grupo deverá preparar e realizar uma apresentação detalhada sobre o projeto desenvolvido, abordando os seguintes aspectos:
-    - [ ] Explique a estrutura de dados utilizada para criar e manipular os objetos geométricos e por que foi escolhida
+    - [x] Explique a estrutura de dados utilizada para criar e manipular os objetos geométricos e por que foi escolhida
     - [ ] Mostre o funcionamento do projeto, incluindo criação, seleção, transformação dos objetos, etc
-    - [ ] Apresentação das implementações dos algoritmos de seleção de objetos
+    - [x] Apresentação das implementações dos algoritmos de seleção de objetos
 
 > [!NOTE]
 > **Tempo de apresentação:** 20-30min <br>

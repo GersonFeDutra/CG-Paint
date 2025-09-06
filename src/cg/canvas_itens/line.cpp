@@ -27,36 +27,80 @@ namespace cg {
 		//glLoadIdentity(); // Restaura a matriz de modelo
 	}
 
-	// Seleção de linha
-	// Verifica se a posição do mouse está próxima de um segmento de reta definido por p1 e p2.
-	// A proximidade é definida pelo threshold.
-	static inline bool lineSelected(Vector2 mousePos, Vector2 p1, Vector2 p2, float threshold = CanvasItem::SELECTION_THRESHOLD) {
-		Vector2 line = p2 - p1;
-		Vector2 toMouse = mousePos - p1;
-		float lineLength = line.length();
+	// Retorna true se o segmento p1-p2 intercepta o retângulo centrado em mousePos com tamanho threshold
+	static inline bool lineSelectedRect(Vector2 mousePos,
+			Vector2 p1, Vector2 p2,
+			float threshold = CanvasItem::SELECTION_THRESHOLD)
+	{
+		// Definir os limites do retângulo de tolerância
+		float left   = mousePos.x - threshold;
+		float right  = mousePos.x + threshold;
+		float top    = mousePos.y - threshold;
+		float bottom = mousePos.y + threshold;
 
-		//Se linha for muito pequena, ignora o seguimento
-		if (lineLength < 1e-5f) return false;
+		// Codificação dos pontos usando 4 bits (Cohen–Sutherland)
+		auto computeCode = [&](Vector2 v) -> int {
+			int code = 0;
+			if (v.x < left)   code |= 1; // Esquerda
+			if (v.x > right)  code |= 2; // Direita
+			if (v.y < top)    code |= 4; // Cima
+			if (v.y > bottom) code |= 8; // Baixo
+			return code;
+		};
 
-		// Projeção do mouse na linha normalizada em relação ao segmento
-		// O Clamp entre 0 e 1 garante que o ponto projetado esteja dentro do segmento
-		float t = std::max(0.0f, std::min(1.0f, toMouse.dot(line) / (lineLength * lineLength)));
-		Vector2 closest = p1 + line * t;
+		int code1 = computeCode(p1);
+		int code2 = computeCode(p2);
 
-		return (mousePos - closest).length() <= threshold;
+		while (true) {
+			if ((code1 | code2) == 0) {
+				// Ambos dentro do retângulo → intercepta
+				return true;
+			} else if ((code1 & code2) != 0) {
+				// Ambos fora da mesma região → não intercepta
+				return false;
+			} else {
+				// Pelo menos um ponto está fora → calcula interseção
+				int outCode = code1 ? code1 : code2;
+				Vector2 newPoint;
+
+				if (outCode & 8) {            // baixo
+					newPoint.x = p1.x + (p2.x - p1.x) * (bottom - p1.y) / (p2.y - p1.y);
+					newPoint.y = bottom;
+				} else if (outCode & 4) {     // cima
+					newPoint.x = p1.x + (p2.x - p1.x) * (top - p1.y) / (p2.y - p1.y);
+					newPoint.y = top;
+				} else if (outCode & 2) {     // direita
+					newPoint.y = p1.y + (p2.y - p1.y) * (right - p1.x) / (p2.x - p1.x);
+					newPoint.x = right;
+				} else if (outCode & 1) {     // esquerda
+					newPoint.y = p1.y + (p2.y - p1.y) * (left - p1.x) / (p2.x - p1.x);
+					newPoint.x = left;
+				}
+
+				// Substituir ponto externo pelo ponto de interseção
+				if (outCode == code1) {
+					p1 = newPoint;
+					code1 = computeCode(p1);
+				} else {
+					p2 = newPoint;
+					code2 = computeCode(p2);
+				}
+			}
+		}
 	}
 
 	bool Line::_isSelected(Vector2 cursor_local_position) const
 	{
-		// TODO -> Fazer seleção de ponto no caso que size < 2
-		if (vertices.size() < 2) // A linha deve ter pelo menos 2 vértices 
+		if (vertices.size() < 2)
 			return false;
 
 		auto iterator = vertices.begin();
 		Vector2 lastVertice = *iterator;
-		for (++iterator; iterator < vertices.end(); ++iterator) {
+		for (++iterator; iterator != vertices.end(); ++iterator) {
 			Vector2 vertice = *iterator;
-			if (lineSelected(cursor_local_position, lastVertice, vertice, CanvasItem::SELECTION_THRESHOLD + width))
+			if (lineSelectedRect(
+					cursor_local_position, lastVertice, vertice,
+					CanvasItem::SELECTION_THRESHOLD + width))
 				return true;
 			lastVertice = vertice;
 		}

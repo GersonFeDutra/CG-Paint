@@ -19,7 +19,8 @@ namespace cg {
 	 */
 	class ToolBox {
 		friend class Tool;
-		static constexpr std::size_t N_PRIMITIVES = 4; // Altere aqui o tamanho do array para adicionar mais ferramentas.
+		// Altere aqui o tamanho do array para adicionar mais ferramentas.
+		static constexpr std::size_t N_PRIMITIVES = 4;
 	public:
 		ToolBox();
 		~ToolBox();

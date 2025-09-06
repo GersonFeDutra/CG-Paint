@@ -370,6 +370,7 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
     constexpr Transf2x3(Vec2<T> arr[3]) : columns{ arr[0], arr[1], arr[2] } {}
     constexpr Transf2x3(Vec2<T> translation) : columns{ Vec2<T>(1, 0), Vec2<T>(0, 1), translation } {}
     constexpr Transf2x3(Vec2<T> v1_xaxis, Vec2<T> v2_yaxis, Vec2<T> v3_translation = {}) : columns{v1_xaxis, v2_yaxis, v3_translation} {}
+
     constexpr Transf2x3(T xaxis_x, T xaxis_y, T yaxis_x, T yaxis_y, T translation_x = 0, T translation_y = 0) : columns{
         { xaxis_x, xaxis_y },
         { yaxis_x, yaxis_y },
