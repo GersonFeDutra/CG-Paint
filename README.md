@@ -12,14 +12,14 @@
 exclusões:
     - [x] Selecionar objetos primários individualmente (ponto, segmento de reta e polígono)
     - [x] Excluir objetos selecionados
-- [ ] Transformações geométricas (crie a matriz de transformação e matriz composta, quando necessário):
+- [x] Transformações geométricas (crie a matriz de transformação e matriz composta, quando necessário):
     - [x] Arrastar e soltar (transladar)
     - [x] Rotacionar em relação ao centro do objeto
         - [x] No ponto é em relação a origem do eixo de coordenadas (local)
     - [x] Escalar em relação ao centro do objeto
         - [x] ~No ponto não existe~ No ponto a escala é feita em relação à origem do eixo de coordenadas (local)
     - [x] Reflexão
-    - [ ] Cisalhamento
+    - [x] Cisalhamento
 
 > [!NOTE]
 > Obs: para a criação de objetos, seleção de objetos e transformações

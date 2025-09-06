@@ -208,7 +208,7 @@ static void onKeyboardKeyPressed(unsigned char key, int x, int y)
 	if (normalizedKey == ESC)
 		std::cout << "ESC\n";
 	else
-		std::cout << "Raw{" << (int)key << "} [" << normalizedKey << "]\n";
+		std::cout << "Raw{" << (int)key << "}" << normalizedKey << '\n';
 
 	canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
 }

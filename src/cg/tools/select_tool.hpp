@@ -61,6 +61,11 @@ namespace cg {
                 selectedItem->mirror(at);
         }
 
+        inline void shearSelected(float x_angle, float y_angle) {
+            if (selectedItem)
+                selectedItem->shear(x_angle, y_angle);
+        }
+
     // setters e getters
         inline bool hasSelection() const {
             return selectedItem != nullptr;
@@ -120,6 +125,16 @@ namespace cg {
 			Tool::mirrorOrigin();
 			mirrorSelected(Transform2D::MIRROR_ORIGIN<float>);
 		}
+
+        void shearH(float angle) override {
+            Tool::shearH(angle);
+            shearSelected(angle, 0.0f);
+        }
+
+        void shearV(float angle) override {
+            Tool::shearV(angle);
+            shearSelected(0.0f, angle);
+        }
 
     private:
         CanvasItem* selectedItem = nullptr;

@@ -53,7 +53,7 @@ namespace cg {
 	static unsigned tool_cursor = GLUT_CURSOR_INHERIT;
 	static unsigned last_cursor = GLUT_CURSOR_INHERIT;
 
-	static inline bool is_scale_inside_bounds(Vector2 scale, Vector2 increment) {
+	static inline bool is_scalar_inside_bounds(Vector2 scale, Vector2 increment) {
 		return !(increment < Vector2::zero() && scale < Vector2(1e-3f) + increment ||
 			increment > Vector2::zero() && scale > Vector2(16.0f) - increment);
 	}
@@ -128,7 +128,7 @@ namespace cg {
 		}
 
 		{ // Controls Window
-			constexpr Vector2 estimate_size = {415.0f, 170.0f};
+			constexpr Vector2 estimate_size = {414.0f, 192.0f};
 			Window controls("Controls", {canvas->getWindowSize().x - estimate_size.x - window_margin , canvas->getWindowSize().y - estimate_size.y - window_margin});
 
 			controls.show2ColorEdit(getColorPtr(), &secondaryColor, "[x: toggle]");
@@ -172,14 +172,13 @@ namespace cg {
 			}
 			// Update scale
 			{
-				// FIXME
 				Vector2 scale = tools[Tools::SELECT]->getScale();
 				Vector2 increment = controls.showIncrementalSliderVector2(&scale, 1e-3f, 16.0f, .1f,
 					"Sx", "*.9x", "*1.1x", "Sy [Shift]", "*.9y", "*1.1y");
 				//controls.showSliderVector2(&scale, 1e-3f, 16.0f, "Sx", "Sy");
 
 				if (increment) {
-					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), increment))
+					if (is_scalar_inside_bounds(tools[Tools::SELECT]->getScale(), increment))
 						tools[Tools::SELECT]->scale(Vector2::one() + increment);
 				}
 				else if ((scale - tools[Tools::SELECT]->getScale()).abs() > Vector2(ZERO_PRECISION_ERROR))
@@ -204,7 +203,27 @@ namespace cg {
 			}
 			// Cisalhamento
 			{
-				// TODO
+				if (controls.showButton("ShX+"))
+					tools[Tools::SELECT]->shearH(1.0f);
+				controls.sameLine();
+				controls.showText("[<]");
+				controls.sameLine();
+				if (controls.showButton("ShX-"))
+					tools[Tools::SELECT]->shearH(-1.0f);
+				controls.sameLine();
+				controls.showText("[>]");
+				controls.sameLine();
+				if (controls.showButton("ShY+"))
+					tools[Tools::SELECT]->shearV(1.0f);
+				controls.sameLine();
+				controls.showText("[^]");
+				controls.sameLine();
+				if (controls.showButton("ShY-"))
+					tools[Tools::SELECT]->shearV(-1.0f);
+				controls.sameLine();
+				controls.showText("[v]");
+				controls.sameLine();
+				controls.showText("Shear [Ctrl]");
 			}
 
 			// Save / Load / Clear / Delete
@@ -299,25 +318,44 @@ namespace cg {
 			if (!Gui::isUsingKeyboardInput()) {
 				switch (input_event.key) {
 				case GLUT_KEY_RIGHT: {
-					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::right()))
+					if (is_scalar_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::right()))
 						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::right() * .1f);
 				} break;
 				case GLUT_KEY_LEFT: {
-					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::left()))
+					if (is_scalar_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::left()))
 						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::left() * .1f);
 				} break;
 				case GLUT_KEY_UP: {
-					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::up()))
+					if (is_scalar_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::up()))
 						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::up() * .1f);
 				} break;
 				case GLUT_KEY_DOWN: {
-					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::down()))
+					if (is_scalar_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::down()))
 						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::down() * .1f);
 				} break;
 				default:
 					break;
 				}
 			} break;
+		case GLUT_ACTIVE_CTRL:
+			if (!Gui::isUsingKeyboardInput()) {
+				switch (input_event.key) {
+				case GLUT_KEY_RIGHT:
+					tools[Tools::SELECT]->shearH(1.0f);
+					break;
+				case GLUT_KEY_LEFT:
+					tools[Tools::SELECT]->shearH(-1.0f);
+					break;
+				case GLUT_KEY_UP:
+					tools[Tools::SELECT]->shearV(1.0f);
+					break;
+				case GLUT_KEY_DOWN:
+					tools[Tools::SELECT]->shearV(-1.0f);
+					break;
+				default:
+					break;
+				}
+			}
 		default:
 			switch (input_event.key) {
 			case GLUT_KEY_F1: {

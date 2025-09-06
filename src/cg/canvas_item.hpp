@@ -81,12 +81,8 @@ namespace cg {
 			model.mirror(at);
 		}
 
-		virtual void mirrorY() {
-			model.mirror(Transform2D::MIRROR_Y<float>);
-		}
-
-		virtual void mirrorOrigin() {
-			model.mirror(Transform2D::MIRROR_ORIGIN<float>);
+		void shear(float x_angle, float y_angle) {
+			model.shear(x_angle, y_angle);
 		}
 
         inline void translateTo(Vector2 to) {

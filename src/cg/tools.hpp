@@ -27,6 +27,14 @@ namespace cg {
 			mirror(Transform2D::MIRROR_ORIGIN<float>);
 		}
 
+		virtual void shearH(float angle) {
+			shear(angle, 0.0f);
+		}
+
+		virtual void shearV(float angle) {
+			shear(0.0f, angle);
+		}
+
 		// Define a posição absoluta do "scanner" da ferramenta no canvas.
 		// Pode ser usado para desenhar o cursor da ferramenta e posicionar novos itens.
 		virtual void setPosition(const Vector2& position) {

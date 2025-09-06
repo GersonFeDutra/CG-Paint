@@ -600,6 +600,10 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         *this *= mirror.m;
     }
 
+    constexpr inline void shear(float x_angle, float y_angle) {
+        *this *= Transf2x3<T>{ 1.0f, y_angle, x_angle, 1.0f };
+    }
+
     // Retorna a rotação uniforme
     // Assume que a matriz é uniforme
     constexpr inline Angle getUniformRotation() const {
