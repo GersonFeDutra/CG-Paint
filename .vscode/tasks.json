@@ -19,15 +19,15 @@
         "focus": true
       },
       "icon": {
-        "color": "terminal.ansiBlue",
-        "id": "tools"
+        "color": "terminal.ansiGreen",
+        "id": "tools",
       }
     },
     {
       "label": "Run App (Python Wrapper)",
       "type": "shell",
-      "command": "python3",
-      "args": ["build.py", "--run"],
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/run.sh"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -37,7 +37,7 @@
       },
       "problemMatcher": [],
       "icon": {
-        "color": "terminal.ansiGreen",
+        "color": "terminal.ansiYellow",
         "id": "play"
       },
       "presentation": {
@@ -66,8 +66,51 @@
         "showReuseMessage": false
       },
       "icon": {
-        "color": "terminal.ansiCyan",
+        "color": "terminal.ansiBlue",
         "id": "debug-continue"
+      }
+    },
+    {
+      "label": "Build (Python Wrapper) [debug]",
+      "type": "shell",
+      "command": "python3",
+      "args": ["build.py", "--debug"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "close": false,
+        "showReuseMessage": false,
+        "clear": false,
+        "focus": true
+      },
+      "icon": {
+        "color": "terminal.ansiCyan",
+        "id": "debug-console"
+      }
+    },
+    {
+      "label": "Build and Run App (Python Wrapper) [debug]",
+      "type": "shell",
+      "command": "python3",
+      "args": ["build.py", "--run", "--debug"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": false,
+        "close": false,
+        "showReuseMessage": false
+      },
+      "icon": {
+        "color": "terminal.ansiMagenta",
+        "id": "debug-alt-small"
       }
     }
   ]
