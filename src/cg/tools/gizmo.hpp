@@ -8,8 +8,13 @@ namespace cg {
 
 class Gizmo {
 public:
-    Gizmo(float size, Vector2 at, Color color = { .333, .333, .333 })
-            : lines{ Line{Vector2::up() * size, Vector2::down() * size, color}, Line{Vector2::left() * size, Vector2::right() * size, color} } {}
+    Gizmo(float size = 1.0f, Transform2D* model = nullptr)
+            : lines{Line{Line::KeepPivot{}, Vector2::left() * size, Vector2::zero(), colors::BLUE, 2.0f},
+                    Line{Line::KeepPivot{}, Vector2::up() * size, Vector2::zero(), colors::GREEN, 2.0f},
+                    Line{Line::KeepPivot{}, Vector2::right() * size, Vector2::zero(), colors::RED, 2.0f},
+                    Line{Line::KeepPivot{}, Vector2::down() * size, Vector2::zero(), colors::CYAN, 2.0f} } {
+        this->model = model;
+    }
 
     void _render() {
         if (model == nullptr)
@@ -25,7 +30,7 @@ public:
     }
 
 private:
-    Line lines[2];
+    Line lines[4];
     Transform2D* model = nullptr;
 };
 

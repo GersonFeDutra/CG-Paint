@@ -151,8 +151,8 @@ struct Vec2 {
     static inline constexpr Vec2<T> one()  noexcept { return { 1, 1 }; }
     static inline constexpr Vec2<T> left()  noexcept { return { -1, 0 }; }
     static inline constexpr Vec2<T> right() noexcept { return { 1, 0 }; }
-    static inline constexpr Vec2<T> up()    noexcept { return { 0,  1 }; }
-    static inline constexpr Vec2<T> down()  noexcept { return { 0, -1 }; }
+    static inline constexpr Vec2<T> up()    noexcept { return { 0,  -1 }; }
+    static inline constexpr Vec2<T> down()  noexcept { return { 0, 1 }; }
 };
 
 // Friends
@@ -800,11 +800,14 @@ struct Color {
 
 namespace colors {
     constexpr Color NONE {};
-    constexpr Color BLACK { 0.0f, 0.0f, 0.0f };
-    constexpr Color WHITE { 1.0f, 1.0f, 1.0f };
-    constexpr Color RED   { 1.0f, 0.0f, 0.0f };
-    constexpr Color GREEN { 0.0f, 1.0f, 0.0f };
-    constexpr Color BLUE  { 0.0f, 0.0f, 1.0f };
+    constexpr Color BLACK   { 0.0f, 0.0f, 0.0f };
+    constexpr Color WHITE   { 1.0f, 1.0f, 1.0f };
+    constexpr Color RED     { 1.0f, 0.0f, 0.0f };
+    constexpr Color GREEN   { 0.0f, 1.0f, 0.0f };
+    constexpr Color BLUE    { 0.0f, 0.0f, 1.0f };
+    constexpr Color MAGENTA { 1.0f, 0.0f, 1.0f };
+    constexpr Color CYAN  { 0.0f, 1.0f, 1.0f };
+    constexpr Color YELLOW  { 1.0f, 1.0f, 0.0f };
     constexpr ColorRgb RGB_BLACK { 0, 0, 0 };
     constexpr ColorRgb RGB_WHITE { 1, 1, 1 };
     constexpr ColorRgb RGB_RED   { 1, 0, 0 };

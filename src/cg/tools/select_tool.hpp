@@ -9,10 +9,12 @@ namespace cg {
 
     class SelectTool : public Tool {
     public:
-        SelectTool(ToolBox& tool_box) : Tool(tool_box) {}
+        SelectTool(ToolBox& tool_box) : Tool(tool_box) {
+            gizmo = Gizmo(13.0f, &model);
+        }
         void _render() override {
             if (selectedItem) {
-                // Pode desenhar highlight aqui (ex: bounding box ou cor diferente)
+                gizmo._render();
             }
         }
 
@@ -88,6 +90,7 @@ namespace cg {
 
     private:
         CanvasItem* selectedItem = nullptr;
+        Gizmo gizmo;
     };
 
 }

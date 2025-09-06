@@ -24,16 +24,30 @@ namespace cg
             vertices.reserve(2);
         }
 
-        Line(Vector2 position, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, position }, color{ color } {
+        Line(Vector2 position, Color color = Color{})
+                : CanvasItem{ TypeInfo::LINE, position }, color{ color }
+        {
             vertices.reserve(2);
 			vertices.emplace_back(Vector2{}); // O ponto inicial é a origem local
         }
 
-        Line(Vector2 from, Vector2 to, Color color = Color{}) : CanvasItem{ TypeInfo::LINE, from }, color{ color } {
+        Line(Vector2 from, Vector2 to, Color color = Color{}, float width = 1.0f)
+                : CanvasItem{ TypeInfo::LINE, from }, color{ color }, width{width}
+        {
             vertices.reserve(2);
             vertices.emplace_back(Vector2{});
             vertices.emplace_back(toLocal(to)); // Os pontos da linha são relativos às coordenadas locais
             setPivotToMiddle();
+        }
+
+        struct KeepPivot{};
+
+        Line(KeepPivot _, Vector2 from, Vector2 to, Color color = Color{}, float width = 1.0f)
+                : CanvasItem{ TypeInfo::LINE, from }, color{ color }, width{width}
+        {
+            vertices.reserve(2);
+            vertices.emplace_back(Vector2{});
+            vertices.emplace_back(toLocal(to)); // Os pontos da linha são relativos às coordenadas locais
         }
 
         //void _process(DeltaTime delta) override;
@@ -113,7 +127,7 @@ namespace cg
         inline Color getColor() const {
             return color;
         }
-        
+
         inline void setColor(ColorRgb lineColor) {
             color = lineColor;
         }
