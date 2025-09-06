@@ -10,14 +10,14 @@
     - [x] Polígono
 - [ ] Seleção de objetos para poder realizar as transformações geométricas e 
 exclusões:
-    - [ ] Selecionar objetos primários individualmente (ponto, segmento de reta e polígono)
+    - [x] Selecionar objetos primários individualmente (ponto, segmento de reta e polígono)
     - [ ] Excluir objetos selecionados
 - [ ] Transformações geométricas (crie a matriz de transformação e matriz composta, quando necessário):
-    - [ ] Arrastar e soltar (transladar)
-    - [ ] Rotacionar em relação ao centro do objeto
-        - [ ] No ponto é em relação a origem do eixo de coordenadas
-    - [ ] Escalar em relação ao centro do objeto
-        - [ ] No ponto não existe
+    - [x] Arrastar e soltar (transladar)
+    - [x] Rotacionar em relação ao centro do objeto
+        - [x] No ponto é em relação a origem do eixo de coordenadas (local)
+    - [x] Escalar em relação ao centro do objeto
+        - [x] ~No ponto não existe~ No ponto a escala é feita em relação à origem do eixo de coordenadas (local)
     - [ ] Reflexão
     - [ ] Cisalhamento
 
@@ -35,7 +35,7 @@ exclusões:
 ### 2. Além das transformações geométricas, implemente também funcionalidades que possam ... (2,0 pontos):
 
 - [x] Salvar os objetos geométricos criados em um arquivo
-- [ ] Carregar os objetos geométricos de um arquivo.
+- [x] Carregar os objetos geométricos de um arquivo.
 
 ### 3. Implemente uma funcionalidade para fazer animação com os objetos primários.
 
