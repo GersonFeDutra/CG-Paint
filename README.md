@@ -18,7 +18,7 @@ exclusões:
         - [x] No ponto é em relação a origem do eixo de coordenadas (local)
     - [x] Escalar em relação ao centro do objeto
         - [x] ~No ponto não existe~ No ponto a escala é feita em relação à origem do eixo de coordenadas (local)
-    - [ ] Reflexão
+    - [x] Reflexão
     - [ ] Cisalhamento
 
 > [!NOTE]

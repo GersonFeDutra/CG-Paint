@@ -128,7 +128,7 @@ namespace cg {
 		}
 
 		{ // Controls Window
-			constexpr Vector2 estimate_size = {414.0f, 146.0f};
+			constexpr Vector2 estimate_size = {415.0f, 170.0f};
 			Window controls("Controls", {canvas->getWindowSize().x - estimate_size.x - window_margin , canvas->getWindowSize().y - estimate_size.y - window_margin});
 
 			controls.show2ColorEdit(getColorPtr(), &secondaryColor, "[x: toggle]");
@@ -184,6 +184,23 @@ namespace cg {
 				}
 				else if ((scale - tools[Tools::SELECT]->getScale()).abs() > Vector2(ZERO_PRECISION_ERROR))
 					tools[Tools::SELECT]->setScale(scale);
+			}
+			// Reflexão
+			{
+				if (controls.showButton("Mirror X"))
+					tools[Tools::SELECT]->mirrorX();
+				controls.sameLine();
+				controls.showText("[\\]");
+				controls.sameLine();
+				if (controls.showButton("Mirror Y"))
+					tools[Tools::SELECT]->mirrorY();
+				controls.sameLine();
+				controls.showText("[/]");
+				controls.sameLine();
+				if (controls.showButton("Mirror Origin"))
+					tools[Tools::SELECT]->mirrorOrigin();
+				controls.sameLine();
+				controls.showText("[']");
 			}
 			// Cisalhamento
 			{
@@ -358,6 +375,15 @@ namespace cg {
 			break;
 		case ']':
 			tools[Tools::SELECT]->rotate(deg_to_rad(1.0f));
+			break;
+		case '\\':
+			tools[Tools::SELECT]->mirrorX();
+			break;
+		case '/':
+			tools[Tools::SELECT]->mirrorY();
+			break;
+		case '\'':
+			tools[Tools::SELECT]->mirrorOrigin();
 			break;
 		case 'x': {
 			Color tmp_color = *colorPtr;

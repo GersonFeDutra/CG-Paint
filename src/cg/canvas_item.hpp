@@ -77,6 +77,18 @@ namespace cg {
             model.scale(by);
         }
 
+		void mirror(Transform2D::Mirror<float> at) {
+			model.mirror(at);
+		}
+
+		virtual void mirrorY() {
+			model.mirror(Transform2D::MIRROR_Y<float>);
+		}
+
+		virtual void mirrorOrigin() {
+			model.mirror(Transform2D::MIRROR_ORIGIN<float>);
+		}
+
         inline void translateTo(Vector2 to) {
             model.translateTo(to);
 		}

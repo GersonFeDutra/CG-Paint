@@ -11,10 +11,22 @@ namespace cg {
 	// construtores
 	public:
 		Tool(ToolBox& tool_box) : toolBox{ tool_box } {}
-	
+
 	public:
 	// setters e getters
-	
+
+		virtual void mirrorX() {
+			mirror(Transform2D::MIRROR_X<float>);
+		}
+
+		virtual void mirrorY() {
+			mirror(Transform2D::MIRROR_Y<float>);
+		}
+
+		virtual void mirrorOrigin() {
+			mirror(Transform2D::MIRROR_ORIGIN<float>);
+		}
+
 		// Define a posição absoluta do "scanner" da ferramenta no canvas.
 		// Pode ser usado para desenhar o cursor da ferramenta e posicionar novos itens.
 		virtual void setPosition(const Vector2& position) {

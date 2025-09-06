@@ -584,6 +584,22 @@ struct Transf2x3 /* Matriz column-major 3x3 representando uma transformação 2D
         *this *= Transf2x3<T>{ delta, 0.0f, 0.0f, delta };
     }
 
+    // Espelhamento
+    template <typename U>
+    struct Mirror {
+        const Transf2x3<U> m;
+    };
+    template <typename U>
+    inline static const Mirror<U> MIRROR_X{ Transf2x3<U>{ -1.0f, 0.0f, 0.0f, 1.0f } };
+    template <typename U>
+    inline static const Mirror<U> MIRROR_Y{ Transf2x3<U>{ 1.0f, 0.0f, 0.0f, -1.0f } };
+    template <typename U>
+    inline static const Mirror<U> MIRROR_ORIGIN{ Transf2x3<U>{ -1.0f, 0.0f, 0.0f, -1.0f } };
+
+    constexpr inline void mirror(Mirror<T> mirror) {
+        *this *= mirror.m;
+    }
+
     // Retorna a rotação uniforme
     // Assume que a matriz é uniforme
     constexpr inline Angle getUniformRotation() const {

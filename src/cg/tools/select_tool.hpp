@@ -56,6 +56,11 @@ namespace cg {
                 selectedItem->scale(by);
         }
 
+        inline void mirrorSelected(Transform2D::Mirror<float> at) {
+            if (selectedItem)
+                selectedItem->mirror(at);
+        }
+
     // setters e getters
         inline bool hasSelection() const {
             return selectedItem != nullptr;
@@ -100,6 +105,21 @@ namespace cg {
             toolBox.canvas->remove(selectedItem);
             deSelect();
         }
+
+		void mirrorX() override {
+			Tool::mirrorX();
+            mirrorSelected(Transform2D::MIRROR_X<float>);
+		}
+
+		void mirrorY() override {
+			Tool::mirrorY();
+			mirrorSelected(Transform2D::MIRROR_Y<float>);
+		}
+
+		void mirrorOrigin() override {
+			Tool::mirrorOrigin();
+			mirrorSelected(Transform2D::MIRROR_ORIGIN<float>);
+		}
 
     private:
         CanvasItem* selectedItem = nullptr;

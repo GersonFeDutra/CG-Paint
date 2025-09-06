@@ -59,7 +59,7 @@ namespace cg {
 			colorPtr = to;
 		}
 		inline void unbindColorPtr() {
-			warn(colorPtr == &currentColor, "color was not bind before");
+			//warn(colorPtr == &currentColor, "color was not bind before");
 			currentColor = *colorPtr;
 			colorPtr = &currentColor;
 		}
