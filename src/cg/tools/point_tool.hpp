@@ -7,8 +7,8 @@
 
 namespace cg {
 	class Point;
-	
-	/* Ferramenta para criação de pontos. */
+
+	/* Ferramenta para criaÃ§Ã£o de pontos. */
 	class PointTool : public Painter {
 	public:
 		PointTool(ToolBox& tool_box);

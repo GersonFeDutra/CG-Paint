@@ -17,22 +17,26 @@ namespace cg
         Point(Vector2 position, Color color = Color{});
 
         //void _process(DeltaTime delta) override;
-        
+
         void _render() override;
-        void _input(io::MouseDrag mouse_event) override;
-        
+
+        void _input(io::MouseDrag mouse_event) override
+        {
+            localPosition = toLocal(mouse_event.position);
+        }
+
         inline Color& getColor() {
             return color;
         }
-        
+
         inline Color getColor() const {
             return color;
         }
-        
+
         inline void setColor(Color newColor) {
             color = newColor;
         }
-        
+
         inline Vector2 getPosition() const {
             return model * localPosition;
         }

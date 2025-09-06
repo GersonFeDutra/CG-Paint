@@ -29,7 +29,7 @@ namespace cg {
 
         void _input(io::MouseDrag mouse_event) override {
             if (selectedItem)
-                selectedItem->_input(mouse_event); // Repassa o evento para o ítem selecionado
+                selectedItem->_input(mouse_event); // Repassa o evento para o item selecionado
         }
 
         void select(CanvasItem* item);

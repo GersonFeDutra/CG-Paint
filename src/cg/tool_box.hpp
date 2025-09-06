@@ -68,7 +68,6 @@ namespace cg {
 		}
 
 	public:
-		// TODO -> Cor secundária [alternada com x key]
 		Canvas* canvas = nullptr;
 		bool isInsideGui = false;
     private:
@@ -83,6 +82,7 @@ namespace cg {
 		std::array<Painter *, N_PRIMITIVES> tools;
 
 		Color currentColor = cg::colors::WHITE;
+		Color secondaryColor = cg::colors::BLACK;
 		Color *colorPtr = &currentColor; // Define a cor atual para pintura.
 	};
 

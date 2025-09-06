@@ -162,9 +162,7 @@ static void onMouseButtonEvent(int button, int state, int x, int y)
 static void onSpecialKeyPressed(int key, int x, int y)
 {
     ImGui_ImplGLUT_SpecialFunc(key, x, y);
-
-    if (!Gui::isUsingKeyboardInput())
-	    canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, key, glutGetModifiers());
+    canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, key, glutGetModifiers());
 }
 
 
@@ -206,12 +204,7 @@ static void onKeyboardKeyPressed(unsigned char key, int x, int y)
     else
         std::cout << normalizedKey << "\n";
 
-    if (Gui::isUsingKeyboardInput()) {
-        if (normalizedKey == ESC) // Fecha diálogos com ESC
-			Gui::closeDialog();
-    }
-    else
-        canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
+    canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
 }
 
 

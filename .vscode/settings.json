@@ -73,6 +73,9 @@
         "codecvt": "cpp",
         "bitset": "cpp",
         "set": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "stack": "cpp"
     }
 }

@@ -36,11 +36,6 @@ namespace cg
         }
     }
 
-    void Point::_input(io::MouseDrag mouse_event)
-    {
-        localPosition = mouse_event.position;
-    }
-
     std::ostream& Point::_print(std::ostream& os) const
     {
         return os << "Point: " << model << " at: " << getPosition() << ", size : " << size << ", color : " << color;

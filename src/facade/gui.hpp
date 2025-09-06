@@ -73,6 +73,10 @@ public:
         Gui::instance()._saveFileDialog(key, title, filters, std::move(callback));
     }
 
+    inline static bool isDialogOpen() {
+        return Gui::instance()._isDialogOpen();
+    }
+
     inline static void closeDialog() {
 		Gui::instance()._closeDialog();
     }
@@ -265,6 +269,10 @@ private:
         ImGuiFileDialog::Instance()->OpenDialog(key, title, filters, { {}, {}, dialogConfigPath });
         dialogSave = key;
         saveFileCallback = std::move(callback);
+    }
+
+    inline bool _isDialogOpen() {
+        return ImGuiFileDialog::Instance()->IsOpened();
     }
 
     inline void _closeDialog() {
@@ -587,9 +595,50 @@ public:
         ImGui::SliderInt(label, value, 0, max, format);
     }
 
-    inline void showColorEdit(cg::Vector3* color, const char *label = "") {
-        ImGui::ColorEdit3(label, (float*)color); // Edit 3 floats representing a color
+    inline void showColorEdit(cg::Color* color, const char *label = "") {
+        ImGui::ColorEdit3(label, (float*)&color->r); // Edit 3 floats representing a color
     }
+
+inline void show2ColorEdit(cg::Color* primary, cg::Color* secondary, const char *label = "") {
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    // largura disponível total
+    float avail = ImGui::GetContentRegionAvail().x;
+
+    // largura mínima defensiva para cada ColorEdit
+    const float color_min_w = 80.0f;
+
+    // largura do label final (ocupando o mínimo)
+    float label_w = (label && label[0]) ? ImGui::CalcTextSize(label).x : 0.0f;
+
+    // número de gaps: sempre 1 gap entre os dois color edits; se houver label, mais 1 gap até o label
+    int gaps = 1 + (label_w > 0.0f ? 1 : 0);
+    float total_gaps_w = style.ItemSpacing.x * (float)gaps;
+
+    // espaço restante que ficará para os dois color edits
+    float remaining = avail - label_w - total_gaps_w;
+    float each_w = remaining * 0.5f;
+
+    // garante um mínimo razoável
+    if (each_w < color_min_w) each_w = color_min_w;
+
+    // desenha os widgets na mesma linha: ColorEdit1 | ColorEdit2 | Label
+    ImGui::PushItemWidth(each_w);
+    ImGui::ColorEdit3("##primary_color", (float*)&primary->r, ImGuiColorEditFlags_NoLabel);
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(each_w);
+    ImGui::ColorEdit3("##secondary_color", (float*)&secondary->r, ImGuiColorEditFlags_NoLabel);
+    ImGui::SameLine();
+
+    // texto final ocupando o mínimo possível
+    if (label && label[0]) ImGui::TextUnformatted(label);
+
+    // limpar os PushItemWidth (duas pushes => duas pops)
+    ImGui::PopItemWidth();
+    ImGui::PopItemWidth();
+}
+
 
 private:
 

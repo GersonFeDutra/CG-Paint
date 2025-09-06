@@ -129,7 +129,7 @@ namespace cg {
 			// default: break;
 			// }
 
-			toolBox.showColorEdit((cg::Vector3*)&(getColorPtr()->r), "color");
+			toolBox.show2ColorEdit(getColorPtr(), &secondaryColor, "[x: toggle]");
 
 			//if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
 			//    counter++;
@@ -267,29 +267,33 @@ namespace cg {
 
 	void ToolBox::captureInput(io::SpecialKeyInputEvent input_event)
 	{
+		if (Gui::isDialogOpen())
+			return;
+
 		switch (input_event.mods) {
 		case GLUT_ACTIVE_SHIFT:
-			switch (input_event.key) {
-			case GLUT_KEY_RIGHT: {
-				if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::right()))
-					tools[Tools::SELECT]->scale(Vector2::one() + Vector2::right() * .1f);
+			if (!Gui::isUsingKeyboardInput()) {
+				switch (input_event.key) {
+				case GLUT_KEY_RIGHT: {
+					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::right()))
+						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::right() * .1f);
+				} break;
+				case GLUT_KEY_LEFT: {
+					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::left()))
+						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::left() * .1f);
+				} break;
+				case GLUT_KEY_UP: {
+					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::up()))
+						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::up() * .1f);
+				} break;
+				case GLUT_KEY_DOWN: {
+					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::down()))
+						tools[Tools::SELECT]->scale(Vector2::one() + Vector2::down() * .1f);
+				} break;
+				default:
+					break;
+				}
 			} break;
-			case GLUT_KEY_LEFT: {
-				if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::left()))
-					tools[Tools::SELECT]->scale(Vector2::one() + Vector2::left() * .1f);
-			} break;
-			case GLUT_KEY_UP: {
-				if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::up()))
-					tools[Tools::SELECT]->scale(Vector2::one() + Vector2::up() * .1f);
-			} break;
-			case GLUT_KEY_DOWN: {
-				if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), Vector2::down()))
-					tools[Tools::SELECT]->scale(Vector2::one() + Vector2::down() * .1f);
-			} break;
-			default:
-				break;
-			}
-			break;
 		default:
 			switch (input_event.key) {
 			case GLUT_KEY_F1: {
@@ -308,27 +312,34 @@ namespace cg {
 				tool_cursor = GLUT_CURSOR_INHERIT;
 				currentTool = Tools::SELECT;
 			} break;
-			case GLUT_KEY_RIGHT:
-				tools[Tools::SELECT]->translate(Vector2::right());
-				break;
-			case GLUT_KEY_LEFT:
-				tools[Tools::SELECT]->translate(Vector2::left());
-				break;
-			case GLUT_KEY_UP:
-				tools[Tools::SELECT]->translate(Vector2::up());
-				break;
-			case GLUT_KEY_DOWN:
-				tools[Tools::SELECT]->translate(Vector2::down());
-				break;
-			default: // ignore
-				break;
-			}
-			break;
+			default:
+				if (!Gui::isUsingKeyboardInput()) {
+					switch (input_event.key) {
+					case GLUT_KEY_RIGHT:
+						tools[Tools::SELECT]->translate(Vector2::right());
+						break;
+					case GLUT_KEY_LEFT:
+						tools[Tools::SELECT]->translate(Vector2::left());
+						break;
+					case GLUT_KEY_UP:
+						tools[Tools::SELECT]->translate(Vector2::up());
+						break;
+					case GLUT_KEY_DOWN:
+						tools[Tools::SELECT]->translate(Vector2::down());
+						break;
+					default:
+						break; // ignore
+					}
+				} break;
+			} break;
 		}
 	}
 
 	void ToolBox::captureInput(io::KeyboardInputEvent input_event)
 	{
+		if (Gui::isDialogOpen())
+			return;
+
 		const unsigned char ESC = 27;
 
 		switch (input_event.key) {
@@ -338,6 +349,11 @@ namespace cg {
 		case ']':
 			tools[Tools::SELECT]->rotate(deg_to_rad(1.0f));
 			break;
+		case 'x': {
+			Color tmp_color = *colorPtr;
+			*colorPtr = secondaryColor;
+			secondaryColor = tmp_color;
+		} break;
 		default:
 			break;
 		}

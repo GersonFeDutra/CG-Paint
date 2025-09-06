@@ -149,10 +149,10 @@ struct Vec2 {
 
     static inline constexpr Vec2<T> zero()  noexcept { return {}; }
     static inline constexpr Vec2<T> one()  noexcept { return { 1, 1 }; }
-    static inline constexpr Vec2<T> left()  noexcept { return { -1, 0 }; }
-    static inline constexpr Vec2<T> right() noexcept { return { 1, 0 }; }
-    static inline constexpr Vec2<T> up()    noexcept { return { 0,  -1 }; }
-    static inline constexpr Vec2<T> down()  noexcept { return { 0, 1 }; }
+    static inline constexpr Vec2<T> left()  noexcept { return { -1,  0 }; }
+    static inline constexpr Vec2<T> right() noexcept { return {  1,  0 }; }
+    static inline constexpr Vec2<T> up()    noexcept { return {  0,  1 }; }
+    static inline constexpr Vec2<T> down()  noexcept { return {  0, -1 }; }
 };
 
 // Friends

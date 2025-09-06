@@ -55,12 +55,12 @@ namespace cg
         void _render() override;
 
         void _input(io::MouseLeftButtonPressed mouse_event) {
-            // Calcula o offset em relação ao pivôt
+            // Calcula o offset em relação ao pivot
             Line::selectionOffset = mouse_event.position - model.getOrigin();
         }
 
         void _input(io::MouseDrag mouse_event) {
-            // Aplica a translação ajustada sobre o pivôt
+            // Aplica a translação ajustada sobre o pivot
             translateTo(mouse_event.position - selectionOffset);
         }
 
