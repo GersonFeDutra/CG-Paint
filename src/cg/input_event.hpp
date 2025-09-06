@@ -11,6 +11,10 @@ namespace cg {
             InputEvent(Vector2 position) : position{ position } {}
 		};
 
+        struct FocusInputEvent {};
+        struct FocusIn : public FocusInputEvent {};
+        struct FocusOut : public FocusInputEvent {};
+
         struct MouseInputEvent : InputEvent {
             MouseInputEvent(Vector2 position) : InputEvent{ position } {}
         };

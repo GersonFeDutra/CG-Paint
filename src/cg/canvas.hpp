@@ -47,6 +47,12 @@ namespace cg {
             toolBox.captureInput(input_event);
         }
 
+		template <typename FIE> requires std::is_base_of_v<io::FocusInputEvent, FIE>
+        inline void sendScreenInput() {
+            FIE input_event;
+            toolBox.captureInput(input_event);
+        }
+
         /* Propagates user input to a Canvas Item on the canvas. */
         template <typename IE> requires std::is_base_of_v<io::InputEvent, IE>
         inline void sendInput(IE input_event) {

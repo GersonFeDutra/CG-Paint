@@ -17,7 +17,7 @@ namespace cg {
         GLdebug() {
             glClearColor(r, g, b, 1.0f); // cor de fundo
         }
-            GLdebug() {
+        GLdebug() {
                 glMatrixMode(GL_PROJECTION);
         }
 

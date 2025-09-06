@@ -32,20 +32,20 @@ namespace cg {
 
     void PolygonTool::_input(io::MouseMove mouse_event)
     {
-        if (isDrawing)
+        if (isDrawing())
             setPosition(mouse_event.position);
     }
 
     void PolygonTool::_input(io::MouseDrag mouse_event)
     {
-        if (isDrawing)
+        if (isDrawing())
             setPosition(mouse_event.position);
     }
 
 
     void PolygonTool::_input(io::MouseLeftButtonPressed mouse_event)
     {
-        if (isDrawing) {
+        if (isDrawing()) {
             polygon->append(mouse_event.position);
         }
         else {
@@ -58,13 +58,13 @@ namespace cg {
             setPosition(mouse_event.position); // update position to the first vertice
             toolBox.getSelectorTool().select(polygon); // auto select the new polygon
 
-            isDrawing = true;
+            enableDraw();
         }
     }
 
     void PolygonTool::_input(io::MouseRightButtonPressed mouse_event)
     {
-        isDrawing = false;
+        disableDraw();
         polygon = nullptr;
 
         //toolBox.unbindColorPtr();

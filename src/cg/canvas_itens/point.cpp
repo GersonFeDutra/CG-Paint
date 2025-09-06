@@ -23,6 +23,8 @@ namespace cg
     void Point::_render()
     {
         GLdebug() {
+            //glEnable(GL_POINT_SMOOTH);
+            //glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
             glPointSize(size);
         }
         GLdebug() {

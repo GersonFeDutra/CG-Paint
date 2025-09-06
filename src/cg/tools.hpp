@@ -64,10 +64,62 @@ namespace cg {
 
 		void appendToCanvas(CanvasItem* item);
 
+        void _input(io::MouseMove mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseDrag mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseRightButtonPressed mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseLeftButtonPressed mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseRightButtonReleased mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseLeftButtonReleased mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseWheelV mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+        void _input(io::MouseWheelH mouse_event) override {
+			Tool::_input(mouse_event);
+		}
+		void _input(io::KeyInputEvent key_event) override {
+			Tool::_input(key_event);
+		}
+
+		void _input(io::FocusIn _focus_event) override {
+			_drawing |= (std::byte)IS_FOCUSED;
+		}
+		void _input(io::FocusOut _focus_event) override {
+			_drawing &= ~(std::byte)IS_FOCUSED;
+		}
+
 		void _render() override;
-		virtual void _onRender() {};
+
+		virtual void _onRender() {}
+
+		inline void enableDraw() {
+			_drawing |= (std::byte)IS_DRAWING;
+		}
+		inline void disableDraw() {
+			_drawing &= ~(std::byte)IS_DRAWING;
+		}
+		inline bool isDrawing() {
+			return _drawing == (std::byte)(IS_DRAWING | IS_FOCUSED);
+		}
+
 	protected:
-		bool isDrawing = false; // _render only if isDrawing
+		enum Drawing {
+			NOT_DRAWING = 0,
+			IS_DRAWING = 1,
+			IS_FOCUSED = 2,
+		};
+		std::byte _drawing = (std::byte)IS_FOCUSED; // _render only if _drawing
 	};
 
 }

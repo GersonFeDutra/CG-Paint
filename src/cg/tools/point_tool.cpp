@@ -13,7 +13,7 @@ namespace cg {
     void PointTool::_render()
     {
         // TODO -> Verificar se está desenhando acima do ponto
-        if (toolBox.isInsideGui || isDrawing)
+        if (toolBox.isInsideGui || isDrawing())
             return;
 
         auto [x, y] = model * Vector2{};
@@ -45,8 +45,8 @@ namespace cg {
     void PointTool::_input(io::MouseDrag mouse_event)
     {
         setPosition(mouse_event.position);
-        if (isDrawing) {
-            assert_err(point != nullptr, "Drawing a not intanced primitive.");
+        if (isDrawing()) {
+            assert_err(point != nullptr, "Drawing a not instanced primitive.");
             point->setPosition(mouse_event.position);
         }
     }
@@ -60,12 +60,12 @@ namespace cg {
 
 		toolBox.getSelectorTool().select(point);
 
-        isDrawing = true;
+        enableDraw();
     }
 
     void cg::PointTool::_input(io::MouseLeftButtonReleased mouse_event)
     {
         setPosition(mouse_event.position);
-        isDrawing = false; // Não mova mais o último ponto.
+        disableDraw(); // Não mova mais o último ponto.
     }
 }

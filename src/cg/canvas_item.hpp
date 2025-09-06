@@ -43,6 +43,9 @@ namespace cg {
         virtual void _input(io::MouseWheelH mouse_event) {}
 		virtual void _input(io::KeyInputEvent key_event) {}
 
+		virtual void _input(io::FocusIn _focus_event) {}
+		virtual void _input(io::FocusOut _focus_event) {}
+
         /** Process data between variations of delta time △t.
          * @param delta : time stamp between previous frame
          */

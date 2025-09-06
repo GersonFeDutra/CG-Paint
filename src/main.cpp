@@ -215,6 +215,22 @@ static void onKeyboardKeyPressed(unsigned char key, int x, int y)
 }
 
 
+static void onKeyboardKeyReleased(unsigned char key, int x, int y) {
+    ImGui_ImplGLUT_KeyboardUpFunc(key, x, y);
+}
+
+
+static void onSpecialKeyReleased(int key, int x, int y) {
+    ImGui_ImplGLUT_SpecialUpFunc(key, x, y);
+}
+
+static void onEntryEvent(int state) {
+    if (state)
+        canvas.sendScreenInput<cg::io::FocusIn>();
+    else
+        canvas.sendScreenInput<cg::io::FocusOut>();
+}
+
 
 #if defined(_WIN32) || defined(_WIN64)
     HANDLE _hConsole;
@@ -274,6 +290,9 @@ int main(int argc, char** argv)
     glutMouseWheelFunc(onMouseWheelEvent);
 	glutSpecialFunc(onSpecialKeyPressed); // Função de teclas especiais
 	glutKeyboardFunc(onKeyboardKeyPressed); // Função de teclas normais
+    glutKeyboardUpFunc(onKeyboardKeyReleased);
+    glutSpecialUpFunc(onSpecialKeyReleased);
+    glutEntryFunc(onEntryEvent);
 
     // Setup Gui Singleton
     Gui::initialize();

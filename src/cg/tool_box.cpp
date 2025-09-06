@@ -356,6 +356,21 @@ namespace cg {
 		}
 	}
 
+	void ToolBox::captureInput(io::FocusIn _input_event)
+	{
+		if (currentTool >= N_PRIMITIVES)
+			return;
+		tools[currentTool]->_input(_input_event);
+	}
+
+	void ToolBox::captureInput(io::FocusOut _input_event)
+	{
+		if (currentTool >= N_PRIMITIVES)
+			return;
+		tools[currentTool]->_input(_input_event);
+	}
+
+
 	void ToolBox::save()
 	{
 		Gui::saveFileDialog("SaveFile", "Salvando arquivo...", ".tcgp,.cgp", [&](std::ofstream& ofs) {

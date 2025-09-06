@@ -22,23 +22,23 @@ namespace cg {
 
 	void LineTool::_input(io::MouseMove mouse_event)
 	{
-		if (isDrawing)
+		if (isDrawing())
 			setPosition(mouse_event.position);
 	}
 
 	void LineTool::_input(io::MouseDrag mouse_event)
 	{
-		if (isDrawing)
+		if (isDrawing())
 			setPosition(mouse_event.position);
 	}
 
 	void LineTool::_input(io::MouseLeftButtonPressed mouse_event)
 	{
-		// ghost line `from` aways points to `position`
-		// ghost line `to` aways points to the current line's `lastVertice`
+		// ghost line `from` always points to `position`
+		// ghost line `to` always points to the current line's `lastVertice`
 		setPosition(mouse_event.position); // update position to the first vertice
 
-		if (isDrawing) {
+		if (isDrawing()) {
 			line->append(mouse_event.position);
 		}
 		else {
@@ -48,14 +48,14 @@ namespace cg {
 
 			toolBox.bindColorPtr(&line->getColor());
 			toolBox.getSelectorTool().select(line); // auto select the new line
-			isDrawing = true;
+			enableDraw();
 		}
 	}
 
 	// TODO -> Accept with Enter
 	// TODO -> Cancel with Escape
 	void LineTool::_input(io::MouseRightButtonPressed mouse_event) {
-		isDrawing = false;
+		disableDraw();
 
 		// TODO -> fallback to point if only one vertice
 		if (line != nullptr && line->size() < 2)

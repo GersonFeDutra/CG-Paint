@@ -41,6 +41,9 @@ namespace cg {
 		void captureInput(io::SpecialKeyInputEvent input_event);
 		void captureInput(io::KeyboardInputEvent input_event);
 
+		void captureInput(io::FocusIn _input_event);
+		void captureInput(io::FocusOut _input_event);
+
 		void save();
 		void load();
 

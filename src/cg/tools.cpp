@@ -4,15 +4,13 @@
 
 namespace cg {
 
-	void Painter::appendToCanvas(CanvasItem* item)
-	{
+	void Painter::appendToCanvas(CanvasItem* item) {
 		toolBox.canvas->insert(std::unique_ptr<CanvasItem>(item));
 	}
 
-	void Painter::_render()
-	{
-		if (isDrawing && !toolBox.isInsideGui)
+	void Painter::_render() {
+		if (isDrawing() && !toolBox.isInsideGui)
 			_onRender();
 	}
 
-}
+	} // namespace cg
