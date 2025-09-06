@@ -8,10 +8,10 @@
     - [x] Ponto
     - [x] Segmento de Reta
     - [x] Polígono
-- [ ] Seleção de objetos para poder realizar as transformações geométricas e 
+- [x] Seleção de objetos para poder realizar as transformações geométricas e 
 exclusões:
     - [x] Selecionar objetos primários individualmente (ponto, segmento de reta e polígono)
-    - [ ] Excluir objetos selecionados
+    - [x] Excluir objetos selecionados
 - [ ] Transformações geométricas (crie a matriz de transformação e matriz composta, quando necessário):
     - [x] Arrastar e soltar (transladar)
     - [x] Rotacionar em relação ao centro do objeto

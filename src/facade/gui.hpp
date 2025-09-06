@@ -303,10 +303,12 @@ private:
 class Window {
 public:
     /* Create a window called by `name` and append into it.*/
-    Window(const char* name) {
+    Window(const char* name, cg::Vector2 default_position = {}) {
 #ifdef _DEBUG
         Gui::instance().appendingWindow = this;
 #endif
+        if (default_position)
+            ImGui::SetNextWindowPos(ImVec2(default_position.x, default_position.y), ImGuiCond_FirstUseEver);
         ImGui::Begin(name);
     }
     ~Window() {

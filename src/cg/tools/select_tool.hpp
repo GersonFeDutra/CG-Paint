@@ -34,6 +34,12 @@ namespace cg {
 
         void select(CanvasItem* item);
 
+        inline void deSelect() {
+            selectedItem = nullptr;
+            gizmo.detach();
+            toolBox.unbindColorPtr();
+        }
+
         inline void translateSelected(const Vec2Offset& delta) {
             if (selectedItem)
                 selectedItem->translate(delta);
@@ -55,12 +61,12 @@ namespace cg {
             return selectedItem != nullptr;
         }
 
-        void setPosition(const Vector2& position) override {
+        inline void setPosition(const Vector2& position) override {
 			translateSelected(position - getPosition()); // delta △translation
 			Tool::setPosition(position);
         }
 
-        void setRotation(float angle) override {
+        inline void setRotation(float angle) override {
             if (selectedItem)
                 selectedItem->rotateTo(angle);
 
@@ -82,10 +88,17 @@ namespace cg {
             Tool::translate(by);
         }
 
-        void setScale(const Vector2& scale) override {
+        inline void setScale(const Vector2& scale) override {
             auto [x, y] = getScale();
             scaleSelected({ scale.x / x, scale.y / y });
 			Tool::setScale(scale);
+        }
+
+        inline void deleteSelected() {
+            if (selectedItem == nullptr)
+                return;
+            toolBox.canvas->remove(selectedItem);
+            deSelect();
         }
 
     private:

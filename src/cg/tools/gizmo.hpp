@@ -29,6 +29,10 @@ public:
         this->model = model;
     }
 
+    void detach() {
+        this->model = nullptr;
+    }
+
 private:
     Line lines[4];
     Transform2D* model = nullptr;

@@ -1,7 +1,9 @@
 ﻿#pragma once
 
+#include <algorithm>
 #include <memory>
 #include <vector>
+#include <set>
 #include <chrono>
 
 #include "util.hpp"
@@ -24,7 +26,7 @@ namespace cg {
          }
 
         /** Send a screen input at screen coordinate.
-         * Converts Screen Cordinates to Normalized Display Coordinates before trigger.
+         * Converts Screen Coordinates to World Coordinates before trigger.
          */
         template <typename IE> requires std::is_base_of_v<io::InputEvent, IE>
         inline void sendScreenInput(int x, int y) {
@@ -66,34 +68,38 @@ namespace cg {
         void updateRender();
 
         inline void insert(std::unique_ptr<CanvasItem> item) {
-            item->id = itens.size();
+            item->id = ++CanvasItem::last_id;
 
             // incrementa o contador de tipos
             if ((int)item->getTypeInfo() < (int)CanvasItem::TypeInfo::OTHER)
 			    typeCount[(int)item->getTypeInfo()]++;
 
-            itens.push_back(std::move(item));
+            itens.insert(std::move(item));
         }
 
         inline void remove(CanvasItem* item) {
-            assert_err(!itens.empty() && item->id < itens.size(), "Invalid range.");
+            warn(itens.empty(), "Can't remove from empty Canvas!");
 
-            size_t last = itens.size() - 1;
-            if (item->id != last) {
-                // atualiza os ids antes de trocar os ponteiros
-                ID id = item->id;
-                std::swap(item->id, itens[last]->id);
-                std::swap(itens[id], itens[last]);
-            }
-            
+            auto found = std::find_if(itens.begin(), itens.end(),
+                        [item](const auto& i) { return i.get() == item; });
+
+            if (found == itens.end())
+                return;
+
             // decrementa o contador de tipos
             if ((int)item->getTypeInfo() < (int)CanvasItem::TypeInfo::OTHER)
-			    typeCount[(int)itens.back()->getTypeInfo()]--;
+			    typeCount[(int)item->getTypeInfo()]--;
 
-            itens.pop_back(); // aqui o unique_ptr no fim do vetor é destruído e liberado do CanvasItem
+            if (item->id == CanvasItem::last_id)
+                CanvasItem::last_id--;
+                // Caso contrário apenas ignoramos,
+                // podemos re-preencher os ids depois com a função normalizeIds
+
+            itens.erase(found);
+            // aqui o unique_ptr é destruído e liberado do Canvas
         }
 
-        /** Retorna o primeiro ítem encontrado na posição passada.
+        /** Retorna o primeiro item encontrado na posição passada.
          * Se não for encontrado, retorna `nullptr`
          */
         CanvasItem* pick(Vector2 mouse_position) {
@@ -168,21 +174,40 @@ namespace cg {
 				typeCount[i] = 0;
         }
 
-        inline const ArrayList<std::unique_ptr<CanvasItem>>& getItens() const {
+    public:
+        struct Compare {
+            // Order itens by id -> sort items based on z-index
+            bool operator()(const std::unique_ptr<CanvasItem>& a, const std::unique_ptr<CanvasItem>& b) const {
+                return a->id < b->id; // compara os valores apontados
+            }
+            bool operator()(const CanvasItem* a, const std::unique_ptr<CanvasItem>& b) const {
+                return a->id < b->id; // compara os valores apontados
+            }
+            bool operator()(const std::unique_ptr<CanvasItem>& a, const CanvasItem* b) const {
+                return a->id < b->id; // compara os valores apontados
+            }
+            bool operator()(const CanvasItem* a, const CanvasItem* b) const {
+                return a->id < b->id; // compara os valores apontados
+            }
+        };
+
+        inline const std::set<std::unique_ptr<CanvasItem>, Compare>& getItens() const {
             return itens;
         }
 
+        // WATCH
         CanvasItem *hitTest(float mx, float my);
+
     private:
+        std::set<std::unique_ptr<CanvasItem>, Compare> itens;
+
         Vector2 windowSize; // aspect ratio: 10:7
 		Transform2D _screenToWorld; // Screen coordinates to World coordinates
         //Transform2D _screenToNdc; // Screen coordinates to Normalized Display Coordinates
         //Transform2D _ndcToScreen; // Normalized Display Coordinates to Screen Coordinates
 
-        ArrayList<std::unique_ptr<CanvasItem>> itens;
         size_t typeCount[3];
     public:
-
         ToolBox toolBox;
     };
 

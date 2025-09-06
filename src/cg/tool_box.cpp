@@ -60,10 +60,11 @@ namespace cg {
 
 	void ToolBox::_render()
 	{
+		constexpr float window_margin = 15.0f;
 		// Cada janela deve ser criada num escopo separado para
 		// invocar os construtores/ destrutores necessários
 		{
-			Window settings("Settings");
+			Window settings("Settings", {window_margin, window_margin});
 
 			static bool showGuideLines = true;
 			if (settings.showCheckBox(&showGuideLines, "Show Guide Lines")) {}
@@ -75,11 +76,12 @@ namespace cg {
 		}
 
 		enum { NONE, SAVE, LOAD } clicked = NONE;
-		{  // Mostra uma janela simples.
+		{  // ToolBox Window
 			static int counter = 0;
 			static float f = 0.0f;
 
-			Window toolBox("ToolBox");
+			constexpr float estimate_x = 123.0f;
+			Window toolBox("ToolBox", { canvas->getWindowSize().x - estimate_x - window_margin, window_margin });
 			// TODO -> Use Icon buttons for each tool
 
 			// toolBox.showCheckBox(&check, "Active
@@ -123,18 +125,18 @@ namespace cg {
 			// } break;
 			// default: break;
 			// }
+		}
 
-			toolBox.show2ColorEdit(getColorPtr(), &secondaryColor, "[x: toggle]");
+		{ // Controls Window
+			constexpr Vector2 estimate_size = {414.0f, 146.0f};
+			Window controls("Controls", {canvas->getWindowSize().x - estimate_size.x - window_margin , canvas->getWindowSize().y - estimate_size.y - window_margin});
 
-			//if (toolBox.showButton("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-			//    counter++;
-			//toolBox.sameLine();
-			//toolBox.showText("counter = %d", counter);
+			controls.show2ColorEdit(getColorPtr(), &secondaryColor, "[x: toggle]");
 
 			// Update translation
 			{
 				Vector2 translation = tools[Tools::SELECT]->getPosition();
-				cg::Vector2 increment = toolBox.showIncrementalSliderVector2(
+				cg::Vector2 increment = controls.showIncrementalSliderVector2(
 					&translation,
 					canvas->getUpperLeft(),
 					canvas->getBottomRight(),
@@ -150,16 +152,16 @@ namespace cg {
 					if (translation != tools[Tools::SELECT]->getPosition())
 						tools[Tools::SELECT]->setPosition(translation);
 				}
-				//toolBox.showSliderVector2(&translation, canvas->getUpperLeft(), canvas->getBottomRight(), "X", "Y");
+				//controls.showSliderVector2(&translation, canvas->getUpperLeft(), canvas->getBottomRight(), "X", "Y");
 
 			}
 			// Update rotation
 			{
 				float rotation_deg = rad_to_deg(tools[Tools::SELECT]->getRotation()); // degrees
-				int increment_unit = toolBox.showIncrementalFloatSlider(
+				int increment_unit = controls.showIncrementalFloatSlider(
 					&rotation_deg, -180.0f, 180.0f, 1.0f,
 					"Rotation", "-1 deg", "+1 deg", "[", "]");
-				
+
 				if (increment_unit) // Apply negative / positive rotation
 					tools[Tools::SELECT]->rotate(deg_to_rad((float)increment_unit));
 				else {
@@ -172,9 +174,9 @@ namespace cg {
 			{
 				// FIXME
 				Vector2 scale = tools[Tools::SELECT]->getScale();
-				Vector2 increment = toolBox.showIncrementalSliderVector2(&scale, 1e-3f, 16.0f, .1f,
+				Vector2 increment = controls.showIncrementalSliderVector2(&scale, 1e-3f, 16.0f, .1f,
 					"Sx", "*.9x", "*1.1x", "Sy [Shift]", "*.9y", "*1.1y");
-				//toolBox.showSliderVector2(&scale, 1e-3f, 16.0f, "Sx", "Sy");
+				//controls.showSliderVector2(&scale, 1e-3f, 16.0f, "Sx", "Sy");
 
 				if (increment) {
 					if (is_scale_inside_bounds(tools[Tools::SELECT]->getScale(), increment))
@@ -188,16 +190,23 @@ namespace cg {
 				// TODO
 			}
 
-			// Save / Load / Clear
+			// Save / Load / Clear / Delete
 			{
-				if (toolBox.showButton("Save to file"))
+				if (controls.showButton("Save to file"))
 					clicked = SAVE;
-				toolBox.sameLine();
-				if (toolBox.showButton("Load from file"))
+				controls.sameLine();
+				if (controls.showButton("Load from file"))
 					clicked = LOAD;
-				toolBox.sameLine();
-				if (toolBox.showButton("Clear screen"))
+				controls.sameLine();
+				if (controls.showButton("Clear screen"))
 					clearScreen();
+				if (((SelectTool *)tools[Tools::SELECT])->hasSelection()) {
+					controls.sameLine();
+					if (controls.showButton("Delete"))
+						((SelectTool *)tools[Tools::SELECT])->deleteSelected();
+					controls.sameLine();
+					controls.showText("[del]");
+				}
 			}
 		}
 
@@ -310,6 +319,9 @@ namespace cg {
 				tool_cursor = GLUT_CURSOR_INHERIT;
 				currentTool = Tools::SELECT;
 			} break;
+			case GLUT_KEY_DELETE:
+				((SelectTool *)tools[Tools::SELECT])->deleteSelected();
+				break;
 			default:
 				if (!Gui::isUsingKeyboardInput()) {
 					switch (input_event.key) {
@@ -444,6 +456,7 @@ namespace cg {
 
 	void ToolBox::clearScreen()
 	{
+		((SelectTool *)tools[Tools::SELECT])->deSelect();
 		canvas->clear();
 	}
 

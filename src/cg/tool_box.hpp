@@ -7,7 +7,7 @@
 
 
 namespace cg {
-	// Foward Declarations
+	// Forward Declarations
 	class Canvas;
 	class Painter;
 	class PointTool;

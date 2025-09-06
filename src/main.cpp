@@ -199,12 +199,18 @@ static void onKeyboardKeyPressed(unsigned char key, int x, int y)
     if (mods & GLUT_ACTIVE_ALT)
         std::cout << "Alt + ";
 
-    if (normalizedKey == ESC)
-		std::cout << "ESC\n";
-    else
-        std::cout << normalizedKey << "\n";
+    if (key == 127) {
+        std::cout << "Delete [ASCII]\n";
+        canvas.sendScreenInput<cg::io::SpecialKeyInputEvent>(x, y, GLUT_KEY_DELETE, mods);
+        return;
+    }
 
-    canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
+	if (normalizedKey == ESC)
+		std::cout << "ESC\n";
+	else
+		std::cout << "Raw:[" << (int)key << "]" << normalizedKey << "\n";
+
+	canvas.sendScreenInput<cg::io::KeyboardInputEvent>(x, y, normalizedKey, mods);
 }
 
 

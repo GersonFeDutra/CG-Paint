@@ -12,6 +12,8 @@ namespace cg {
     class CanvasItem {
         friend class Canvas;
 		friend class SelectTool;
+    protected:
+        inline static ID last_id = 0;
     public:
         enum class TypeInfo {
             POINT = 0,
@@ -82,7 +84,7 @@ namespace cg {
         inline void rotateTo(float angle) {
             model.rotateTo(angle);
         }
-        
+
         inline TypeInfo getTypeInfo() const {
             return typeInfo;
         }
@@ -94,7 +96,7 @@ namespace cg {
         }
 
         inline Vector2 toGlobal(Vector2 local_position) const {
-            // Applies the model transformation to the local position obtainning a global coordinate.
+            // Applies the model transformation to the local position obtaining a global coordinate.
             return model * local_position;
         }
 
